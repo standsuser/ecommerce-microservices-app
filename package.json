@@ -6,10 +6,19 @@
     "main": "server.js",
     "private": true,
     "scripts": {
-      "start": "node server.js"
+        "start": "node server.js"
     },
     "dependencies": {
-      "express": "^4.19.2"
+        "@nestjs/jwt": "^10.2.0",
+        "@nestjs/microservices": "^10.3.8",
+        "@nestjs/mongoose": "^10.0.6",
+        "@nestjs/passport": "^10.0.3",
+        "bcryptjs": "^2.4.3",
+        "express": "^4.19.2",
+        "kafkajs": "^2.2.4",
+        "mongoose": "^8.3.2",
+        "nodemailer": "^6.9.13",
+        "passport": "^0.7.0",
+        "passport-local": "^1.0.0"
     }
-  }
-  
+}
