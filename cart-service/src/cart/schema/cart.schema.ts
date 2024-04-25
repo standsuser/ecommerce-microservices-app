@@ -7,7 +7,10 @@ export type CartDocument = Cart & Document;
 export class Cart {
     
     @Prop()
-    userId: string;
+    userId: string; // For authenticated users
+
+    @Prop()
+    sessionId: string; // For guest users
 
     @Prop([{ productId: String, quantity: Number }])
     items: { productId: string, quantity: number }[];
@@ -22,7 +25,13 @@ export class Cart {
     couponCode: string;
 
     @Prop()
+    couponPercentage: number;
+
+    @Prop()
     isCheckout: boolean;
+
+    @Prop({ default: Date.now })
+    updatedAt: Date;
 
 }
 

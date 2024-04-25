@@ -9,6 +9,7 @@
         "start": "node server.js"
     },
     "dependencies": {
+        "@nestjs/core": "^10.3.8",
         "@nestjs/jwt": "^10.2.0",
         "@nestjs/microservices": "^10.3.8",
         "@nestjs/mongoose": "^10.0.6",
