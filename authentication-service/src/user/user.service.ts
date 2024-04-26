@@ -1,10 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-var */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable prefer-const */
+/* eslint-disable prettier/prettier */
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from './interfaces/user';
 import { CreateUserDto } from './dto/create.user.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { TokenDto } from './dto/token.dto';
+import { UserAlreadyExistsException } from './exceptions/userAlreadyExists.exception';
 
 @Injectable()
 export class UserService {
@@ -18,12 +24,12 @@ export class UserService {
         return message;
     }
 
-    async register(CreateUserDto:CreateUserDto){
-        const createUser= new this.userModel(CreateUserDto)
-        let saveResult = await createUser.save();
-        console.log(saveResult)
-        return saveResult;
-    }
+    // async register(CreateUserDto:CreateUserDto){
+    //     const createUser= new this.userModel(CreateUserDto)
+    //     let saveResult = await createUser.save();
+    //     console.log(saveResult)
+    //     return saveResult;
+    // }
 
     async validateUser(loginDto:LoginDto){
         let loginResult =await this.userModel.findOne({
@@ -61,6 +67,13 @@ export class UserService {
             ...userData
         }
     }
+    async findByEmail(email: string): Promise<User> {
+        const user = await this.userModel.findOne({ email }).exec();
+        if (!user) {
+          throw new NotFoundException('User not found');
+        }
+        return user;
+      }
     async login(user:any){
         //console.log(command)
         let payload = {
@@ -86,4 +99,19 @@ export class UserService {
         const validatedToken = this.jwtService.sign(jwt);
         return validatedToken;
     }
+
+    async register(createUserDto: CreateUserDto): Promise<User> {
+        const existingUser = await this.findByEmail(createUserDto.email);
+        if (existingUser) {
+          throw new UserAlreadyExistsException();
+        }
+    
+        // Create a new User document using the Mongoose model
+        const newUser = new this.userModel(createUserDto);
+    
+        // Save the new user
+        return newUser.save();
+      }
+    
+    
 }

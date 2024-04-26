@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserController } from './user/user.controller';
@@ -12,7 +13,6 @@ import { Reflector } from '@nestjs/core/services/reflector.service';
 import { AccountService } from './account/account.service';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 
-
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost/nestjs-auth'),
@@ -25,17 +25,18 @@ import { ErrorInterceptor } from './interceptors/error.interceptor';
         options: {
           client: {
             clientId: 'auth',
-            brokers: ['localhost:9092']
+            brokers: ['localhost:9092'],
           },
           consumer: {
             groupId: 'account-consumer',
-          }
-        }
-      }
+          },
+        },
+      },
     ]),
   ],
-  controllers: [AppController ],
-  providers: [AppService ,
+  controllers: [AppController],
+  providers: [
+    AppService,
     AppService,
     RolesGuard,
     Reflector,
@@ -43,8 +44,8 @@ import { ErrorInterceptor } from './interceptors/error.interceptor';
     AccountService,
     {
       provide: 'APP_INTERCEPTORS',
-      useClass: ErrorInterceptor
-    }
+      useClass: ErrorInterceptor,
+    },
   ],
 })
 export class AppModule {}
