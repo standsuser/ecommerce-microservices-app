@@ -16,6 +16,15 @@ export class CartController {
     async addItemToCartGuest(@Param('sessionId') sessionId: string, @Body() addItemDto: AddCartItemDto) {
         return this.cartService.addItemToCart(sessionId, addItemDto);
     }
+    @Post(':userId/items/:productId/rent')
+    async rentProduct(@Param('userId') userId: string, @Param('productId') productId: string, @Body() rentalData: { rentalDuration: string }) {
+            return await this.cartService.rentProduct(userId, productId, rentalData.rentalDuration);
+    }
+    @Post(':sessionId/items/:productId/rent')
+    async rentProductGuest(@Param('sessionId') userId: string, @Param('productId') sessionId: string, productId: string, @Body() rentalData: { rentalDuration: string }) {
+            return await this.cartService.rentProductGuest(sessionId, productId, rentalData.rentalDuration);
+    }
+    
 
     @Patch(':userId/items/:productId')
     async updateCartItem(@Param('userId') userId: string, @Param('productId') productId: string, @Body() updateItemDto: UpdateCartItemDto) {
