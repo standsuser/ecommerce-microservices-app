@@ -1,26 +1,89 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from './user';
+import { User } from './interfaces/user';
+import { CreateUserDto } from './dto/create.user.dto';
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { TokenDto } from './dto/token.dto';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+    constructor(
+        @Inject('USER_MODEL')
+        private userModel: Model<User>,
+        private jwtService:JwtService
+        ) {}
 
-  async findByEmail(email: string): Promise<User> {
-    return this.userModel.findOne({ email }).exec();
-  }
+    hello(message){
+        return message;
+    }
 
-  async findById(id: string): Promise<User> {
-    return this.userModel.findById(id).exec();
-  }
+    async register(CreateUserDto:CreateUserDto){
+        const createUser= new this.userModel(CreateUserDto)
+        let saveResult = await createUser.save();
+        console.log(saveResult)
+        return saveResult;
+    }
 
-  async create(user: User): Promise<User> {
-    const newUser = new this.userModel(user);
-    return newUser.save();
-  }
+    async validateUser(loginDto:LoginDto){
+        let loginResult =await this.userModel.findOne({
+            username:loginDto.username,
+            password:loginDto.password,
+        });
 
-  async update(user: User): Promise<User> {
-    return this.userModel.findByIdAndUpdate(user.id, user, { new: true }).exec();
-  }
+        if(loginResult===null){
+            return null;
+        }
+        
+        let jsonData =loginResult.toObject();
+        let {__v, _id, ...userData}=jsonData;
+
+        return {
+            id:jsonData._id,
+            ...userData
+        }
+    }
+
+    async getUserbyUsername(username:string){
+        let loginResult =await this.userModel.findOne({
+            username:username,
+           
+        });
+
+        if(loginResult===null){
+            return null;
+        }
+        let jsonData =loginResult.toObject();
+        let {__v, _id, ...userData}=jsonData;
+
+        return {
+            id:jsonData._id,
+            ...userData
+        }
+    }
+    async login(user:any){
+        //console.log(command)
+        let payload = {
+            id:user._id,
+            name:user.name,
+            username:user.username,
+            roles:user.roles
+
+        };
+        
+        var token =this.jwtService.sign(payload);
+        var tokenvalue:any =this.jwtService.decode(token);
+       
+
+        return{
+            access_token:token,
+            expires_in:tokenvalue.exp,
+
+        };
+        
+    }
+    validateToken(jwt:string){
+        const validatedToken = this.jwtService.sign(jwt);
+        return validatedToken;
+    }
 }
