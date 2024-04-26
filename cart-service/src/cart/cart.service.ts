@@ -5,24 +5,23 @@ import { Cart, CartDocument } from './schema/cart.schema';
 import { Coupon, CouponDocument }  from './schema/coupon.schema';
 import { AddCartItemDto } from './dto/addcartitem.dto';
 import { UpdateCartItemDto } from'./dto/updatecartitem.dto';
+import mongoose, { ObjectId } from 'mongoose';
 
 @Injectable()
 export class CartService {
     constructor(@InjectModel('Cart') private readonly cartModel: Model<CartDocument>,
         @InjectModel('Coupon') private readonly couponModel: Model<CouponDocument>) {}
 
-
+    //rent
     async addItemToCart(userId: string, addItemDto: AddCartItemDto): Promise<Cart> {
         let cart = await this.getCartByUserId(userId);
 
-        const existingItemIndex = cart.items.findIndex(item => item.productId === addItemDto.productId);
-        if (existingItemIndex !== -1) {
+        const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === addItemDto.productId);        if (existingItemIndex !== -1) {
             // Item already exists in cart, update quantity
             cart.items[existingItemIndex].quantity += addItemDto.quantity;
         } else {
             // Item doesn't exist in cart, add new item
-            cart.items.push({ productId: addItemDto.productId, quantity: addItemDto.quantity });
-            // At front end, update quantity to ensure that the person buying can pick the amount, otherwise set the quantity to 1
+            const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === addItemDto.productId);            // At front end, update quantity to ensure that the person buying can pick the amount, otherwise set the quantity to 1
         }
 
         const updatedCart = cart as CartDocument;
@@ -34,24 +33,61 @@ export class CartService {
             cart = new this.cartModel({ sessionId, items: [] });
         }
 
-        const existingItemIndex = cart.items.findIndex(item => item.productId === addItemDto.productId);
-        if (existingItemIndex !== -1) {
+        const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === addItemDto.productId);        if (existingItemIndex !== -1) {
             // Item already exists in cart, update quantity
             cart.items[existingItemIndex].quantity += addItemDto.quantity;
         } else {
             // Item doesn't exist in cart, add new item
-            cart.items.push({ productId: addItemDto.productId, quantity: addItemDto.quantity });
-            // At front end, update quantity to ensure that the person buying can pick the amount, otherwise set the quantity to 1
+            const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === addItemDto.productId);            // At front end, update quantity to ensure that the person buying can pick the amount, otherwise set the quantity to 1
         }
 
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
     }
 
+    async rentProduct(userId: string, productId: string, rentalDuration: string): Promise<Cart> {
+        // Retrieve the cart for the user
+        let cart = await this.getCartByUserId(userId);
+    
+        // Find the product in the cart
+        const existingItem = cart.items.find(item => item.productId.toString() === productId);
+        if (!existingItem) {
+            throw new NotFoundException('Item not found in cart');
+        }
+    
+        // Update the existing item with rental information
+        existingItem.rentalDuration = rentalDuration;
+        existingItem.isRented = true;
+    
+        // Save the updated cart
+        const updatedCart = cart as CartDocument;
+        return await updatedCart.save();
+    }
+
+    async rentProductGuest(sessionId: string, productId: string, rentalDuration: string): Promise<Cart> {
+        // Retrieve the cart for the user
+        let cart = await this.getCartBySessionId(sessionId);
+    
+        // Find the product in the cart
+        const existingItem = cart.items.find(item => item.productId.toString() === productId);
+        if (!existingItem) {
+            throw new NotFoundException('Item not found in cart');
+        }
+    
+        // Update the existing item with rental information
+        existingItem.rentalDuration = rentalDuration;
+        existingItem.isRented = true;
+    
+        // Save the updated cart
+        const updatedCart = cart as CartDocument;
+        return await updatedCart.save();
+    }
+
+
     async updateCartItem(userId: string, productId: string, updateItemDto: UpdateCartItemDto): Promise<Cart> {
         let cart = await this.getCartByUserId(userId);
 
-        const existingItem = cart.items.find(item => item.productId === productId); //TODO: check if productId is named properly
+        const existingItem = cart.items.find(item => item.productId.toString() === productId);
         if (!existingItem) {
             throw new NotFoundException('Item not found in cart');
         }
@@ -59,7 +95,7 @@ export class CartService {
         if (updateItemDto.quantity !== undefined) {
             if (updateItemDto.quantity === 0) {
                 // If quantity is zero, remove the item from the cart
-                cart.items = cart.items.filter(item => item.productId !== productId); //TODO: check if productId is named properly
+                cart.items = cart.items.filter(item => !item.productId || item.productId.toString() !== productId);
             } else {
                 existingItem.quantity = updateItemDto.quantity;
             }
@@ -72,7 +108,7 @@ export class CartService {
         
         let cart = await this.getCartBySessionId(sessionId);
 
-        const existingItem = cart.items.find(item => item.productId === productId); //TODO: check if productId is named properly
+        const existingItem = cart.items.find(item => item.productId.toString() === productId);
         if (!existingItem) {
             throw new NotFoundException('Item not found in cart');
         }
@@ -80,7 +116,7 @@ export class CartService {
         if (updateItemDto.quantity !== undefined) {
             if (updateItemDto.quantity === 0) {
                 // If quantity is zero, remove the item from the cart
-                cart.items = cart.items.filter(item => item.productId !== productId); //TODO: check if productId is named properly
+                cart.items = cart.items.filter(item => !item.productId || item.productId.toString() !== productId);
             } else {
                 existingItem.quantity = updateItemDto.quantity;
             }
@@ -94,7 +130,7 @@ export class CartService {
         let cart = await this.getCartByUserId(userId);
 
 
-        cart.items = cart.items.filter(item => item.productId !== productId); //TODO: check if productId is named properly
+        cart.items = cart.items.filter(item => !item.productId || item.productId.toString() !== productId.toString());
 
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
@@ -102,7 +138,7 @@ export class CartService {
     async removeItemFromCartGuest(productId: string, sessionId: string): Promise<Cart> {    
         let cart = await this.getCartBySessionId(sessionId);
     
-        cart.items = cart.items.filter(item => item.productId !== productId); //TODO: check if productId is named properly
+        cart.items = cart.items.filter(item => !item.productId || item.productId.toString() !== productId.toString());
 
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
@@ -145,6 +181,7 @@ export class CartService {
         
         let cart = await this.getCartBySessionId(sessionId);
         if(cart){
+            //divert to sign up page?
             throw new Error(`Cannot proceed to checkout, because you are not a user`);
         }
         
@@ -181,8 +218,8 @@ export class CartService {
             }
             return cart;
         }
-        async getCouponByCode(couponCode: string): Promise<Coupon | null> {
-            const coupon = await this.couponModel.findOne({ couponCode });
-            return coupon ? coupon : null;
-        }
+    async getCouponByCode(couponCode: string): Promise<Coupon | null> {
+        const coupon = await this.couponModel.findOne({ couponCode });
+        return coupon ? coupon : null;
+    }
 }

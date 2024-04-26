@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from 'mongoose';
+import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 
 export type CartDocument = Cart & Document;
 
@@ -7,13 +7,13 @@ export type CartDocument = Cart & Document;
 export class Cart {
     
     @Prop()
-    userId: string; // For authenticated users
+    userId: ObjectId; // For authenticated users
 
     @Prop()
-    sessionId: string; // For guest users
+    sessionId: ObjectId; // For guest users
 
-    @Prop([{ productId: String, quantity: Number }])
-    items: { productId: string, quantity: number }[];
+    @Prop()
+    items: CartItem[];
 
     @Prop()
     totalPricePreCoupon: number;
@@ -35,4 +35,11 @@ export class Cart {
 
 }
 
-export const CartItemSchema = SchemaFactory.createForClass(Cart);
+export const CartSchema = SchemaFactory.createForClass(Cart);
+
+export interface CartItem {
+    productId: ObjectId;
+    quantity: number;
+    rentalDuration?: string;
+    isRented?: boolean;
+}

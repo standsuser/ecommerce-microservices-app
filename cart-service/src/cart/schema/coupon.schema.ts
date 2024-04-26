@@ -12,11 +12,13 @@ export class Coupon {
     couponPercentage: number;
 
     @Prop()
-    limited: Date;
+    expires: Date; //implement 
+
+    @Prop()
+    limited: boolean;
 
     @Prop({ required: function(this: Coupon) { return this.limited; } })
     quantity?: number;
-   
 }
 
 export const CouponSchema = SchemaFactory.createForClass(Coupon);
