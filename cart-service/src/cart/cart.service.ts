@@ -6,6 +6,7 @@ import { Coupon, CouponDocument }  from './schema/coupon.schema';
 import { AddCartItemDto } from './dto/addcartitem.dto';
 import { UpdateCartItemDto } from'./dto/updatecartitem.dto';
 import mongoose, { ObjectId } from 'mongoose';
+import { Order, OrderDocument, OrderStatus } from './schema/order.schema';
 
 @Injectable()
 export class CartService {
@@ -192,17 +193,42 @@ export class CartService {
     }
     
 
-    async placeOrder(userId: string, orderId: string): Promise<Cart>{
+    async placeOrder(userId: string, orderId: string): Promise<Cart> {
         let cart = await this.getCartByUserId(userId);
-        if(cart.isCheckout != true) {
+    
+        if (!cart.isCheckout) {
             throw new NotFoundException('You have not clicked on the checkout button! Please go back and click it!');
         }
-        
-        //look at credit card validation on profile
+        function generateOrderNumber(): string {
+            const timestamp = Date.now().toString();
+            const usersId = this.userId.toString();
+            const randomDigits = Math.floor(Math.random() * 10000).toString().padStart(4, '0'); 
+            return `ORD-${usersId}-${timestamp}-${randomDigits}`;
+        }
+        const order = new Order();
+    
+        order.userId = cart.userId;
+        order.orderNumber = generateOrderNumber(); 
+        order.orderDate = new Date();
+        order.total = cart.totalPricePostCoupon;
+        order.items = cart.items;
+        order.status = OrderStatus.PENDING; 
+    
+        const savedOrder = order as OrderDocument; 
+        await savedOrder.save();
+    
+        cart.items = [];
+        cart.isCheckout = false;
+        cart.couponCode = null; 
+        cart.couponPercentage = 0;
+        cart.totalPricePreCoupon = 0;
+        cart.totalPricePostCoupon = 0;
 
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
+        
     }
+    
 
     async getCartByUserId(userId: string): Promise<Cart> {
         let cart = await this.cartModel.findOne({ userId }).exec();
