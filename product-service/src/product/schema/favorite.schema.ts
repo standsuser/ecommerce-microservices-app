@@ -1,22 +1,16 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
-export type CouponDocument = Coupon & Document;
 
 @Schema()
-export class Coupon {
-    @Prop()
-    couponCode: string;
+export class Favorite extends Document {
+  @Prop({ type: MongooseSchema.Types.ObjectId, required: true })
+  userid: MongooseSchema.Types.ObjectId;
 
-    @Prop()
-    couponPercentage: number;
-
-    @Prop()
-    limited: Date;
-
-    @Prop({ required: function(this: Coupon) { return this.limited; } })
-    quantity?: number;
-   
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Product', required: true })
+  productid: MongooseSchema.Types.ObjectId;
 }
 
-export const CouponSchema = SchemaFactory.createForClass(Coupon);
+export const FavoriteSchema = SchemaFactory.createForClass(Favorite);
+
+
