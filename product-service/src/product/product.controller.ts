@@ -1,8 +1,43 @@
 import { Controller, Post, Body, Param, Patch, Delete, Get, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
-// import { CartService } from './cart.service';
-
+import { ProductService } from './product.service';
 
 @Controller('product')
 export class ProductController {
-    
+  constructor(private readonly productService: ProductService) {}
+
+  @Get('favorites/:userId')
+  async getFavorites(@Param('userId') userId: string) {
+    return await this.productService.getFavorites(userId);
+  }
+
+  @Post('favorites')
+  async addFavorite(@Body() body: { userId: string; productId: string }) {
+    const { userId, productId } = body;
+    return await this.productService.addFavorite(userId, productId);
+  }
+
+  @Get(':productId')
+  async getProductDetails(@Param('productId') productId: string) {
+    return await this.productService.getProductDetails(productId);
+  }
+
+  @Patch(':productId/customize')
+  async customizeProduct(@Param('productId') productId: string, @Body() customizationOptions: any) {
+    return await this.productService.customizeProduct(productId, customizationOptions);
+  }
+
+  @Post('wishlist')
+  async addToWishlist(@Body() body: { userId: string; productId: string }) {
+    // Implement logic to add to wishlist
+  }
+
+  @Post(':productId/share')
+  async shareProduct(@Param('productId') productId: string, @Body() shareOptions: any) {
+    // Implement logic to share product
+  }
+
+  @Get('search/:keyword')
+  async searchKeyword(@Param('keyword') keyword: string) {
+    return await this.productService.searchKeyword(keyword);
+  }
 }
