@@ -1,17 +1,20 @@
-// topoffer.schema.ts
+import { Prop , Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId } from 'mongoose';
+export type OfferDocument = Offer & Document;
 
 @Schema()
-export class TopOffer extends Document {
+export class Offer {
   @Prop({ required: true })
-  productId: ObjectId;
+  productId: string;
 
-  //@Prop({ required: true })
-  //discountPercentage: number;
+  @Prop({ required: true }) // kafka ya shabab rakzo abos edeko
+  discountPercentage: number;
 
-  
+  @Prop({ required: true })
+  validityPeriod: Date;
+
+  // Additional properties like start date, end date, etc. can be added
 }
 
-export const TopOfferSchema = SchemaFactory.createForClass(TopOffer);
+export const OfferSchema = SchemaFactory.createForClass(Offer);
