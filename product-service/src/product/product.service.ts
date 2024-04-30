@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException , Req,  HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
@@ -8,6 +8,8 @@ import { Kafka } from 'kafkajs';
 const kafka = new Kafka({
   brokers: ['localhost:9092'] // Update with your Kafka broker(s) address
 });
+
+const socialSharingUtils = require('social-sharing-utilities');
 
 const producer = kafka.producer();
 
@@ -64,9 +66,28 @@ export class ProductService {
     }
   
 
-  async shareProduct(productId: string, shareOptions: any) {
-    // Implement logic to share product
-  }
+  async shareProduct( productId: string, @Req() req: any) {
+    try {
+      // Get base URL dynamically
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+      // generate the product URL
+      const productUrl = `${baseUrl}/products/${productId}`;
+      const text = 'Check out this link';
+
+      const facebookShareUrl = socialSharingUtils.shareOnFacebook(productUrl);
+      console.log('Share on Facebook:', facebookShareUrl);
+
+      const twitterShareUrl = socialSharingUtils.shareOnTwitter(productUrl, text);
+      console.log('Share on Twitter:', twitterShareUrl);
+      return { 
+        message: 'Product shared successfully',
+        facebookShareUrl,
+        twitterShareUrl
+      };
+  } catch (error) {
+    throw new HttpException('Failed to share product', HttpStatus.INTERNAL_SERVER_ERROR);
+  }  }
 
   async searchKeyword(keyword: string) {
     return await this.productModel.find({ $text: { $search: keyword } });
