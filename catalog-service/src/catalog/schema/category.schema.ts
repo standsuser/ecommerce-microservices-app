@@ -11,6 +11,8 @@ export class ProductCatalog extends Document {
   @Prop({ required: true })
   description: string;
 
+
+
  
 }
 

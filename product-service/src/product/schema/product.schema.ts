@@ -32,6 +32,12 @@ export class Product extends Document {
 
   @Prop()
   material: string;
+
+  @Prop()
+  totalPrice: number;
+
+
+
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
