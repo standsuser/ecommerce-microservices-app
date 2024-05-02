@@ -51,7 +51,7 @@ import { User } from 'src/decorators/user.decorator';
             brokers:['localhost:9092']
           },
           consumer:{
-            groupId:'account-consumer',
+            groupId:'..',
           }
         }
       }
