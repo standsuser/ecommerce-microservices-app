@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Controller,Request, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { MessagePattern } from '@nestjs/microservices';
