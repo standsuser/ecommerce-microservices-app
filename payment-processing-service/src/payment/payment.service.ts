@@ -6,6 +6,10 @@ import { Model } from 'mongoose';
 import { Payment, PaymentDocument } from './schema/payment.schema';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { HttpService } from '@nestjs/axios'; 
+
+
+
+
 @Injectable()
 export class PaymentService {
   constructor(
