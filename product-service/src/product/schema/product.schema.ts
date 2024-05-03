@@ -18,9 +18,6 @@ export class Product extends Document {
   @Prop({ default: 0 })
   discountpercentage: number;
 
-  @Prop({ type: Date })
-  discountenddate: Date;
-
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category', required: true })
   categoryid: MongooseSchema.Types.ObjectId;
 
@@ -36,7 +33,11 @@ export class Product extends Document {
   @Prop()
   totalPrice: number;
 
+  @Prop()
+  totalRating: number;
 
+  @Prop()
+  totalReviews: number;
 
 }
 

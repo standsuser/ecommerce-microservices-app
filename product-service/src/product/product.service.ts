@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { Favorite } from './schema/favorite.schema';
+import { Category } from './schema/category.schema';
 
 import { Kafka } from 'kafkajs';
 
@@ -19,6 +20,7 @@ export class ProductService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
     @InjectModel(Favorite.name) private readonly favoriteModel: Model<Favorite>,
+    @InjectModel(Category.name) private readonly categoryModel: Model<Favorite>,
   ) {}
 
   async getFavorites(userId: string) {
@@ -234,11 +236,58 @@ async addReview(userId: string, productId: string, rating: number, review: strin
         }
         const newReview = new this.productModel({ userid: userId, productid: productId, rating: rating, review: review });
         await newReview.save();
+
+        //calculate the new product rating
+        const totalRating = product.totalRating + rating;
+        const totalReviews = product.totalReviews + 1;
+        const newRating = totalRating / totalReviews;
+        await this.productModel.findByIdAndUpdate
+        (productId, { rating: newRating, totalRating: totalRating, totalReviews: totalReviews }, { new: true }).exec();
+
         return newReview;
     } catch (error) {
         throw new NotFoundException('Product not found');
     }
 }
+
+//----------------------CATEGORIES-----------------------------------------
+
+
+async getCategories() {
+  try {
+    const categories = await this.categoryModel.find().exec();
+    if (!categories) {
+      throw new NotFoundException('Categories not found');
+    }
+    return categories;
+  } catch (error) {
+    throw new NotFoundException('Categories not found');
+  }
+}
+
+
+
+async getProductsByCategory(categoryid: string) {
+  try {
+    const products = await this.productModel.find({ categoryid }).exec();
+    if (!products) {
+      throw new NotFoundException('Products not found');
+    }
+    return products;
+  } catch (error) {
+    throw new NotFoundException('Products not found');
+  }
+}
+
+
+
+
+
+
+
+
+
+
 /*
 async updateReview(userId: string, reviewId: string, rating: number, review: string) {
     try {

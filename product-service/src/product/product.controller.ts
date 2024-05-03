@@ -73,6 +73,28 @@ export class ProductController {
       const { userId, rating, review } = body;
       return await this.productService.addReview(productId, userId, rating, review);
   }
+
+//----------------------------CATEGORIES----------------------------------------------
+@Get('/categories')
+async getCategories() {
+  return await this.productService.getCategories();
+}
+@Get('/products/:categoryid')
+async getProductsByCategory(@Param('categoryid') categoryid: string) {
+  return await this.productService.getProductsByCategory(categoryid);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 /*
   @Delete(':reviewId') 
   async deleteReview(@Param('reviewId') reviewId: string) {

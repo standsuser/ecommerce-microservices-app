@@ -29,6 +29,7 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
 
   mongodb:
     image: docker.io/bitnami/mongodb:7.0
@@ -36,6 +37,16 @@ services:
       - "27017:27017"
     volumes:
       - 'mongodb_data:/bitnami/mongodb'
+  
+  catalog:
+    build: ./catalog-service
+    ports:
+      - "3002:3000"
+    environment:
+      # Add environment variables for your NestJS application here
+      # Example:
+      NODE_ENV: production
+      # Other environment variables...
 
 
 volumes:
