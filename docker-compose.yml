@@ -48,6 +48,16 @@ services:
       NODE_ENV: production
       # Other environment variables...
 
+  product:
+    build: ./product-service
+    ports:
+      - "3003:3000"
+    environment:
+      # Add environment variables for your NestJS application here
+      # Example:
+      NODE_ENV: production
+      # Other environment variables...
+
 
 volumes:
   kafka_data:

@@ -19,18 +19,18 @@ export class Product extends Document {
   discountpercentage: number;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category', required: true })
-  categoryid: MongooseSchema.Types.ObjectId;
+  @Prop([MongooseSchema.Types.ObjectId])
+  categoryIds: MongooseSchema.Types.ObjectId[];
 
-  @Prop()
-  size: string;
+  @Prop([String])
+  sizes: string[];
 
-  @Prop()
-  color: string;
+  @Prop([String])
+  colors: string[];
 
-  @Prop()
-  material: string;
-
-  @Prop()
+  @Prop([String])
+  materials: string[];
+  
   totalPrice: number;
 
   @Prop()

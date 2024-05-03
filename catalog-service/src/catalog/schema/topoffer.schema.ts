@@ -8,11 +8,11 @@ export class Offer {
   @Prop({ required: true })
   productId: string;
 
-  // @Prop({ required: true }) // kafka ya shabab rakzo abos edeko
-  // discountPercentage: number;
+  @Prop({ required: true }) // kafka ya shabab rakzo abos edeko
+  discountPercentage: number;
 
-  // @Prop({ required: true })
-  // validityPeriod: Date;
+  @Prop({ required: true })
+  validityPeriod: Date;
 
 }
 

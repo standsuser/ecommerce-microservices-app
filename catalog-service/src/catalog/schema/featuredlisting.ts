@@ -8,8 +8,8 @@ export class FeaturedListing extends Document {
   @Prop({ required: true })
   productId: ObjectId;
 
-  //@Prop({ required: true })
-  // rating: number;
+  @Prop({ required: true })
+  rating: number;
 }
 
 export const FeaturedListingSchema =
