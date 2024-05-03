@@ -1,48 +1,61 @@
-import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
-import { Observable } from 'rxjs';
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
 
 @Injectable()
 export class PaymobService {
-  private readonly PAYMOB_API_BASE_URL = 'https://accept.paymob.com/';
-  private readonly apiKey: string;
-  private readonly merchantId: string;
 
-  constructor(private readonly httpService: HttpService) {
-    // Load API credentials from configuration (you can use environment variables or a config file)
-    this.apiKey = process.env.PAYMOB_API_KEY;
-    this.merchantId = process.env.PAYMOB_MERCHANT_ID;
-  }
+  
 
-  initiatePayment(orderId: string, amount: number): Observable<AxiosResponse<any>> {
-    const url = `${this.PAYMOB_API_BASE_URL}acceptance/payment_keys`;
-    const payload = {
-      integration_id: this.apiKey,
-      amount_cents: amount * 100, // Paymob accepts amount in cents
-      currency: 'EGP', // Change to your currency code
-      order_id: orderId,
-      billing_data: {
-        apartment: 'NA',
-        email: 'customer@example.com', // Example email, replace with actual customer email
-        floor: 'NA',
-        first_name: 'John', // Example first name, replace with actual customer name
-        street: 'NA',
-        building: 'NA',
-        phone_number: '+201000000000', // Example phone number, replace with actual customer phone number
-        shipping_method: 'NA',
-        postal_code: 'NA',
-        city: 'NA',
-        country: 'NA',
-        last_name: 'Doe', // Example last name, replace with actual customer name
-        state: 'NA',
-      },
-    };
-    return this.httpService.post(url, payload, { headers: { 'Content-Type': 'application/json' } });
+    async makePayment() {
+      try {
+        const headers = {
+          Authorization: 'egy_sk_live_b08759deedde87f612b6cde8e2ab2a914f0d35bfef0519a4b21032c6165c2bf0',
+          'Content-Type': 'application/json',
+        };
+  
+        const data = {
+          amount: 10,
+          currency: 'EGP',
+          payment_methods: [12, 'card', 'you can add Integration id directly or your integration name'],
+          items: [
+            {
+              name: 'Item name 1',
+              amount: 10,
+              description: 'Watch',
+              quantity: 1,
+            },
+          ],
+          billing_data: {
+            apartment: '6',
+            first_name: 'Ammar',
+            last_name: 'Sadek',
+            street: '938, Al-Jadeed Bldg',
+            building: '939',
+            phone_number: '+96824480228',
+            country: 'OMN',
+            email: 'AmmarSadek@gmail.com',
+            floor: '1',
+            state: 'Alkhuwair',
+          },
+          customer: {
+            first_name: 'Ammar',
+            last_name: 'Sadek',
+            email: 'AmmarSadek@gmail.com',
+            extras: {
+              re: '22',
+            },
+          },
+          extras: {
+            ee: 22,
+          },
+        };
+  
+        const response = await axios.post('https://accept.paymob.com/v1/intention/', data, { headers });
+        console.log(response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Error:', error);
+        throw error;
+      }
+    }
   }
-
-  queryPaymentStatus(paymentKey: string): Observable<AxiosResponse<any>> {
-    const url = `${this.PAYMOB_API_BASE_URL}acceptance/payment_key/${paymentKey}/status`;
-    return this.httpService.get(url);
-  }
-}
