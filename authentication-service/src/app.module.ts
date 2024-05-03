@@ -13,7 +13,7 @@ import { Reflector } from '@nestjs/core';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/nestjs'),
+    MongooseModule.forRoot('mongodb+srv://omarx10050:12345@users.bez5bwk.mongodb.net/'),
     UserModule,
     ClientsModule.register([
       {
@@ -39,4 +39,4 @@ import { Reflector } from '@nestjs/core';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

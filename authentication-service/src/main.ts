@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+//import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 /*
 async function bootstrap() {

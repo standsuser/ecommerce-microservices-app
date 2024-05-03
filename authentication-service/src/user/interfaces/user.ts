@@ -1,12 +1,14 @@
+/* eslint-disable prettier/prettier */
 //export schema as a model
 // Path: authentication-service/src/user/user.model.ts
 
-import mongoose from "mongoose";
-
+//import { SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
+//import { User } from 'src/decorators/user.decorator';
 
 export interface User extends mongoose.Document {
     name: string;
     username: string;
     password: string;
-   
 }
+//export const userModel = SchemaFactory.createForClass(User);

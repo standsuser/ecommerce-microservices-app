@@ -1,6 +1,7 @@
+/* eslint-disable prettier/prettier */
 import { CanActivate,ExecutionContext,Logger,Inject } from "@nestjs/common";
-import { ClientKafka, ClientProxy } from "@nestjs/microservices";
-import { Observable } from "rxjs";
+import { ClientKafka} from "@nestjs/microservices";
+//import { Observable } from "rxjs";
 import {timeout} from 'rxjs/operators'
 import { AppService } from "src/app.service";
 

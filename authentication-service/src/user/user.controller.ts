@@ -1,12 +1,15 @@
 /* eslint-disable prettier/prettier */
-import { Controller,Request, UseGuards } from '@nestjs/common';
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Controller, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { LocalAuthGuard } from './strategies/local-auth.guard';
 import { JwtAuthGuard } from './strategies/jwt-auth.guard';
 import { ExistsAuthGuard } from './strategies/exists-auth.guard';
+//import { Post } from '@nestjs/common';
 
-@Controller('user')
+@Controller()
 export class UserController {
     constructor(private userService : UserService){}
 
@@ -16,7 +19,9 @@ export class UserController {
 //     
 //     return this.accountService.register({body:req.body});
 // }
+
     @UseGuards(ExistsAuthGuard)
+    
     @MessagePattern('register')
     async register(command){
         console.log(command);

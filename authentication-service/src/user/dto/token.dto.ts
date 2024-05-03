@@ -1,3 +1,6 @@
+/* eslint-disable prettier/prettier */
+
+/* eslint-disable @typescript-eslint/ban-types */
 export class TokenDto{
     readonly token:string;
     readonly expiresIn:string;
