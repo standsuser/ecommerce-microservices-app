@@ -3,59 +3,44 @@ import axios from 'axios';
 
 @Injectable()
 export class PaymobService {
-
-  
-
-    async makePayment() {
+    async makePayment(
+      amount: number,
+      currency: string,
+      paymentMethods: string,
+      items: any[],
+      billingData: any,
+      customer: any,
+      extras: any
+    ): Promise<any> {
       try {
-        const headers = {
-          Authorization: 'egy_sk_live_b08759deedde87f612b6cde8e2ab2a914f0d35bfef0519a4b21032c6165c2bf0',
-          'Content-Type': 'application/json',
-        };
-  
-        const data = {
-          amount: 10,
-          currency: 'EGP',
-          payment_methods: [12, 'card', 'you can add Integration id directly or your integration name'],
-          items: [
-            {
-              name: 'Item name 1',
-              amount: 10,
-              description: 'Watch',
-              quantity: 1,
-            },
-          ],
-          billing_data: {
-            apartment: '6',
-            first_name: 'Ammar',
-            last_name: 'Sadek',
-            street: '938, Al-Jadeed Bldg',
-            building: '939',
-            phone_number: '+96824480228',
-            country: 'OMN',
-            email: 'AmmarSadek@gmail.com',
-            floor: '1',
-            state: 'Alkhuwair',
-          },
-          customer: {
-            first_name: 'Ammar',
-            last_name: 'Sadek',
-            email: 'AmmarSadek@gmail.com',
-            extras: {
-              re: '22',
-            },
-          },
-          extras: {
-            ee: 22,
-          },
-        };
-  
-        const response = await axios.post('https://accept.paymob.com/v1/intention/', data, { headers });
-        console.log(response.data);
-        return response.data;
-      } catch (error) {
-        console.error('Error:', error);
-        throw error;
-      }
+          // Set your Paymob API token
+          const API_TOKEN = "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RjME9EWXdMQ0p1WVcxbElqb2lhVzVwZEdsaGJDSjkuVTJELWZOQTM1VG9qWnFTay1USHFRX3BNX1FrRm5VdnFuWFlQMUxFTGdiWUJaQzg1dGlNQlVvVS1hZDA4UjlCZFp3MWFDaWVlN0RrdTFMQ1FPUVJRdFE="; // Replace with your actual API token
+
+          // Define the payment data
+          const paymentData = {
+              amount,
+              currency,
+              payment_methods: paymentMethods,
+              items,
+              billing_data: billingData,
+              customer,
+              extras
+          };
+
+            // Define Axios request configuration
+            const requestOptions = {
+                headers: {
+                    "Authorization": `Token ${API_TOKEN}`,
+                    "Content-Type": "application/json"
+                }
+            };
+
+            // Make a POST request to Paymob API
+            const response = await axios.post("https://accept.paymob.com/v1/intention/", paymentData, requestOptions);
+            return response.data;
+        } catch (error) {
+            console.error("Error:", error);
+            throw error;
+        }
     }
-  }
+}

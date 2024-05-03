@@ -1,36 +1,34 @@
-// Import necessary modules
-import { Request, Response } from 'express';
-// import PaymobSDK from 'paymob-sdk'; 
+import { Controller, Post, Body } from '@nestjs/common';
+import { PaymobService } from './paymob.service';
 
-// Create PaymobController class
+@Controller('paymob')
 export class PaymobController {
-    // Method to initiate payment
-    static async initiatePayment(req: Request, res: Response) {
+    constructor(private readonly paymobService: PaymobService) {}
+
+    @Post('make-payment')
+    async makePayment(
+        @Body('amount') amount: number,
+        @Body('currency') currency: string,
+        @Body('paymentMethods') paymentMethods: string,
+        @Body('items') items: any[],
+        @Body('billingData') billingData: any,
+        @Body('customer') customer: any,
+        @Body('extras') extras: any
+    ): Promise<any> {
         try {
-            const paymob = new PaymobSDK({ apiKey: 'YOUR_API_KEY' });
-
-            // Make API call to create payment request
-            const paymentData = await paymob.createPayment({
-                // Payment details
-            });
-
-            // Return payment data to client
-            res.json(paymentData);
+            const paymentResponse = await this.paymobService.makePayment(
+                amount,
+                currency,
+                paymentMethods,
+                items,
+                billingData,
+                customer,
+                extras
+            );
+            return paymentResponse;
         } catch (error) {
-            console.error('Error initiating payment:', error);
-            res.status(500).json({ error: 'Internal server error' });
+            console.error('Error making payment:', error);
+            throw error;
         }
     }
-
-    // Method to handle callback from Paymob
-    static async handleCallback(req: Request, res: Response) {
-        try {
-            // Handle callback logic
-        } catch (error) {
-            console.error('Error handling callback:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    }
-
-    // Other methods for payment-related functionality can be added here
 }
