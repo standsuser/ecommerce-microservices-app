@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
@@ -11,17 +12,17 @@ import { ExistsStrategy } from './strategies/exists.strategy';
 
 
 @Module({
-  imports:[
+  imports: [
     PassportModule,
     JwtModule.register({
-      secret:'Mado451880',
-      signOptions:{expiresIn:'10000s'},
+      secret: 'Mado451880',
+      signOptions: { expiresIn: '10000s' },
     }),
   ],
   controllers: [UserController],
   providers: [UserService,
-    ...userProvider ,...databaseProviders,
-     LocalStrategy,JwtStrategy,ExistsStrategy],
-  exports: [...databaseProviders],
+    ...userProvider, ...databaseProviders,
+    LocalStrategy, JwtStrategy, ExistsStrategy],
+  exports: [...databaseProviders, UserService],// added User Servcie to exports
 })
-export class UserModule {}
+export class UserModule { }
