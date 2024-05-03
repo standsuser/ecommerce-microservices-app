@@ -20,16 +20,14 @@ export class UserService {
         private jwtService:JwtService
         ) {}
 
-    hello(message){
-        return message;
-    }
+    
 
-    // async register(CreateUserDto:CreateUserDto){
-    //     const createUser= new this.userModel(CreateUserDto)
-    //     let saveResult = await createUser.save();
-    //     console.log(saveResult)
-    //     return saveResult;
-    // }
+     async register(CreateUserDto:CreateUserDto){
+         const createUser= new this.userModel(CreateUserDto)
+         let saveResult = await createUser.save();
+         console.log(saveResult)
+         return saveResult;
+     }
 
     async validateUser(loginDto:LoginDto){
         let loginResult =await this.userModel.findOne({
@@ -67,8 +65,8 @@ export class UserService {
             ...userData
         }
     }
-    async findByEmail(email: string): Promise<User> {
-        const user = await this.userModel.findOne({ email }).exec();
+    async findByEmail(username: string): Promise<User> {
+        const user = await this.userModel.findOne({ username }).exec();
         if (!user) {
           throw new NotFoundException('User not found');
         }
@@ -100,8 +98,10 @@ export class UserService {
         return validatedToken;
     }
 
+    /*
+
     async register(createUserDto: CreateUserDto): Promise<User> {
-        const existingUser = await this.findByEmail(createUserDto.email);
+        const existingUser = await this.findByEmail(createUserDto.username);
         if (existingUser) {
           throw new UserAlreadyExistsException();
         }
@@ -112,6 +112,10 @@ export class UserService {
         // Save the new user
         return newUser.save();
       }
+
+      */
+
+      
     
     
 }

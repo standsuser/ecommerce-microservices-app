@@ -9,16 +9,18 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ExistsStrategy } from './strategies/exists.strategy';
 
+
 @Module({
   imports:[
     PassportModule,
     JwtModule.register({
-      secret:'secretKey_YoucANWritewhateveryoulike',
+      secret:'Mado451880',
       signOptions:{expiresIn:'10000s'},
-    })
+    }),
   ],
   controllers: [UserController],
-  providers: [UserService,...userProvider ,...databaseProviders,
+  providers: [UserService,
+    ...userProvider ,...databaseProviders,
      LocalStrategy,JwtStrategy,ExistsStrategy],
   exports: [...databaseProviders],
 })
