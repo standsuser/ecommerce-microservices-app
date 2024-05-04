@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { Favorite } from './schema/favorite.schema';
 import { Category } from './schema/category.schema';
+import { ProducerService } from '../kafka/producer.service';
 
 import { Kafka } from 'kafkajs';
 
@@ -21,7 +22,28 @@ export class ProductService {
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
     @InjectModel(Favorite.name) private readonly favoriteModel: Model<Favorite>,
     @InjectModel(Category.name) private readonly categoryModel: Model<Favorite>,
+    private readonly producerService: ProducerService,
   ) {}
+
+  async sendTopDiscountedProducts() {
+    // Query the top 5 highest discounted products
+    const products = await this.productModel
+      .find()
+      .sort({ discountpercentage: -1 })
+      .limit(5)
+      .exec();
+
+    // Prepare the record for Kafka
+    const record = {
+      topic: 'topoffer',
+      messages: products.map((product) => ({
+        value: JSON.stringify(product),
+      })),
+    };
+
+    // Send the record to Kafka
+    await this.producerService.produce(record);
+  }
 
   async getFavorites(userId: string) {
         

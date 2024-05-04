@@ -31,6 +31,7 @@ export class Product extends Document {
   @Prop([String])
   materials: string[];
   
+  @Prop()
   totalPrice: number;
 
   @Prop()
