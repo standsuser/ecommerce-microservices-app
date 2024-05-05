@@ -34,29 +34,29 @@ services:
   mongodb:
     image: docker.io/bitnami/mongodb:7.0
     ports:
-      - "27017:27017"
+      - "27016:27017"
     volumes:
       - 'mongodb_data:/bitnami/mongodb'
   
-  # catalog:
-  #   build: ./catalog-service
-  #   ports:
-  #     - "3002:3000"
-  #   environment:
-  #     # Add environment variables for your NestJS application here
-  #     # Example:
-  #     NODE_ENV: production
-  #     # Other environment variables...
+  catalog:
+    build: ./catalog-service
+    ports:
+      - "3002:3000"
+    environment:
+      # Add environment variables for your NestJS application here
+      # Example:
+      NODE_ENV: production
+      # Other environment variables...
 
-  # product:
-  #   build: ./product-service
-  #   ports:
-  #     - "3003:3000"
-  #   environment:
-  #     # Add environment variables for your NestJS application here
-  #     # Example:
-  #     NODE_ENV: production
-  #     # Other environment variables...
+  product:
+    build: ./product-service
+    ports:
+      - "5000:3000"
+    environment:
+      # Add environment variables for your NestJS application here
+      # Example:
+      NODE_ENV: production
+      # Other environment variables...
 
 
 volumes:

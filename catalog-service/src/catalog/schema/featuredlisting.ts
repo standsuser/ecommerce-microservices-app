@@ -1,12 +1,12 @@
 // featuredlisting.schema.ts
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId } from 'mongoose';
+import { Document, Types } from 'mongoose'; 
 
 @Schema()
 export class FeaturedListing extends Document {
-  @Prop({ required: true })
-  productId: ObjectId;
+  @Prop({ type: Types.ObjectId, required: true }) 
+  productId: Types.ObjectId;
 
   @Prop({ required: true })
   totalRating: number;

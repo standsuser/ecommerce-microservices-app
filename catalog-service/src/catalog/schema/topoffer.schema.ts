@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose'; 
 
 export type OfferDocument = Offer & Document;
 
 @Schema()
 export class Offer {
-  @Prop({ required: true })
-  productId: string;
+  @Prop({ type: Types.ObjectId, required: true }) 
+  productId: Types.ObjectId;
 
   @Prop({ required: true }) 
   discountPercentage: number;
