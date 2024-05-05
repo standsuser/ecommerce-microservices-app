@@ -36,6 +36,19 @@ export class AppController {
     }
   }
 
+  @Post('login')
+  async login(@Body() user: any): Promise<any> {
+    try {
+      // Attempt to login user
+      const response = await this.userService.login(user);
+      return {success: true ,response};
+ // Return response
+    } catch (error) {
+      // Handle any errors thrown during login
+      return { success: false, message: error }; // Return error response
+    }
+  }
+
 
 
 
