@@ -30,7 +30,10 @@ export class ProductService {
     const record = {
       topic: 'topoffer',
       messages: products.map((product) => ({
-        value: JSON.stringify(product),
+        value: JSON.stringify({
+          productId: product._id.toString(),
+          discountpercentage: product.discountpercentage,
+        }),
       })),
     };
 
@@ -50,7 +53,10 @@ export class ProductService {
     const record = {
       topic: 'featured',
       messages: products.map((product) => ({
-        value: JSON.stringify(product),
+        value: JSON.stringify({
+          productId: product._id.toString(),
+          totalRating: product.totalRating,
+        }),
       })),
     };
 

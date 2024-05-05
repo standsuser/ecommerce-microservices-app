@@ -9,7 +9,7 @@ export class FeaturedListing extends Document {
   productId: ObjectId;
 
   @Prop({ required: true })
-  rating: number;
+  totalRating: number;
 }
 
 export const FeaturedListingSchema =
