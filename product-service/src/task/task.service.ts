@@ -4,11 +4,12 @@ import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class TaskService implements OnModuleInit {
-  constructor(private readonly productService: ProductService) {}
+    constructor(private readonly productService: ProductService) {}
 
-  onModuleInit() {
-    cron.schedule('0 * * * *', () => { // This will run every hour
-      this.productService.sendTopDiscountedProducts();
-    });
-  }
+    onModuleInit() {
+        cron.schedule('0 * * * *', () => { // This will run every hour
+            this.productService.sendTopDiscountedProducts();
+            this.productService.sendTopRatedProducts();
+        });
+    }
 }

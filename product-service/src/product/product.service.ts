@@ -6,15 +6,8 @@ import { Favorite } from './schema/favorite.schema';
 import { Category } from './schema/category.schema';
 import { ProducerService } from '../kafka/producer.service';
 
-import { Kafka } from 'kafkajs';
-
-const kafka = new Kafka({
-  brokers: ['localhost:9092'] // Update with your Kafka broker(s) address
-});
-
 const socialSharingUtils = require('social-sharing-utilities');
 
-const producer = kafka.producer();
 
 @Injectable()
 export class ProductService {
@@ -45,6 +38,60 @@ export class ProductService {
     await this.producerService.produce(record);
   }
 
+  async sendTopRatedProducts() {
+    // Query the top 5 highest rated products
+    const products = await this.productModel
+      .find()
+      .sort({ rating: -1 })
+      .limit(5)
+      .exec();
+
+    // Prepare the record for Kafka
+    const record = {
+      topic: 'featured',
+      messages: products.map((product) => ({
+        value: JSON.stringify(product),
+      })),
+    };
+
+    // Send the record to Kafka
+    await this.producerService.produce(record);
+  }
+
+  async addToWishlist(userId: string, productId: string, selectedColor: string, selectedMaterial: string, selectedSize: string) {
+    try {
+      // Query the product details
+      const product = await this.productModel.findById(productId).exec();
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+
+      // Prepare the record for Kafka
+      const record = {
+        topic: 'wishlist',
+        messages: [
+          {
+            value: JSON.stringify({
+              userId,
+              productId,
+              selectedColor,
+              selectedMaterial,
+              selectedSize,
+              eventType: 'WishlistItemAdded',
+            }),
+          },
+        ],
+      };
+
+      // Send the record to Kafka
+      await this.producerService.produce(record);
+
+      console.log('Event published successfully:', record.messages[0].value);
+    } catch (error) {
+      console.error('Error publishing event:', error);
+    }
+  }
+
   async getFavorites(userId: string) {
         
     try {
@@ -62,15 +109,27 @@ export class ProductService {
 
 
   async addFavorite(userId: string, productId: string, selectedColor: string, selectedMaterial: string, selectedSize: string) {
-        //const favorite = new this.favoriteModel({ userid: userId, productid: productId });
-
     try {
-      await this.addToWishlist(userId, productId , selectedColor, selectedMaterial, selectedSize);
+      // Query the product details
+      const product = await this.productModel.findById(productId).exec();
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+
+      // Create a new favorite
+      const favorite = new this.favoriteModel({
+        userid: userId,
+        productid: productId,
+        selectedColor,
+        selectedMaterial,
+        selectedSize,
+      });
+
+      // Save the favorite
+      await favorite.save();
     } catch (error) {
       throw new NotFoundException('Product not found');
-
     }
-    //return await favorite.save();
   }
 
   async removeFavorite(userId: string, productId: string) {
@@ -126,34 +185,7 @@ export class ProductService {
       throw new Error('Failed to customize product: ' + error.message);
     }
   }
-    async addToWishlist(userId: string, productId: string, selectedColor: string, selectedMaterial: string, selectedSize: string) {
-        try {
-        await producer.connect();
 
-        const event = {
-            userId,
-            productId,
-            selectedColor,
-            selectedMaterial,
-            selectedSize,
-            eventType: 'WishlistItemAdded'
-        };
-
-        await producer.send({
-            topic: 'wishlist-events',
-            messages: [
-            { value: JSON.stringify(event) }
-            ]
-        });
-
-        console.log('Event published successfully:', event);
-        } catch (error) {
-        console.error('Error publishing event:', error);
-        } finally {
-        await producer.disconnect();
-        }
-
-    }
 
   async shareProduct( productId: string, @Req() req: any) {
     try {

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Patch, Delete, Get, UseInterceptors, ClassSerializerInterceptor, Req,  HttpException, HttpStatus  } from '@nestjs/common';
+import { Controller, Post, Body, Param, Patch, Delete, Get, ClassSerializerInterceptor, Req,  HttpException, HttpStatus  } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './schema/product.schema';
 import { ProductModule } from './product.module';
