@@ -40,4 +40,12 @@ export class CatalogService implements OnModuleInit {
       },
     );
   }
+
+  async getFeaturedListings() {
+    return this.featuredListingModel.find().exec();
+  }
+
+  async getTopOffers() {
+    return this.topOfferModel.find().exec();
+  }
 }
