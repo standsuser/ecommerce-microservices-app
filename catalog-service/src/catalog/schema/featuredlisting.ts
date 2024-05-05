@@ -8,10 +8,9 @@ export class FeaturedListing extends Document {
   @Prop({ required: true })
   productId: ObjectId;
 
- //@Prop({ required: true })
- // rating: number;
-
- 
+  @Prop({ required: true })
+  totalRating: number;
 }
 
-export const FeaturedListingSchema = SchemaFactory.createForClass(FeaturedListing);
+export const FeaturedListingSchema =
+  SchemaFactory.createForClass(FeaturedListing);

@@ -1,4 +1,4 @@
-import { Prop , Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 export type OfferDocument = Offer & Document;
@@ -8,13 +8,9 @@ export class Offer {
   @Prop({ required: true })
   productId: string;
 
-  @Prop({ required: true }) // kafka ya shabab rakzo abos edeko
+  @Prop({ required: true }) 
   discountPercentage: number;
 
-  @Prop({ required: true })
-  validityPeriod: Date;
-
-  // Additional properties like start date, end date, etc. can be added
 }
 
-export const OfferSchema = SchemaFactory.createForClass(Offer);
+export const TopOffer = SchemaFactory.createForClass(Offer);

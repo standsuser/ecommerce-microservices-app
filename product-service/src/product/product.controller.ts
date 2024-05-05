@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Patch, Delete, Get, UseInterceptors, ClassSerializerInterceptor, Req,  HttpException, HttpStatus  } from '@nestjs/common';
+import { Controller, Post, Body, Param, Patch, Delete, Get, ClassSerializerInterceptor, Req,  HttpException, HttpStatus  } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './schema/product.schema';
 import { ProductModule } from './product.module';
@@ -73,6 +73,28 @@ export class ProductController {
       const { userId, rating, review } = body;
       return await this.productService.addReview(productId, userId, rating, review);
   }
+
+//----------------------------CATEGORIES----------------------------------------------
+@Get('/categories')
+async getCategories() {
+  return await this.productService.getCategories();
+}
+@Get('/products/:categoryid')
+async getProductsByCategory(@Param('categoryid') categoryid: string) {
+  return await this.productService.getProductsByCategory(categoryid);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 /*
   @Delete(':reviewId') 
   async deleteReview(@Param('reviewId') reviewId: string) {

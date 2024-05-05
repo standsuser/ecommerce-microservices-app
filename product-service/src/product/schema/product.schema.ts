@@ -18,25 +18,27 @@ export class Product extends Document {
   @Prop({ default: 0 })
   discountpercentage: number;
 
-  @Prop({ type: Date })
-  discountenddate: Date;
-
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category', required: true })
-  categoryid: MongooseSchema.Types.ObjectId;
+  @Prop([MongooseSchema.Types.ObjectId])
+  categoryIds: MongooseSchema.Types.ObjectId[];
 
-  @Prop()
-  size: string;
+  @Prop([String])
+  sizes: string[];
 
-  @Prop()
-  color: string;
+  @Prop([String])
+  colors: string[];
 
-  @Prop()
-  material: string;
-
+  @Prop([String])
+  materials: string[];
+  
   @Prop()
   totalPrice: number;
 
+  @Prop()
+  totalRating: number;
 
+  @Prop()
+  totalReviews: number;
 
 }
 

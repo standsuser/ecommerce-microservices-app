@@ -3,23 +3,100 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { Favorite } from './schema/favorite.schema';
-
-import { Kafka } from 'kafkajs';
-
-const kafka = new Kafka({
-  brokers: ['localhost:9092'] // Update with your Kafka broker(s) address
-});
+import { Category } from './schema/category.schema';
+import { ProducerService } from '../kafka/producer.service';
 
 const socialSharingUtils = require('social-sharing-utilities');
 
-const producer = kafka.producer();
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
     @InjectModel(Favorite.name) private readonly favoriteModel: Model<Favorite>,
+    @InjectModel(Category.name) private readonly categoryModel: Model<Favorite>,
+    private readonly producerService: ProducerService,
   ) {}
+
+  async sendTopDiscountedProducts() {
+    // Query the top 5 highest discounted products
+    const products = await this.productModel
+      .find()
+      .sort({ discountpercentage: -1 })
+      .limit(5)
+      .exec();
+
+    // Prepare the record for Kafka
+    const record = {
+      topic: 'topoffer',
+      messages: products.map((product) => ({
+        value: JSON.stringify({
+          productId: product._id.toString(),
+          discountpercentage: product.discountpercentage,
+        }),
+      })),
+    };
+
+    // Send the record to Kafka
+    await this.producerService.produce(record);
+  }
+
+  async sendTopRatedProducts() {
+    // Query the top 5 highest rated products
+    const products = await this.productModel
+      .find()
+      .sort({ rating: -1 })
+      .limit(5)
+      .exec();
+
+    // Prepare the record for Kafka
+    const record = {
+      topic: 'featured',
+      messages: products.map((product) => ({
+        value: JSON.stringify({
+          productId: product._id.toString(),
+          totalRating: product.totalRating,
+        }),
+      })),
+    };
+
+    // Send the record to Kafka
+    await this.producerService.produce(record);
+  }
+
+  async addToWishlist(userId: string, productId: string, selectedColor: string, selectedMaterial: string, selectedSize: string) {
+    try {
+      // Query the product details
+      const product = await this.productModel.findById(productId).exec();
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+
+      // Prepare the record for Kafka
+      const record = {
+        topic: 'wishlist',
+        messages: [
+          {
+            value: JSON.stringify({
+              userId,
+              productId,
+              selectedColor,
+              selectedMaterial,
+              selectedSize,
+              eventType: 'WishlistItemAdded',
+            }),
+          },
+        ],
+      };
+
+      // Send the record to Kafka
+      await this.producerService.produce(record);
+
+      console.log('Event published successfully:', record.messages[0].value);
+    } catch (error) {
+      console.error('Error publishing event:', error);
+    }
+  }
 
   async getFavorites(userId: string) {
         
@@ -38,15 +115,27 @@ export class ProductService {
 
 
   async addFavorite(userId: string, productId: string, selectedColor: string, selectedMaterial: string, selectedSize: string) {
-        //const favorite = new this.favoriteModel({ userid: userId, productid: productId });
-
     try {
-      await this.addToWishlist(userId, productId , selectedColor, selectedMaterial, selectedSize);
+      // Query the product details
+      const product = await this.productModel.findById(productId).exec();
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+
+      // Create a new favorite
+      const favorite = new this.favoriteModel({
+        userid: userId,
+        productid: productId,
+        selectedColor,
+        selectedMaterial,
+        selectedSize,
+      });
+
+      // Save the favorite
+      await favorite.save();
     } catch (error) {
       throw new NotFoundException('Product not found');
-
     }
-    //return await favorite.save();
   }
 
   async removeFavorite(userId: string, productId: string) {
@@ -102,34 +191,7 @@ export class ProductService {
       throw new Error('Failed to customize product: ' + error.message);
     }
   }
-    async addToWishlist(userId: string, productId: string, selectedColor: string, selectedMaterial: string, selectedSize: string) {
-        try {
-        await producer.connect();
 
-        const event = {
-            userId,
-            productId,
-            selectedColor,
-            selectedMaterial,
-            selectedSize,
-            eventType: 'WishlistItemAdded'
-        };
-
-        await producer.send({
-            topic: 'wishlist-events',
-            messages: [
-            { value: JSON.stringify(event) }
-            ]
-        });
-
-        console.log('Event published successfully:', event);
-        } catch (error) {
-        console.error('Error publishing event:', error);
-        } finally {
-        await producer.disconnect();
-        }
-
-    }
 
   async shareProduct( productId: string, @Req() req: any) {
     try {
@@ -234,11 +296,58 @@ async addReview(userId: string, productId: string, rating: number, review: strin
         }
         const newReview = new this.productModel({ userid: userId, productid: productId, rating: rating, review: review });
         await newReview.save();
+
+        //calculate the new product rating
+        const totalRating = product.totalRating + rating;
+        const totalReviews = product.totalReviews + 1;
+        const newRating = totalRating / totalReviews;
+        await this.productModel.findByIdAndUpdate
+        (productId, { rating: newRating, totalRating: totalRating, totalReviews: totalReviews }, { new: true }).exec();
+
         return newReview;
     } catch (error) {
         throw new NotFoundException('Product not found');
     }
 }
+
+//----------------------CATEGORIES-----------------------------------------
+
+
+async getCategories() {
+  try {
+    const categories = await this.categoryModel.find().exec();
+    if (!categories) {
+      throw new NotFoundException('Categories not found');
+    }
+    return categories;
+  } catch (error) {
+    throw new NotFoundException('Categories not found');
+  }
+}
+
+
+
+async getProductsByCategory(categoryid: string) {
+  try {
+    const products = await this.productModel.find({ categoryid }).exec();
+    if (!products) {
+      throw new NotFoundException('Products not found');
+    }
+    return products;
+  } catch (error) {
+    throw new NotFoundException('Products not found');
+  }
+}
+
+
+
+
+
+
+
+
+
+
 /*
 async updateReview(userId: string, reviewId: string, rating: number, review: string) {
     try {
