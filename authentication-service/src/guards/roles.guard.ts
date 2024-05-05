@@ -3,11 +3,11 @@ import { Reflector } from "@nestjs/core";
 import { ClientKafka, ClientProxy } from "@nestjs/microservices";
 import { Observable } from "rxjs";
 import {timeout} from 'rxjs/operators'
-import { AccountService } from "src/account/account.service";
+import { AppService } from "src/app.service";
 
 export class RolesGuard implements CanActivate{
-    constructor(private accountServices:AccountService,
-        @Inject('ACC_SERVICE') private readonly Client:ClientKafka,
+    constructor(private accountServices:AppService,
+        @Inject('USER_SERVICE') private readonly Client:ClientKafka,
         private readonly reflector:Reflector){
 
         }

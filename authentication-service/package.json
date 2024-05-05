@@ -30,7 +30,7 @@
     "@types/passport-jwt": "^4.0.1",
     "bcryptjs": "^2.4.3",
     "kafkajs": "^2.2.4",
-    "mongoose": "^8.3.2",
+    "mongoose": "^8.3.3",
     "nodemailer": "^6.9.13",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -39,6 +39,8 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
@@ -62,7 +64,10 @@
     "typescript": "^5.1.3"
   },
   "eslintConfig": {
-    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
       "ecmaVersion": 2018,
@@ -72,7 +77,6 @@
       "linebreak-style": "off"
     }
   },
-
   "jest": {
     "moduleFileExtensions": [
       "js",
