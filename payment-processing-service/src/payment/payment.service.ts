@@ -21,7 +21,11 @@ export class PaymentService {
       throw error.response.data; // or customize error handling as needed
     }
   }
+  async helloWorld(): Promise<string> {
+    return 'Hello, world!';
+  }
 }
+
 const paymentData = {
     // Populate payment data here
   };

@@ -14,7 +14,7 @@ enum OrderStatus {
 @Schema()
 export class Order {
     @Prop()
-    userId: ObjectId;
+    userId: string;
 
     @Prop()
     orderNumber: string;
@@ -32,6 +32,6 @@ export class Order {
     status: string;
 }
 
-export const CouponSchema = SchemaFactory.createForClass(Order);
+export const OrderSchema = SchemaFactory.createForClass(Order);
 
 export { OrderStatus }; 

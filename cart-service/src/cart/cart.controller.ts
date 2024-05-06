@@ -7,6 +7,13 @@ import { UpdateCartItemDto } from'./dto/updatecartitem.dto';
 export class CartController {
     constructor(private readonly cartService: CartService) {}
 
+    // async test(t: string): Promise<any> {
+    //     return 'joe biden';
+    // }
+    @Post('test')
+    async test(@Param() t: string, @Body('test') test: string ) {
+        return this.cartService.test(t);
+    }
     @Post(':userId/items')
     async addItemToCart(@Param('userId') userId: string, @Body() addItemDto: AddCartItemDto) {
         return this.cartService.addItemToCart(userId, addItemDto);

@@ -7,10 +7,10 @@ export type CartDocument = Cart & Document;
 export class Cart {
     
     @Prop()
-    userId: ObjectId; // For authenticated users
+    userId: string; // For authenticated users
 
     @Prop()
-    sessionId: ObjectId; // For guest users
+    sessionId: string; // For guest users
 
     @Prop()
     items: CartItem[];
