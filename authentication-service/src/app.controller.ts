@@ -25,14 +25,23 @@ export class AppController {
   async register(@Body() createUserDto: CreateUserDto): Promise<any> {
     try {
       // Basic validation to ensure required fields are provided
-      if (!createUserDto.username || !createUserDto.password) {
-        throw new BadRequestException('username and password are required');
+      if (!createUserDto.email || !createUserDto.password) {
+        throw new BadRequestException('email and password are required');
       }
+
+      // Check if additional required fields are provided
+      if (!createUserDto.firstname || !createUserDto.lastname || !createUserDto.email || !createUserDto.phonenumber || !createUserDto.address) {
+        throw new BadRequestException('First name, last name, email, phone number, and address are required');
+      }
+
+      // Register user using the provided DTO
       const newUser = await this.userService.register(createUserDto);
-      return { success: true, data: newUser }; // Return successful response
+
+      // Return successful response
+      return { success: true, data: newUser };
     } catch (error) {
       // Handle any errors thrown during registration
-      return { success: false, message: error }; // Return error response
+      return { success: false, message: error.message || 'An error occurred during registration' };
     }
   }
 
@@ -41,8 +50,8 @@ export class AppController {
     try {
       // Attempt to login user
       const response = await this.userService.login(user);
-      return {success: true ,response};
- // Return response
+      return { success: true, response };
+      // Return response
     } catch (error) {
       // Handle any errors thrown during login
       return { success: false, message: error }; // Return error response

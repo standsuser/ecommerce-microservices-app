@@ -1,4 +1,6 @@
 /* eslint-disable prettier/prettier */
+
+/* eslint-disable no-var */
 import {
     Injectable,
     NestInterceptor,

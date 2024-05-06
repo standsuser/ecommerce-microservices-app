@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { CanActivate,ExecutionContext,Logger,Inject, OnModuleInit } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { ClientKafka, ClientProxy } from "@nestjs/microservices";
