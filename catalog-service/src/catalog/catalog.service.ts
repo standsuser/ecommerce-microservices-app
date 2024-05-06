@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit } from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ConsumerService } from "../kafka/consumer.service";
-import { FeaturedListing } from './schema/featuredlisting';
+import { FeaturedListing } from './schema/featuredlisting.schema';
 import { Offer } from './schema/topoffer.schema';
 
 @Injectable()

@@ -51,7 +51,7 @@ services:
   # product:
   #   build: ./product-service
   #   ports:
-  #     - "3003:3000"
+  #     - "5000:3000"
   #   environment:
   #     # Add environment variables for your NestJS application here
   #     # Example:
