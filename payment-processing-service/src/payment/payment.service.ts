@@ -18,14 +18,12 @@ export class PaymentService {
       );
       return response.data;
     } catch (error) {
-      throw error.response.data; // or customize error handling as needed
+      throw error.response.data;
     }
   }
-  async helloWorld(): Promise<string> {
-    return 'Hello, world!';
-  }
+
 }
 
 const paymentData = {
-    // Populate payment data here
+
   };

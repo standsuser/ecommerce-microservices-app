@@ -16,8 +16,4 @@ export class PaymentController {
       return { success: false, error: error.message || 'Payment failed' };
     }
   }
-  @Get('hello')
-  async helloWorld(): Promise<string> {
-    return 'Hello, world!';
-  }
 }
