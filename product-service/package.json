@@ -25,8 +25,7 @@
     "@nestjs/mongoose": "^10.0.6",
     "@nestjs/platform-express": "^10.0.0",
     "node-cron": "^3.0.3",
-    "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "reflect-metadata": "^0.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
