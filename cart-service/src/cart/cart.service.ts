@@ -1,19 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Cart, CartDocument } from './schema/cart.schema';
 import { Coupon, CouponDocument }  from './schema/coupon.schema';
 import { AddCartItemDto } from './dto/addcartitem.dto';
 import { UpdateCartItemDto } from'./dto/updatecartitem.dto';
-import mongoose, { ObjectId } from 'mongoose';
+// import mongoose, { ObjectId } from 'mongoose';
 import { Order, OrderDocument, OrderStatus } from './schema/order.schema';
 
 @Injectable()
 export class CartService {
     constructor(@InjectModel('Cart') private readonly cartModel: Model<CartDocument>,
-        @InjectModel('Coupon') private readonly couponModel: Model<CouponDocument>) {}
+        @InjectModel('Coupon') private readonly couponModel: Model<CouponDocument>,
+        @InjectModel('Order') private readonly orderModel: Model<OrderDocument>) {}
+  
 
     //rent
+
+    async test(t: string): Promise<any> {
+        return 'joe biden';
+    }
     async addItemToCart(userId: string, addItemDto: AddCartItemDto): Promise<Cart> {
         let cart = await this.getCartByUserId(userId);
 
