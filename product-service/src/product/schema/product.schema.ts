@@ -18,8 +18,7 @@ export class Product extends Document {
   @Prop({ default: 0 })
   discountpercentage: number;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category', required: true })
-  @Prop([MongooseSchema.Types.ObjectId])
+  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Category' }])
   categoryIds: MongooseSchema.Types.ObjectId[];
 
   @Prop([String])
@@ -39,8 +38,6 @@ export class Product extends Document {
 
   @Prop()
   totalReviews: number;
-
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
-

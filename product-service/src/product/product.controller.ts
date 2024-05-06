@@ -1,12 +1,19 @@
-import { Controller, Post, Body, Param, Patch, Delete, Get, ClassSerializerInterceptor, Req,  HttpException, HttpStatus  } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Get,
+  ClassSerializerInterceptor,
+  Req,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './schema/product.schema';
 import { ProductModule } from './product.module';
-
-
-
-
-
 
 @Controller('product')
 export class ProductController {
@@ -18,13 +25,32 @@ export class ProductController {
   }
 
   @Post('favorites') // check and it is correct insha'allah
-  async addFavorite(@Body() body: { userId: string, productId: string, selectedColor: string, selectedMaterial: string, selectedSize: string }) {
-    const { userId, productId , selectedColor  , selectedMaterial, selectedSize} = body;
-    return await this.productService.addFavorite(userId, productId , selectedColor, selectedMaterial, selectedSize);
+  async addFavorite(
+    @Body()
+    body: {
+      userId: string;
+      productId: string;
+      selectedColor: string;
+      selectedMaterial: string;
+      selectedSize: string;
+    },
+  ) {
+    const { userId, productId, selectedColor, selectedMaterial, selectedSize } =
+      body;
+    return await this.productService.addFavorite(
+      userId,
+      productId,
+      selectedColor,
+      selectedMaterial,
+      selectedSize,
+    );
   }
 
   @Delete(':userId/:productId') // checked in service file and it is correct insha'allah
-  async removeFavorite(@Param('userId') userId: string, @Param('productId') productId: string) {
+  async removeFavorite(
+    @Param('userId') userId: string,
+    @Param('productId') productId: string,
+  ) {
     return await this.productService.removeFavorite(userId, productId);
   }
 
@@ -34,8 +60,16 @@ export class ProductController {
   }
 
   @Patch(':productId/customize') // checked in service file and it is correct insha'allah
-  async customizeProduct(@Param('productId') productId: string, @Body() { color, material, size }) {
-    return await this.productService.customizeProduct(productId, color , material , size);
+  async customizeProduct(
+    @Param('productId') productId: string,
+    @Body() { color, material, size },
+  ) {
+    return await this.productService.customizeProduct(
+      productId,
+      color,
+      material,
+      size,
+    );
   }
 
   @Post('wishlist')
@@ -45,57 +79,49 @@ export class ProductController {
     @Body('selectedColor') selectedColor: string,
     @Body('selectedMaterial') selectedMaterial: string,
     @Body('selectedSize') selectedSize: string,
-  ) {    
-  }
+  ) {}
 
-  async shareProduct(@Param('productId') productId: string, @Body() shareOptions: any) {
-    return await this.productService.shareProduct(productId, shareOptions);
-  }
+  // async shareProduct(@Param('productId') productId: string, @Body() shareOptions: any) {
+  //   return await this.productService.shareProduct();
+  // }
 
   @Get('search/:keyword') // checked in service file and it is correct insha'allah
   async searchKeyword(@Param('keyword') keyword: string) {
     return await this.productService.searchKeyword(keyword);
   }
 
-
-
-
   // -----------------------------------------------------REVIEW-----------------------------------------------------
 
-
-  @Get('product/:productId') 
+  @Get('product/:productId')
   async getProductReviews(@Param('productId') productId: string) {
-      return await this.productService.getProductReviews(productId);
+    return await this.productService.getProductReviews(productId);
   }
 
-  @Post('product/:productId') 
-  async addReview(@Param('productId') productId: string, @Body() body: { userId: string, rating: number, review: string }) {
-      const { userId, rating, review } = body;
-      return await this.productService.addReview(productId, userId, rating, review);
+  @Post('product/:productId')
+  async addReview(
+    @Param('productId') productId: string,
+    @Body() body: { userId: string; rating: number; review: string },
+  ) {
+    const { userId, rating, review } = body;
+    return await this.productService.addReview(
+      productId,
+      userId,
+      rating,
+      review,
+    );
   }
 
-//----------------------------CATEGORIES----------------------------------------------
-@Get('/categories')
-async getCategories() {
-  return await this.productService.getCategories();
-}
-@Get('/products/:categoryid')
-async getProductsByCategory(@Param('categoryid') categoryid: string) {
-  return await this.productService.getProductsByCategory(categoryid);
-}
+  //----------------------------CATEGORIES----------------------------------------------
+  @Get('/categories')
+  async getCategories() {
+    return await this.productService.getCategories();
+  }
+  @Get('/products/:categoryid')
+  async getProductsByCategory(@Param('categoryid') categoryid: string) {
+    return await this.productService.getProductsByCategory(categoryid);
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-/*
+  /*
   @Delete(':reviewId') 
   async deleteReview(@Param('reviewId') reviewId: string) {
       return await this.productService.deleteReview(reviewId);
@@ -118,5 +144,4 @@ async getProductsByCategory(@Param('categoryid') categoryid: string) {
       return await this.productService.getUserProductReview(userId, productId);
   }
 */
-  
 }

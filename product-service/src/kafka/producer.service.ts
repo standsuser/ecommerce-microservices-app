@@ -19,7 +19,7 @@ export class ProducerService implements OnModuleInit, OnApplicationShutdown {
 
     async produce(record: ProducerRecord) {
         //Send Records to Kafka to producer
-        this.producer.send(record);
+        await this.producer.send(record);
 
     }
 
