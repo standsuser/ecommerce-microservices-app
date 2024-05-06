@@ -7,8 +7,13 @@ import mongoose from 'mongoose';
 //import { User } from 'src/decorators/user.decorator';
 
 export interface User extends mongoose.Document {
-    name: string;
-    username: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    phonenumber: string;
+    company: string;
+    address: string;
+    //username: string;
     password: string;
 }
 //export const userModel = SchemaFactory.createForClass(User);
