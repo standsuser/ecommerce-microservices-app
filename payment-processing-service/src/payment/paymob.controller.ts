@@ -13,9 +13,9 @@ export class PaymobController {
 
 
   @Post('register-order')
-  async registerOrder(@Body() auth:string, orderData: any): Promise<{ orderId: number }> {
+  async registerOrder(@Body() orderData: any): Promise<{ orderId: number }> {
     try {
-      const orderId = await this.paymobService.registerOrder(auth, orderData);
+      const orderId = await this.paymobService.registerOrder(orderData);
       return { orderId };
     } catch (error) {
       console.error('Error registering order:', error);
@@ -23,7 +23,7 @@ export class PaymobController {
     }
   }
   @Post('get-payment-key')
-  async getPaymentKey(@Body()  paymentData: any): Promise<{ token: string }> {
+  async getPaymentKey(@Body() paymentData: any): Promise<{ token: string }> {
     try {
       const token = await this.paymobService.getPaymentKey(paymentData);
       return { token };

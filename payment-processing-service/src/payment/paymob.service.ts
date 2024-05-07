@@ -7,7 +7,8 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class PaymobService {
   constructor(private readonly configService: ConfigService) {}
-  async registerOrder(auth:string, orderData: any): Promise<number> {
+  async registerOrder(orderData: any): Promise<number> {
+    const authToken = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RjME9EWXdMQ0p3YUdGemFDSTZJalZpWlRCaVlqa3lORE0wWVdRMVlUZzRaVEZoWmpReFlUQTNNV1ZtT1RjM1l6QTRNRFF5WlRnME4yUmpaakkxTUdNeE9HRTRNV05qWm1KbVlUQmxPVGdpTENKbGVIQWlPakUzTVRVd09ERTRPVEo5Ljh5Z1Nzc3I5M0EtUTlDVC1fSDREdzNsN2Z2elQ5R01qMWNQaWgxRi1YcHNZYWY2OXdLbm04ODRnRXd0bmI1WUNVS091OXpkREZpTDZjNm1qU0dwb293';
 
     try {
       const response: AxiosResponse<any> = await axios.post(
@@ -16,7 +17,7 @@ export class PaymobService {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${auth}`,
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
