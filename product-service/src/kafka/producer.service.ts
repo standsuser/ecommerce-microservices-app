@@ -6,7 +6,8 @@ export class ProducerService implements OnModuleInit, OnApplicationShutdown {
 
     // Connect to Kafka Server
     private readonly kafka = new Kafka({
-        brokers: ['kafka:9092']
+        // brokers: ['kafka:9092']
+        brokers: ['localhost:9092']
     });
 
     private readonly producer: Producer = this.kafka.producer();
@@ -19,7 +20,7 @@ export class ProducerService implements OnModuleInit, OnApplicationShutdown {
 
     async produce(record: ProducerRecord) {
         //Send Records to Kafka to producer
-        this.producer.send(record);
+        await this.producer.send(record);
 
     }
 
