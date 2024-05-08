@@ -10,6 +10,7 @@ import {
   Req,
   HttpException,
   HttpStatus,
+  Query
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './schema/product.schema';
@@ -60,16 +61,18 @@ export class ProductController {
     return await this.productService.getProductDetails(productId);
   }
 
-  @Patch(':productId/customize') // checked in service file and it is correct insha'allah
+  @Get(':productId/customize')
   async customizeProduct(
     @Param('productId') productId: string,
-    @Body() { color, material, size },
+    @Query('color') color: string,
+    @Query('material') material: string,
+    @Query('size') size: string,
   ) {
     return await this.productService.customizeProduct(
       productId,
+      size,
       color,
       material,
-      size,
     );
   }
 
