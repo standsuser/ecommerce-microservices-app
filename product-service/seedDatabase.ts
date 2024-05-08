@@ -1,6 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb';
 
-const url = 'mongodb://localhost:27017';
+const url = 'mongodb://localhost:27018';
 const dbName = 'product'; // replace with your database name
 
 const client = new MongoClient(url);
@@ -18,7 +18,7 @@ async function run() {
       { name: 'Category 2', description: 'Description 2' },
       // add more categories as needed
     ];
-    const categoryResult = await db.collection('Category').insertMany(categories);
+    const categoryResult = await db.collection('categories').insertMany(categories);
     console.log(categoryResult.insertedCount + ' categories were inserted');
 
     // Insert products
@@ -39,7 +39,7 @@ async function run() {
       },
       // add more products as needed
     ];
-    const productResult = await db.collection('Product').insertMany(products);
+    const productResult = await db.collection('products').insertMany(products);
     console.log(productResult.insertedCount + ' products were inserted');
 
     // Insert reviews
@@ -53,7 +53,7 @@ async function run() {
       },
       // add more reviews as needed
     ];
-    const reviewResult = await db.collection('Review').insertMany(reviews);
+    const reviewResult = await db.collection('reviews').insertMany(reviews);
     console.log(reviewResult.insertedCount + ' reviews were inserted');
 
     // Insert favorites
@@ -64,7 +64,7 @@ async function run() {
       },
       // add more favorites as needed
     ];
-    const favoriteResult = await db.collection('Favorite').insertMany(favorites);
+    const favoriteResult = await db.collection('favorites').insertMany(favorites);
     console.log(favoriteResult.insertedCount + ' favorites were inserted');
   } finally {
     await client.close();

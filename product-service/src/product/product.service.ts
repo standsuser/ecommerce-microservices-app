@@ -126,12 +126,17 @@ export class ProductService {
     //return await favorite.save();
   }
 
+  async getAllFavorites() {
+    try {
+      return await this.favoriteModel.find().populate('productid').exec();
+    } catch (error) {
+      throw new NotFoundException('Favorites not found');
+    }
+  }
+
   async addFavorite(
     userId: string,
-    productId: string,
-    selectedColor: string,
-    selectedMaterial: string,
-    selectedSize: string,
+    productId: string
   ) {
     try {
       // Query the product details
@@ -143,15 +148,13 @@ export class ProductService {
       // Create a new favorite
       const favorite = new this.favoriteModel({
         userid: userId,
-        productid: productId,
-        selectedColor,
-        selectedMaterial,
-        selectedSize,
+        productid: productId
       });
 
       // Save the favorite
       await favorite.save();
     } catch (error) {
+      console.error(error);
       throw new NotFoundException('Product not found');
     }
   }

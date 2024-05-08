@@ -24,6 +24,10 @@ export class ProductController {
     return await this.productService.getFavorites(userId);
   }
 
+  @Get('/favorites/all')
+  async getAllFavorites() {
+    return await this.productService.getAllFavorites();
+  }
   @Post('favorites') // check and it is correct insha'allah
   async addFavorite(
     @Body()
@@ -35,14 +39,11 @@ export class ProductController {
       selectedSize: string;
     },
   ) {
-    const { userId, productId, selectedColor, selectedMaterial, selectedSize } =
+    const { userId, productId} =
       body;
     return await this.productService.addFavorite(
       userId,
-      productId,
-      selectedColor,
-      selectedMaterial,
-      selectedSize,
+      productId
     );
   }
 
@@ -92,7 +93,7 @@ export class ProductController {
 
   // -----------------------------------------------------REVIEW-----------------------------------------------------
 
-  @Get('product/:productId')
+  @Get('product/view/:productId')
   async getProductReviews(@Param('productId') productId: string) {
     return await this.productService.getProductReviews(productId);
   }
