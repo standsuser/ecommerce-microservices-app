@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { Favorite } from './schema/favorite.schema';
 import { Category } from './schema/category.schema';
+import { Review } from './schema/review.schema';
 import { ProducerService } from '../kafka/producer.service';
 
 // const socialSharingUtils = require('social-sharing-utilities');
@@ -19,7 +20,8 @@ export class ProductService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
     @InjectModel(Favorite.name) private readonly favoriteModel: Model<Favorite>,
-    @InjectModel(Category.name) private readonly categoryModel: Model<Favorite>,
+    @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
+    @InjectModel(Review.name) private readonly reviewModel: Model<Review>,
     private readonly producerService: ProducerService,
   ) {}
 
@@ -299,10 +301,10 @@ export class ProductService {
 
   async getProductReviews(productId: string) {
     try {
-      const reviews = await this.productModel
+      const reviews = await this.reviewModel
         .find({ productid: productId })
         .exec();
-      if (!reviews) {
+      if (!reviews || reviews.length === 0) {
         throw new NotFoundException('Reviews not found');
       }
       return reviews;
@@ -312,17 +314,20 @@ export class ProductService {
   }
 
   async addReview(
-    userId: string,
     productId: string,
+    userId: string,
     rating: number,
     review: string,
   ) {
+    console.log('Product ID:', productId);
+
     try {
-      const product = await this.productModel.findById(productId).exec();
+      const product = await this.productModel.findOne({ _id: productId }).exec();      console.log('Product:', product);
+
       if (!product) {
         throw new NotFoundException('Product not found');
       }
-      const newReview = new this.productModel({
+      const newReview = new this.reviewModel({
         userid: userId,
         productid: productId,
         rating: rating,

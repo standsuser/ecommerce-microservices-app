@@ -34,7 +34,10 @@ export class Product extends Document {
   totalPrice: number;
 
   @Prop()
-  totalRating: number;
+  rating: number; //stars to display
+
+  @Prop()
+  totalRating: number; //total review star count
 
   @Prop()
   totalReviews: number;

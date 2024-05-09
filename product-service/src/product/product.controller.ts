@@ -96,17 +96,18 @@ export class ProductController {
 
   // -----------------------------------------------------REVIEW-----------------------------------------------------
 
-  @Get('product/view/:productId')
+  @Get('/review/:productId')
   async getProductReviews(@Param('productId') productId: string) {
     return await this.productService.getProductReviews(productId);
   }
-
-  @Post('product/:productId')
+  
+  @Post('/review/add/:productId/:userId')
   async addReview(
     @Param('productId') productId: string,
-    @Body() body: { userId: string; rating: number; review: string },
+    @Param('userId') userId: string,
+    @Body() body: { rating: number; review: string },
   ) {
-    const { userId, rating, review } = body;
+    const { rating, review } = body;
     return await this.productService.addReview(
       productId,
       userId,
