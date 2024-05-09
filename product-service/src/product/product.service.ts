@@ -194,23 +194,24 @@ export class ProductService {
     size: string,
     color: string,
     material: string,
-  ) {
+  ): Promise<number> {
     try {
       if (!productId) {
         throw new Error('Invalid input parameters');
       }
-
-      const updatedProduct = await this.productModel.findByIdAndUpdate(
-        productId,
-        { color, material, size },
-        { new: true },
+      const updatedProduct = await this.productModel.findById(productId).exec();
+      if (!updatedProduct) {
+        throw new Error('Product not found');
+      }
+      const totalPrice = this.calculateTotalPrice(
+        updatedProduct._id.toString(),
+        size,
+        color,
+        material,
+        updatedProduct.totalPrice,
       );
 
-      if (!updatedProduct) {
-        throw new NotFoundException('Product not found');
-      }
-
-      return updatedProduct;
+      return totalPrice;
     } catch (error) {
       throw new Error('Failed to customize product: ' + error.message);
     }
@@ -249,16 +250,13 @@ export class ProductService {
   }
 
   calculateTotalPrice(
-    productId: string,
+    _id: string,
     size: string,
     color: string,
     material: string,
     totalPrice: number,
-  ): void {
-    const product = this.productModel.findById(productId);
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
+  ): number {
+
 
     // Define prices for different sizes and colors (you can adjust these values as needed)
     const sizePrices = {
@@ -278,20 +276,20 @@ export class ProductService {
     };
 
     const materialPrices = {
-      cotton: 10,
-      silk: 20,
-      wool: 30,
-      plastice: 40,
+      plastic: 20,
+      wood: 30,
+      HDPEplastic: 40,
       // Add prices for other materials as needed
     };
-
+  
     // Calculate total price based on size and color
     let sizePrice = sizePrices[size] || 0; // Default to 0 if size not found
     let colorPrice = colorPrices[color] || 0; // Default to 0 if color not found
     let materialPrice = materialPrices[material] || 0; // Default to 0 if base price not found
+    // Calculate total price
+    let total = materialPrice + sizePrice + colorPrice+ totalPrice;
 
-    // Update total price of the product
-    product[totalPrice] = materialPrice + sizePrice + colorPrice;
+    return total;
   }
 
   //------------------------------------------------------REVIEW------------------------------------------------------
