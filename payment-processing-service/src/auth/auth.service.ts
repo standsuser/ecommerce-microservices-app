@@ -32,7 +32,7 @@ export class AuthService implements OnModuleInit {
       );
 
       const token = response?.data?.token;
-      console.log('Authentication token:', token); // Log the authentication token
+      console.log('Authentication token:', token); 
       return token;
     } catch (error) {
       console.error('Error during authentication:', error);
@@ -40,3 +40,4 @@ export class AuthService implements OnModuleInit {
     }
   }
 }
+// AUTHENTICATION IS NOW AUTOMATIC
