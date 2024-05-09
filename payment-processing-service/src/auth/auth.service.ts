@@ -1,6 +1,11 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
-import * as dotenv from 'dotenv'; // Import dotenv module
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+console.log(process.env.API_KEY);
+console.log(process.env.API_KEY);
+console.log(process.env.API_KEY);
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -11,13 +16,12 @@ export class AuthService implements OnModuleInit {
   async onModuleInit() {
     try {
       // Load environment variables from .env file in the current directory
-      dotenv.config();
+      // dotenv.config();
       
       // Assign environment variables to class properties
-      this.username = process.env.USERNAME || '';
-      this.password = process.env.PASSWORD || '';
-      this.apiKey = process.env.API_KEY || '';
-      console.log("this is the usernam " + this.username,+ "this is the pass " + this.password, this.apiKey);
+      this.username = process.env.USERNAME;
+      this.password = process.env.PASSWORD;
+      this.apiKey = process.env.API_KEY;
     } catch (error) {
       console.error('Error reading .env file:', error);
       throw new Error('Failed to read authentication details from .env file');
