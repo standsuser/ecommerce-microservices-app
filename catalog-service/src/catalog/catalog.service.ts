@@ -27,8 +27,16 @@ export class CatalogService implements OnModuleInit {
                     if (topic === 'featured') {
                         await this.featuredListingModel.updateOne({ productId: data.productId }, data, { upsert: true });
                     } else if (topic === 'topoffer') {
-                        await this.topOfferModel.updateOne({ productId: data.productId }, data, { upsert: true });
-                    }
+                      await this.topOfferModel.updateOne(
+                        { productId: data.productId },
+                        { 
+                            $set: {
+                                ...data,
+                                discountpercentage: data.discountpercentage 
+                            } 
+                        },
+                        { upsert: true })
+                      }
                 } catch (error) {
                     console.error(`Error processing message from ${topic} topic:`, error);
                 }
