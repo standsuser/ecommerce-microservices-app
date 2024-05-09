@@ -32,4 +32,16 @@ export class PaymobController {
       throw new Error('Failed to obtain payment key');
     }
   }
+
+  @Post('/iframe')
+  async paymentIFrame(@Body('paymentToken') paymentToken: string): Promise<any> {
+    try {
+      const result = await this.paymobService.paymentIFrame(paymentToken);
+      return result;
+    } catch (error) {
+      // Handle errors here
+      console.error('Error in paymentIFrame:', error);
+      throw new Error('Failed to load payment iFrame');
+    }
+  }
 }

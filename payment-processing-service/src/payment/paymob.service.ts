@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 export class PaymobService {
   constructor(private readonly configService: ConfigService) {}
   async registerOrder(orderData: any): Promise<number> {
-    const authToken = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RjME9EWXdMQ0p3YUdGemFDSTZJalZpWlRCaVlqa3lORE0wWVdRMVlUZzRaVEZoWmpReFlUQTNNV1ZtT1RjM1l6QTRNRFF5WlRnME4yUmpaakkxTUdNeE9HRTRNV05qWm1KbVlUQmxPVGdpTENKbGVIQWlPakUzTVRVd09ERTRPVEo5Ljh5Z1Nzc3I5M0EtUTlDVC1fSDREdzNsN2Z2elQ5R01qMWNQaWgxRi1YcHNZYWY2OXdLbm04ODRnRXd0bmI1WUNVS091OXpkREZpTDZjNm1qU0dwb293';
+    const authToken = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RjME9EWXdMQ0p3YUdGemFDSTZJalZpWlRCaVlqa3lORE0wWVdRMVlUZzRaVEZoWmpReFlUQTNNV1ZtT1RjM1l6QTRNRFF5WlRnME4yUmpaakkxTUdNeE9HRTRNV05qWm1KbVlUQmxPVGdpTENKbGVIQWlPakUzTVRVeU1UVTJOREI5LjlvX0dZcEdIZkhjRm95cGliZDlrc1FKZVVxVVFURXRpall0Wk41QmxxNEk4WmNmTG1DTkpZQnBTTnBKVkRORHdWZXV5SC04ZGF0a01ZeFk4SnF3c2FB';
 
     try {
       const response: AxiosResponse<any> = await axios.post(
@@ -23,32 +23,54 @@ export class PaymobService {
       );
 
       // Assuming response includes an order ID
-      return response?.data?.id;
+      return response.data;
     } catch (error) {
       console.error('Error registering order:', error);
       throw new Error('Failed to register order');
     }
   }
   async getPaymentKey(paymentData: any): Promise<string> {
-    const authToken = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RjME9EWXdMQ0p3YUdGemFDSTZJalZpWlRCaVlqa3lORE0wWVdRMVlUZzRaVEZoWmpReFlUQTNNV1ZtT1RjM1l6QTRNRFF5WlRnME4yUmpaakkxTUdNeE9HRTRNV05qWm1KbVlUQmxPVGdpTENKbGVIQWlPakUzTVRVd056Y3lNRFI5LjVtR1lZUlltQVhsMnJ0bHN0SllrR1dWQkNIYW9SLVVhR2RSRDRSQWZIdXZzWkZfR3hUblJaRUNiN09IRXBoZE5BVVItVHVrR2ViTWo4ZWtadXpRMDdB';
+    const authToken = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RjME9EWXdMQ0p3YUdGemFDSTZJalZpWlRCaVlqa3lORE0wWVdRMVlUZzRaVEZoWmpReFlUQTNNV1ZtT1RjM1l6QTRNRFF5WlRnME4yUmpaakkxTUdNeE9HRTRNV05qWm1KbVlUQmxPVGdpTENKbGVIQWlPakUzTVRVeU1UVTJOREI5LjlvX0dZcEdIZkhjRm95cGliZDlrc1FKZVVxVVFURXRpall0Wk41QmxxNEk4WmNmTG1DTkpZQnBTTnBKVkRORHdWZXV5SC04ZGF0a01ZeFk4SnF3c2FB'; 
 
     try {
-      const response: AxiosResponse<any> = await axios.post(
-        'https://accept.paymob.com/api/acceptance/payment_keys',
-        paymentData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
+        const response: AxiosResponse<any> = await axios.post(
+            'https://accept.paymob.com/api/acceptance/payment_keys',
+            paymentData,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
 
-      // Assuming response includes a token
-      return response?.data?.token;
+        // Log the response data for debugging
+        console.log('Paymob API Response:', response.data);
+
+        // Assuming response includes a token
+        return response?.data?.token;
     } catch (error) {
-      console.error('Error obtaining payment key:', error);
-      throw new Error('Failed to obtain payment key');
+        // Log detailed error message and response for debugging
+        console.error('Error obtaining payment key:', error?.message);
+        if (error.response) {
+            console.error('Paymob API Error Response:', error.response.data);
+        }
+        throw new Error('Failed to obtain payment key');
+    }
+  }
+  async paymentIFrame(paymentToken: string): Promise<void> {
+    try {
+      const iframeId: string = '844345'; // Your iframe ID
+      const url = `https://accept.paymobsolutions.com/api/acceptance/iframes/${iframeId}?payment_token=${paymentToken}`;
+  
+      const response: AxiosResponse<any> = await axios.post(url);
+  
+      // Handle response data here if needed
+      return response.data;
+    } catch (error) {
+      // Handle errors here
+      console.error('Error in paymentIFrame:', error);
+      throw new Error('Failed to load payment iFrame');
     }
   }
 }
