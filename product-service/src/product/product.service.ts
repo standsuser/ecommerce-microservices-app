@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { Favorite } from './schema/favorite.schema';
 import { Category } from './schema/category.schema';
+import { Review } from './schema/review.schema';
 import { ProducerService } from '../kafka/producer.service';
 
 // const socialSharingUtils = require('social-sharing-utilities');
@@ -19,7 +20,8 @@ export class ProductService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
     @InjectModel(Favorite.name) private readonly favoriteModel: Model<Favorite>,
-    @InjectModel(Category.name) private readonly categoryModel: Model<Favorite>,
+    @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
+    @InjectModel(Review.name) private readonly reviewModel: Model<Review>,
     private readonly producerService: ProducerService,
   ) {}
 
@@ -44,6 +46,8 @@ export class ProductService {
 
     // Send the record to Kafka
     await this.producerService.produce(record);
+
+    console.log('Top discounted products sent:', record);
   }
 
   async sendTopRatedProducts() {
@@ -60,13 +64,15 @@ export class ProductService {
       messages: products.map((product) => ({
         value: JSON.stringify({
           productId: product._id.toString(),
-          totalRating: product.totalRating,
+          totalRating: product.rating,
         }),
       })),
     };
 
     // Send the record to Kafka
     await this.producerService.produce(record);
+
+    console.log('Top rated products sent:', record);
   }
 
   async addToWishlist(
@@ -242,12 +248,15 @@ export class ProductService {
 
   async searchKeyword(keyword: string) {
     try {
-      return await this.productModel.find({ $text: { $search: keyword } });
+      const products = await this.productModel.find({ $text: { $search: keyword } });
+      return products;
     } catch (error) {
+      console.error('Error:', error);
       throw new NotFoundException('Product not found');
     }
-    //return await this.productModel.find({ $text: { $search: keyword } });
   }
+
+  
 
   calculateTotalPrice(
     _id: string,
@@ -296,10 +305,10 @@ export class ProductService {
 
   async getProductReviews(productId: string) {
     try {
-      const reviews = await this.productModel
+      const reviews = await this.reviewModel
         .find({ productid: productId })
         .exec();
-      if (!reviews) {
+      if (!reviews || reviews.length === 0) {
         throw new NotFoundException('Reviews not found');
       }
       return reviews;
@@ -309,17 +318,19 @@ export class ProductService {
   }
 
   async addReview(
-    userId: string,
     productId: string,
+    userId: string,
     rating: number,
     review: string,
   ) {
+
     try {
-      const product = await this.productModel.findById(productId).exec();
+      const product = await this.productModel.findOne({ _id: productId }).exec();
+
       if (!product) {
         throw new NotFoundException('Product not found');
       }
-      const newReview = new this.productModel({
+      const newReview = new this.reviewModel({
         userid: userId,
         productid: productId,
         rating: rating,
@@ -351,21 +362,25 @@ export class ProductService {
 
   //----------------------CATEGORIES-----------------------------------------
 
-  async getCategories() {
+async getCategories() {
+
     try {
       const categories = await this.categoryModel.find().exec();
+
       if (!categories) {
         throw new NotFoundException('Categories not found');
       }
+
       return categories;
     } catch (error) {
+      console.error('Error:', error);
       throw new NotFoundException('Categories not found');
     }
   }
 
-  async getProductsByCategory(categoryid: string) {
+  async getProductsByCategory(categoryId: string) {
     try {
-      const products = await this.productModel.find({ categoryid }).exec();
+      const products = await this.productModel.find({categoryId: categoryId }).exec();
       if (!products) {
         throw new NotFoundException('Products not found');
       }

@@ -5,7 +5,8 @@ import { Consumer, ConsumerRunConfig, ConsumerSubscribeTopics, Kafka } from "kaf
 export class ConsumerService implements OnApplicationShutdown {
   // Connect to Kafka Server
   private readonly kafka = new Kafka({
-    brokers: ['kafka:9092']
+    // brokers: ['kafka:9092']
+    brokers: ['localhost:9092']
   });
 
   private readonly consumers: Consumer[] = [];
