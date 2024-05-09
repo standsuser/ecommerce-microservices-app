@@ -241,13 +241,20 @@ export class ProductService {
   // }  }
 
   async searchKeyword(keyword: string) {
+    console.log('Keyword:', keyword);
+  
     try {
-      return await this.productModel.find({ $text: { $search: keyword } });
+      const products = await this.productModel.find({ $text: { $search: keyword } });
+      console.log('Products:', products);
+  
+      return products;
     } catch (error) {
+      console.error('Error:', error);
       throw new NotFoundException('Product not found');
     }
-    //return await this.productModel.find({ $text: { $search: keyword } });
   }
+
+  
 
   calculateTotalPrice(
     _id: string,

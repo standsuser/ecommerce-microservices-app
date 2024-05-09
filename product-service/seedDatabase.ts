@@ -11,8 +11,6 @@ async function run() {
     console.log("Connected successfully to server");
 
     const db = client.db(dbName);
-
-    // Insert categories
     const categories = [
       { name: 'Category 1', description: 'Description 1' },
       { name: 'Category 2', description: 'Description 2' },

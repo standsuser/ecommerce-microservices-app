@@ -3,7 +3,7 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 
 @Schema()
 export class Product extends Document {
-  @Prop({ required: true })
+  @Prop({ required: true, text: true  })
   name: string;
 
   @Prop({ required: true })
