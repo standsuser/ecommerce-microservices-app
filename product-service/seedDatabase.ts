@@ -27,7 +27,7 @@ async function run() {
         imageURL: ['http://example.com/image1.jpg'],
         availability: true,
         discountpercentage: 0,
-        categoryIds: [categoryResult.insertedIds[0]], // reference to a category
+        categoryId: categoryResult.insertedIds[0], // reference to a category
         sizes: ['S', 'M', 'L'],
         colors: ['Red', 'Blue'],
         materials: ['Cotton'],

@@ -25,7 +25,7 @@ export class ProductController {
     async getCategories() {
       return await this.productService.getCategories();
     }
-    @Get('/:categoryid')
+    @Get('products/:categoryid')
     async getProductsByCategory(@Param('categoryid') categoryid: string) {
       return await this.productService.getProductsByCategory(categoryid);
     }
@@ -66,7 +66,7 @@ export class ProductController {
     return await this.productService.removeFavorite(userId, productId);
   }
 
-  @Get(':productId') // checked in service file and it is correct insha'allah
+  @Get('/:productId') // checked in service file and it is correct insha'allah
   async getProductDetails(@Param('productId') productId: string) {
     return await this.productService.getProductDetails(productId);
   }

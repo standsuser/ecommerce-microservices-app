@@ -374,9 +374,9 @@ async getCategories() {
     }
   }
 
-  async getProductsByCategory(categoryid: string) {
+  async getProductsByCategory(categoryId: string) {
     try {
-      const products = await this.productModel.find({ categoryid }).exec();
+      const products = await this.productModel.find({categoryId: categoryId }).exec();
       if (!products) {
         throw new NotFoundException('Products not found');
       }
