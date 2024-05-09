@@ -1,49 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from 'src/auth/auth.service'; 
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class PaymobService {
   constructor(
     private readonly configService: ConfigService,
-    private readonly authService: AuthService, 
-  ) {}
+    private readonly authService: AuthService,
+  ) { }
+  async onModuleInit() {
 
-  async registerOrder(orderData: any): Promise<number> {
-    const authToken = await this.authService.authenticate(); 
+  }
 
+  async generateConfigWithAuthToken(orderData: any): Promise<any> {
     try {
-      const response: AxiosResponse<any> = await axios.post(
-        'https://accept.paymob.com/api/ecommerce/orders',
-        orderData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`, // Include the authentication token in the request header 
-          },
-        }
-      );
+      // Get the authentication token from the AuthService
+      const authToken = await this.authService.authenticate();
 
-      // Assuming response includes an order ID
-      return response.data;
+      const config = {
+        ...orderData, // Merge the orderData with additional properties
+        "auth_token": authToken
+      };
+      //ask mariam about kafkaking the transferred data  
+
+      return config;
     } catch (error) {
-      console.error('Error registering order:', error);
-      throw new Error('Failed to register order');
+      console.error('Error generating config:', error);
+      throw new Error('Failed to generate config');
     }
   }
 
-  async getPaymentKey(paymentData: any): Promise<string> {
-    const authToken = await this.authService.authenticate(); // Call authenticate method on injected instance
-
+  async registerOrder(orderData: any): Promise<number> {
     try {
+      const config = await this.generateConfigWithAuthToken(orderData);
+
       const response: AxiosResponse<any> = await axios.post(
-        'https://accept.paymob.com/api/acceptance/payment_keys',
-        paymentData,
+        'https://accept.paymob.com/api/ecommerce/orders',
+        config,
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${config.auth_token}`,
           },
         }
       );

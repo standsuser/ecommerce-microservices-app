@@ -32,7 +32,7 @@ export class AuthService implements OnModuleInit {
       );
 
       const token = response?.data?.token;
-      console.log('Authentication token:', token); 
+      console.log('Authentication token:', token);
       return token;
     } catch (error) {
       console.error('Error during authentication:', error);
