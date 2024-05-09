@@ -241,12 +241,8 @@ export class ProductService {
   // }  }
 
   async searchKeyword(keyword: string) {
-    console.log('Keyword:', keyword);
-  
     try {
       const products = await this.productModel.find({ $text: { $search: keyword } });
-      console.log('Products:', products);
-  
       return products;
     } catch (error) {
       console.error('Error:', error);
