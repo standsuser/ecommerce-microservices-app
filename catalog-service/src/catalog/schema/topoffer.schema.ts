@@ -8,7 +8,7 @@ export class Offer extends Document{
   productId: Types.ObjectId;
 
   @Prop({ required: true }) 
-  discountPercentage: number;
+  discountpercentage: number;
 
 }
 
