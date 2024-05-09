@@ -3,8 +3,8 @@ import axios, { AxiosResponse } from 'axios';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
-console.log(process.env.API_KEY);
-console.log(process.env.API_KEY);
+console.log(process.env.USERNAME);
+console.log(process.env.PASSWORD);
 console.log(process.env.API_KEY);
 
 @Injectable()
