@@ -16,26 +16,36 @@ export class CatalogService implements OnModuleInit {
   async onModuleInit() {
     // Consume 'featured' topic
     await this.consumerService.consume(
-      { topics: ['featured'] },
+      { topics: ['featured'] , fromBeginning: true },
       {
         eachMessage: async ({ topic, partition, message }) => {
-          const product = JSON.parse(message.value.toString());
+          try {
+            const product = JSON.parse(message.value.toString());
+            console.log('Received message from featured topic:', product);
 
-          // Update the featured listing with the product info
-          await this.featuredListingModel.updateOne({ productId: product.productId }, product, { upsert: true });
+            // Update the featured listing with the product info
+            await this.featuredListingModel.updateOne({ productId: product.productId }, product, { upsert: true });
+          } catch (error) {
+            console.error('Error processing message from featured topic:', error);
+          }
         },
       },
     );
 
     // Consume 'topoffer' topic
     await this.consumerService.consume(
-      { topics: ['topoffer'] },
+      { topics: ['topoffer'] , fromBeginning: true },
       {
         eachMessage: async ({ topic, partition, message }) => {
-          const offer = JSON.parse(message.value.toString());
+          try {
+            const offer = JSON.parse(message.value.toString());
+            console.log('AAAAA Received message from topoffer topic:', offer);
 
-          // Update the top offer with the offer info
-          await this.topOfferModel.updateOne({ productId: offer.productId }, offer, { upsert: true });
+            // Update the top offer with the offer info
+            await this.topOfferModel.updateOne({ productId: offer.productId }, offer, { upsert: true });
+          } catch (error) {
+            console.error('Error processing message from topoffer topic:', error);
+          }
         },
       },
     );

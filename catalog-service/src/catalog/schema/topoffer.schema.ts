@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 
 
 @Schema()
-export class Offer {
+export class Offer extends Document{
   @Prop({ type: Types.ObjectId, required: true }) 
   productId: Types.ObjectId;
 

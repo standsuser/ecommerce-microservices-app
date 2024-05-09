@@ -46,6 +46,8 @@ export class ProductService {
 
     // Send the record to Kafka
     await this.producerService.produce(record);
+
+    console.log('Top discounted products sent:', record);
   }
 
   async sendTopRatedProducts() {
@@ -69,6 +71,8 @@ export class ProductService {
 
     // Send the record to Kafka
     await this.producerService.produce(record);
+
+    console.log('Top rated products sent:', record);
   }
 
   async addToWishlist(
