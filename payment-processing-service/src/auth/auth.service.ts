@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
-console.log(process.env.USERNAME);
+console.log(process.env.AUSERNAME);
 console.log(process.env.PASSWORD);
 console.log(process.env.API_KEY);
 
@@ -19,7 +19,7 @@ export class AuthService implements OnModuleInit {
       // dotenv.config();
       
       // Assign environment variables to class properties
-      this.username = process.env.USERNAME;
+      this.username = process.env.AUSERNAME;
       this.password = process.env.PASSWORD;
       this.apiKey = process.env.API_KEY;
     } catch (error) {
