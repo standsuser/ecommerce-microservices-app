@@ -1,14 +1,17 @@
-// paymob.service.ts
-
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { ConfigService } from '@nestjs/config';
+import { AuthService } from 'src/auth/auth.service'; 
 
 @Injectable()
 export class PaymobService {
-  constructor(private readonly configService: ConfigService) { }
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly authService: AuthService, 
+  ) {}
+
   async registerOrder(orderData: any): Promise<number> {
-    const authToken = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RjME9EWXdMQ0p3YUdGemFDSTZJalZpWlRCaVlqa3lORE0wWVdRMVlUZzRaVEZoWmpReFlUQTNNV1ZtT1RjM1l6QTRNRFF5WlRnME4yUmpaakkxTUdNeE9HRTRNV05qWm1KbVlUQmxPVGdpTENKbGVIQWlPakUzTVRVeU9EWTVOVEI5Ljh1clhQWjh6NTE5NE1ncjlra2xmQi1mZEpGWm5DcHV2RWE1VUxnUVVNeXBpT3FubnFRSGNRSHFTelhlN21SbE1WWk9RRVNNS1VPVXdpLXhjTEs4Y0p3';
+    const authToken = await this.authService.authenticate(); 
 
     try {
       const response: AxiosResponse<any> = await axios.post(
@@ -17,7 +20,7 @@ export class PaymobService {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken}`, // Include the authentication token in the request header 
           },
         }
       );
@@ -29,8 +32,9 @@ export class PaymobService {
       throw new Error('Failed to register order');
     }
   }
+
   async getPaymentKey(paymentData: any): Promise<string> {
-    const authToken = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RjME9EWXdMQ0p3YUdGemFDSTZJalZpWlRCaVlqa3lORE0wWVdRMVlUZzRaVEZoWmpReFlUQTNNV1ZtT1RjM1l6QTRNRFF5WlRnME4yUmpaakkxTUdNeE9HRTRNV05qWm1KbVlUQmxPVGdpTENKbGVIQWlPakUzTVRVeU9EWTVOVEI5Ljh1clhQWjh6NTE5NE1ncjlra2xmQi1mZEpGWm5DcHV2RWE1VUxnUVVNeXBpT3FubnFRSGNRSHFTelhlN21SbE1WWk9RRVNNS1VPVXdpLXhjTEs4Y0p3';
+    const authToken = await this.authService.authenticate(); // Call authenticate method on injected instance
 
     try {
       const response: AxiosResponse<any> = await axios.post(
@@ -44,13 +48,10 @@ export class PaymobService {
         }
       );
 
-      // Log the response data for debugging
       console.log('Paymob API Response:', response.data);
 
-      // Assuming response includes a token
       return response?.data?.token;
     } catch (error) {
-      // Log detailed error message and response for debugging
       console.error('Error obtaining payment key:', error?.message);
       if (error.response) {
         console.error('Paymob API Error Response:', error.response.data);
@@ -58,6 +59,7 @@ export class PaymobService {
       throw new Error('Failed to obtain payment key');
     }
   }
+
   async paymentIFrame(paymentToken: string): Promise<void> {
     try {
       const iframeId: string = '844345'; // Your iframe ID
@@ -65,7 +67,6 @@ export class PaymobService {
 
       const response: AxiosResponse<any> = await axios.post(url);
 
-      // Handle response data here if needed
       return response.data;
     } catch (error) {
       // Handle errors here
