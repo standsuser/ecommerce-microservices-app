@@ -1,7 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
-import * as path from 'path';
-import * as fs from 'fs';
+import * as dotenv from 'dotenv'; // Import dotenv module
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -11,13 +10,17 @@ export class AuthService implements OnModuleInit {
 
   async onModuleInit() {
     try {
-      const authData = JSON.parse(fs.readFileSync('./auth/json/auth.json', 'utf8'));
-      this.username = authData.username;
-      this.password = authData.password;
-      this.apiKey = authData.apiKey;
+      // Load environment variables from .env file in the current directory
+      dotenv.config();
+      
+      // Assign environment variables to class properties
+      this.username = process.env.USERNAME || '';
+      this.password = process.env.PASSWORD || '';
+      this.apiKey = process.env.API_KEY || '';
+      console.log("this is the usernam " + this.username,+ "this is the pass " + this.password, this.apiKey);
     } catch (error) {
-      console.error('Error reading auth.json:', error);
-      throw new Error('Failed to read authentication details');
+      console.error('Error reading .env file:', error);
+      throw new Error('Failed to read authentication details from .env file');
     }
   }
 
@@ -30,7 +33,7 @@ export class AuthService implements OnModuleInit {
       );
 
       const token = response?.data?.token;
-      console.log('Authentication token:', token);
+      console.log('Authentication token:', token); // Log the authentication token
       return token;
     } catch (error) {
       console.error('Error during authentication:', error);
