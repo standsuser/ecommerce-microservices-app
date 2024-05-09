@@ -64,7 +64,7 @@ export class ProductService {
       messages: products.map((product) => ({
         value: JSON.stringify({
           productId: product._id.toString(),
-          totalRating: product.totalRating,
+          totalRating: product.rating,
         }),
       })),
     };

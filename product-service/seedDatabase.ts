@@ -34,6 +34,7 @@ async function run() {
         totalPrice: 100,
         totalRating: 5,
         totalReviews: 10,
+        rating: 5
       },
       // add more products as needed
     ];
@@ -62,6 +63,7 @@ async function run() {
       },
       // add more favorites as needed
     ];
+
     const favoriteResult = await db.collection('favorites').insertMany(favorites);
     console.log(favoriteResult.insertedCount + ' favorites were inserted');
   } finally {
