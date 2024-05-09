@@ -20,6 +20,16 @@ import { ProductModule } from './product.module';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+    //----------------------------CATEGORIES----------------------------------------------
+    @Get('/category')
+    async getCategories() {
+      return await this.productService.getCategories();
+    }
+    @Get('/:categoryid')
+    async getProductsByCategory(@Param('categoryid') categoryid: string) {
+      return await this.productService.getProductsByCategory(categoryid);
+    }
+
   @Get('favorites/:userId') // checked in service file and it is correct insha'allah
   async getFavorites(@Param('userId') userId: string) {
     return await this.productService.getFavorites(userId);
@@ -100,7 +110,7 @@ export class ProductController {
   async getProductReviews(@Param('productId') productId: string) {
     return await this.productService.getProductReviews(productId);
   }
-  
+
   @Post('/review/add/:productId/:userId')
   async addReview(
     @Param('productId') productId: string,
@@ -116,15 +126,7 @@ export class ProductController {
     );
   }
 
-  //----------------------------CATEGORIES----------------------------------------------
-  @Get('/categories')
-  async getCategories() {
-    return await this.productService.getCategories();
-  }
-  @Get('/products/:categoryid')
-  async getProductsByCategory(@Param('categoryid') categoryid: string) {
-    return await this.productService.getProductsByCategory(categoryid);
-  }
+
 
   /*
   @Delete(':reviewId') 

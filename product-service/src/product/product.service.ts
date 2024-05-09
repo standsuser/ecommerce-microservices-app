@@ -319,10 +319,9 @@ export class ProductService {
     rating: number,
     review: string,
   ) {
-    console.log('Product ID:', productId);
 
     try {
-      const product = await this.productModel.findOne({ _id: productId }).exec();      console.log('Product:', product);
+      const product = await this.productModel.findOne({ _id: productId }).exec();
 
       if (!product) {
         throw new NotFoundException('Product not found');
@@ -359,14 +358,18 @@ export class ProductService {
 
   //----------------------CATEGORIES-----------------------------------------
 
-  async getCategories() {
+async getCategories() {
+
     try {
       const categories = await this.categoryModel.find().exec();
+
       if (!categories) {
         throw new NotFoundException('Categories not found');
       }
+
       return categories;
     } catch (error) {
+      console.error('Error:', error);
       throw new NotFoundException('Categories not found');
     }
   }
