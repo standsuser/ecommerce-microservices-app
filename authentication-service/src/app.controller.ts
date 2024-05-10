@@ -58,6 +58,19 @@ export class AppController {
     }
   }
 
+  @Post('forgot-password')
+  async forgotPassword(@Body() { email }: { email: string }): Promise<any> {
+    try {
+      // Attempt to send password reset email
+      const response = await this.userService.forgetPassword(email);
+      return { success: true, response };
+    } catch (error) {
+      // Handle any errors thrown during password reset
+      return { success: false, message: error }; // Return error response
+    }
+  }
+  
+
 
 
 

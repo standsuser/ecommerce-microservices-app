@@ -27,6 +27,10 @@ export class UserController {
         console.log(command);
         return this.userService.register(command.data);
     }
+    @MessagePattern('forgot-password')
+    async forgetPassword(command){
+        return this.userService.forgetPassword(command.data);
+    }
     @UseGuards(LocalAuthGuard)
     @MessagePattern('login')
     async login(command){

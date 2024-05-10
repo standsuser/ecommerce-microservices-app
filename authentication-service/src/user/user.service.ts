@@ -170,6 +170,36 @@ export class UserService {
         }
     }
 
+    async forgetPassword(email: string) : Promise<void> {
+        const existingUser = await this.getUserbyEmail(email);
+        if (!existingUser) {
+            throw new NotFoundException('User not found');
+        }
+
+        // Send password reset email
+        await this.sendPasswordResetEmail(email);
+
+        console.log("Password reset email sent");
+    }
+
+    private async sendPasswordResetEmail(email: any): Promise<void> {
+        const resetLink = `https://yourwebsite.com/reset-password/${encodeURIComponent(email)}`;
+        const mailOptions = {
+            from: 'omarx10050@gmail.com', // Sender email address
+            to: email,
+            subject: 'Reset Your Password',
+            text: `Please click on the following link to reset your password: ${resetLink}`,
+        };
+
+        try {
+            await this.mailService.sendMail(mailOptions);
+        } catch (error) {
+            console.error('Error sending password reset email:', error);
+            throw new Error('Failed to send password reset email');
+        }
+    }
+
+
 
 
 }
