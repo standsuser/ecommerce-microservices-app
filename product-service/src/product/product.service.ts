@@ -119,8 +119,8 @@ export class ProductService {
     try {
       const favorites = await this.favoriteModel
         .find({ userid: userId })
-        .populate('productid')
         .exec();
+        
       if (!favorites) {
         throw new NotFoundException('Favorites not found');
       }
@@ -128,8 +128,6 @@ export class ProductService {
     } catch (error) {
       throw new NotFoundException('Favorites not found');
     }
-    // return await this.favoriteModel.find({ userid: userId }).populate('productid').exec()
-    //return await favorite.save();
   }
 
   async getAllFavorites() {
