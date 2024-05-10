@@ -3,9 +3,6 @@ import axios, { AxiosResponse } from 'axios';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
-console.log(process.env.AUSERNAME);
-console.log(process.env.PASSWORD);
-console.log(process.env.API_KEY);
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -15,13 +12,11 @@ export class AuthService implements OnModuleInit {
 
   async onModuleInit() {
     try {
-      // Load environment variables from .env file in the current directory
-      // dotenv.config();
-      
-      // Assign environment variables to class properties
       this.username = process.env.AUSERNAME;
       this.password = process.env.PASSWORD;
       this.apiKey = process.env.API_KEY;
+
+      await this.authenticate();
     } catch (error) {
       console.error('Error reading .env file:', error);
       throw new Error('Failed to read authentication details from .env file');
@@ -37,7 +32,7 @@ export class AuthService implements OnModuleInit {
       );
 
       const token = response?.data?.token;
-      console.log('Authentication token:', token); // Log the authentication token
+      console.log('Authentication token:', token);
       return token;
     } catch (error) {
       console.error('Error during authentication:', error);
@@ -45,3 +40,4 @@ export class AuthService implements OnModuleInit {
     }
   }
 }
+// AUTHENTICATION IS NOW AUTOMATIC
