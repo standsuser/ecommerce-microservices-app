@@ -7,29 +7,48 @@ enum OrderStatus {
     PENDING = 'pending',
     PROCESSING = 'processing',
     SHIPPED = 'shipped',
-    DELIVERED = 'delivered',
-    CANCELLED = 'cancelled'
+    SUCCESSFUL = 'successful',
+    DECLINED = 'declined'
 }
 
 @Schema()
 export class Order {
     @Prop()
-    userId: string;
+    delivery_needed: boolean;
 
     @Prop()
-    orderNumber: string;
+    amount_cents: number;
 
     @Prop()
-    orderDate: Date;
+    currency: string;
 
     @Prop()
-    total: number;
+    merchant_order_id: number;
 
     @Prop()
-    items: { productId: ObjectId, quantity: number }[];
+    items: { product_id: string, name: string, amount_cents: number /*call the function from laineymclainpants*/ , description: string, color: string, size: string, material: string, quantity: number }[];
 
     @Prop({ type: String, enum: OrderStatus, default: OrderStatus.PENDING })
     status: string;
+
+    @Prop()
+    shipping_data: {
+        apartment: string, email: string, floor: number, first_name: string, street: string, building: string,
+        phone_number: string, postal_code: number, extra_description: string, city: string, country: string, last_name: string, state: string
+    }
+    @Prop()
+    payment_info: {
+        order_id: number, amount_cents: number, expiration: 3600, 
+        billing_data: {
+            apartment: string, email: string, floor: number, first_name: string, street: string, building: string,
+            phone_number: string, shipping_method: string, postal_code: number, city: string, country: string, last_name: string, state: string
+        },
+        currency: string,
+        integration_id: number,
+        lock_order_when_paid: boolean
+    }
+    @Prop()
+    shipping_details: { notes: string, number_of_packages: number, weight: number, length: number, width: number, height: number, contents: string }
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

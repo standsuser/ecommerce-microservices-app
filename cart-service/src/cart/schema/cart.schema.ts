@@ -7,39 +7,45 @@ export type CartDocument = Cart & Document;
 export class Cart {
     
     @Prop()
-    userId: string; // For authenticated users
+    user_id?: string ;  // For authenticated users
 
     @Prop()
-    sessionId: string; // For guest users
+    sessiond_id?: string ; // For guest users
 
     @Prop()
     items: CartItem[];
 
     @Prop()
-    totalPricePreCoupon: number;
+    total_price_pre_coupon: number; //lained
 
     @Prop()
-    totalPricePostCoupon: number;
+    total_price_post_coupon: number | null;
 
     @Prop()
-    couponCode: string;
+    coupon_code: string | null;
 
     @Prop()
-    couponPercentage: number;
+    coupon_percentage: number;
 
     @Prop()
-    isCheckout: boolean;
+    is_checkout: boolean;
 
     @Prop({ default: Date.now })
-    updatedAt: Date;
+    updated_at: Date;
 
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);
 
-export interface CartItem {
-    productId: ObjectId;
+export interface CartItem { 
+    productId: string;
+    name: string;
+    amount_cents: number;
+    description: string;
+    color: string;
+    size: string;
+    material: string;
     quantity: number;
-    rentalDuration?: string;
-    isRented?: boolean;
+    rental_duration?: string;
+    is_rented?: boolean;
 }
