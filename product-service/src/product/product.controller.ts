@@ -10,6 +10,7 @@ import {
   Req,
   HttpException,
   HttpStatus,
+  Query
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './schema/product.schema';
@@ -19,11 +20,25 @@ import { ProductModule } from './product.module';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Get('favorites/:userId') // checked in service file and it is correct insha'allah
+    //----------------------------CATEGORIES----------------------------------------------
+    @Get('/category')
+    async getCategories() {
+      return await this.productService.getCategories();
+    }
+    @Get('/products/:categoryid')
+    async getProductsByCategory(@Param('categoryid') categoryid: string) {
+      return await this.productService.getProductsByCategory(categoryid);
+    }
+
+  @Get('/favorites/:userId') // checked in service file and it is correct insha'allah
   async getFavorites(@Param('userId') userId: string) {
     return await this.productService.getFavorites(userId);
   }
 
+  @Get('/favorites/all')
+  async getAllFavorites() {
+    return await this.productService.getAllFavorites();
+  }
   @Post('favorites') // check and it is correct insha'allah
   async addFavorite(
     @Body()
@@ -35,14 +50,11 @@ export class ProductController {
       selectedSize: string;
     },
   ) {
-    const { userId, productId, selectedColor, selectedMaterial, selectedSize } =
+    const { userId, productId} =
       body;
     return await this.productService.addFavorite(
       userId,
-      productId,
-      selectedColor,
-      selectedMaterial,
-      selectedSize,
+      productId
     );
   }
 
@@ -54,21 +66,23 @@ export class ProductController {
     return await this.productService.removeFavorite(userId, productId);
   }
 
-  @Get(':productId') // checked in service file and it is correct insha'allah
+  @Get('/:productId') // checked in service file and it is correct insha'allah
   async getProductDetails(@Param('productId') productId: string) {
     return await this.productService.getProductDetails(productId);
   }
 
-  @Patch(':productId/customize') // checked in service file and it is correct insha'allah
+  @Get(':productId/customize')
   async customizeProduct(
     @Param('productId') productId: string,
-    @Body() { color, material, size },
+    @Query('color') color: string,
+    @Query('material') material: string,
+    @Query('size') size: string,
   ) {
     return await this.productService.customizeProduct(
       productId,
+      size,
       color,
       material,
-      size,
     );
   }
 
@@ -92,17 +106,18 @@ export class ProductController {
 
   // -----------------------------------------------------REVIEW-----------------------------------------------------
 
-  @Get('product/:productId')
+  @Get('/review/:productId')
   async getProductReviews(@Param('productId') productId: string) {
     return await this.productService.getProductReviews(productId);
   }
 
-  @Post('product/:productId')
+  @Post('/review/add/:productId/:userId')
   async addReview(
     @Param('productId') productId: string,
-    @Body() body: { userId: string; rating: number; review: string },
+    @Param('userId') userId: string,
+    @Body() body: { rating: number; review: string },
   ) {
-    const { userId, rating, review } = body;
+    const { rating, review } = body;
     return await this.productService.addReview(
       productId,
       userId,
@@ -111,15 +126,7 @@ export class ProductController {
     );
   }
 
-  //----------------------------CATEGORIES----------------------------------------------
-  @Get('/categories')
-  async getCategories() {
-    return await this.productService.getCategories();
-  }
-  @Get('/products/:categoryid')
-  async getProductsByCategory(@Param('categoryid') categoryid: string) {
-    return await this.productService.getProductsByCategory(categoryid);
-  }
+
 
   /*
   @Delete(':reviewId') 

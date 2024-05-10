@@ -2,22 +2,14 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { KafkaModule } from './kafka/kafka.module';
-import { TestConsumer } from './kafka/test.consumer';
-import { CatalogController } from './catalog/catalog.controller';
-import { CatalogService } from './catalog/catalog.service';
-import { FeaturedListing, FeaturedListingSchema } from './catalog/schema/featuredlisting.schema';
-import { Offer, TopOffer } from './catalog/schema/topoffer.schema';
-
+import { CatalogModule } from './catalog/catalog.module';
+import { ProducerService } from 'src/kafka/producer.service';
 @Module({
   imports: [
-    KafkaModule,
-    MongooseModule.forFeature([
-      { name: FeaturedListing.name, schema: FeaturedListingSchema },
-      { name: Offer.name, schema: TopOffer },
-    ]),
+    CatalogModule,
+    MongooseModule.forRoot('mongodb://localhost:27018/catalog'),
   ],
-  controllers: [AppController, CatalogController],
-  providers: [AppService, TestConsumer, CatalogService],
+  controllers: [AppController],
+  providers: [AppService, ProducerService],
 })
 export class AppModule {}

@@ -3,7 +3,7 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 
 @Schema()
 export class Product extends Document {
-  @Prop({ required: true })
+  @Prop({ required: true, text: true  })
   name: string;
 
   @Prop({ required: true })
@@ -18,8 +18,8 @@ export class Product extends Document {
   @Prop({ default: 0 })
   discountpercentage: number;
 
-  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Category' }])
-  categoryIds: MongooseSchema.Types.ObjectId[];
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category' })
+  categoryId: MongooseSchema.Types.ObjectId;
 
   @Prop([String])
   sizes: string[];
@@ -34,7 +34,10 @@ export class Product extends Document {
   totalPrice: number;
 
   @Prop()
-  totalRating: number;
+  rating: number; //stars to display
+
+  @Prop()
+  totalRating: number; //total review star count
 
   @Prop()
   totalReviews: number;

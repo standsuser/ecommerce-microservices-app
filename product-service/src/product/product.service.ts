@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { Favorite } from './schema/favorite.schema';
 import { Category } from './schema/category.schema';
+import { Review } from './schema/review.schema';
 import { ProducerService } from '../kafka/producer.service';
 
 // const socialSharingUtils = require('social-sharing-utilities');
@@ -19,7 +20,8 @@ export class ProductService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
     @InjectModel(Favorite.name) private readonly favoriteModel: Model<Favorite>,
-    @InjectModel(Category.name) private readonly categoryModel: Model<Favorite>,
+    @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
+    @InjectModel(Review.name) private readonly reviewModel: Model<Review>,
     private readonly producerService: ProducerService,
   ) {}
 
@@ -44,6 +46,8 @@ export class ProductService {
 
     // Send the record to Kafka
     await this.producerService.produce(record);
+
+    console.log('Top discounted products sent:', record);
   }
 
   async sendTopRatedProducts() {
@@ -60,13 +64,15 @@ export class ProductService {
       messages: products.map((product) => ({
         value: JSON.stringify({
           productId: product._id.toString(),
-          totalRating: product.totalRating,
+          totalRating: product.rating,
         }),
       })),
     };
 
     // Send the record to Kafka
     await this.producerService.produce(record);
+
+    console.log('Top rated products sent:', record);
   }
 
   async addToWishlist(
@@ -113,8 +119,8 @@ export class ProductService {
     try {
       const favorites = await this.favoriteModel
         .find({ userid: userId })
-        .populate('productid')
         .exec();
+        
       if (!favorites) {
         throw new NotFoundException('Favorites not found');
       }
@@ -122,16 +128,19 @@ export class ProductService {
     } catch (error) {
       throw new NotFoundException('Favorites not found');
     }
-    // return await this.favoriteModel.find({ userid: userId }).populate('productid').exec()
-    //return await favorite.save();
+  }
+
+  async getAllFavorites() {
+    try {
+      return await this.favoriteModel.find().populate('productid').exec();
+    } catch (error) {
+      throw new NotFoundException('Favorites not found');
+    }
   }
 
   async addFavorite(
     userId: string,
-    productId: string,
-    selectedColor: string,
-    selectedMaterial: string,
-    selectedSize: string,
+    productId: string
   ) {
     try {
       // Query the product details
@@ -143,15 +152,13 @@ export class ProductService {
       // Create a new favorite
       const favorite = new this.favoriteModel({
         userid: userId,
-        productid: productId,
-        selectedColor,
-        selectedMaterial,
-        selectedSize,
+        productid: productId
       });
 
       // Save the favorite
       await favorite.save();
     } catch (error) {
+      console.error(error);
       throw new NotFoundException('Product not found');
     }
   }
@@ -191,23 +198,24 @@ export class ProductService {
     size: string,
     color: string,
     material: string,
-  ) {
+  ): Promise<number> {
     try {
       if (!productId) {
         throw new Error('Invalid input parameters');
       }
-
-      const updatedProduct = await this.productModel.findByIdAndUpdate(
-        productId,
-        { color, material, size },
-        { new: true },
+      const updatedProduct = await this.productModel.findById(productId).exec();
+      if (!updatedProduct) {
+        throw new Error('Product not found');
+      }
+      const totalPrice = this.calculateTotalPrice(
+        updatedProduct._id.toString(),
+        size,
+        color,
+        material,
+        updatedProduct.totalPrice,
       );
 
-      if (!updatedProduct) {
-        throw new NotFoundException('Product not found');
-      }
-
-      return updatedProduct;
+      return totalPrice;
     } catch (error) {
       throw new Error('Failed to customize product: ' + error.message);
     }
@@ -238,24 +246,24 @@ export class ProductService {
 
   async searchKeyword(keyword: string) {
     try {
-      return await this.productModel.find({ $text: { $search: keyword } });
+      const products = await this.productModel.find({ $text: { $search: keyword } });
+      return products;
     } catch (error) {
+      console.error('Error:', error);
       throw new NotFoundException('Product not found');
     }
-    //return await this.productModel.find({ $text: { $search: keyword } });
   }
 
+  
+
   calculateTotalPrice(
-    productId: string,
+    _id: string,
     size: string,
     color: string,
     material: string,
     totalPrice: number,
-  ): void {
-    const product = this.productModel.findById(productId);
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
+  ): number {
+
 
     // Define prices for different sizes and colors (you can adjust these values as needed)
     const sizePrices = {
@@ -275,30 +283,30 @@ export class ProductService {
     };
 
     const materialPrices = {
-      cotton: 10,
-      silk: 20,
-      wool: 30,
-      plastice: 40,
+      plastic: 20,
+      wood: 30,
+      HDPEplastic: 40,
       // Add prices for other materials as needed
     };
-
+  
     // Calculate total price based on size and color
     let sizePrice = sizePrices[size] || 0; // Default to 0 if size not found
     let colorPrice = colorPrices[color] || 0; // Default to 0 if color not found
     let materialPrice = materialPrices[material] || 0; // Default to 0 if base price not found
+    // Calculate total price
+    let total = materialPrice + sizePrice + colorPrice+ totalPrice;
 
-    // Update total price of the product
-    product[totalPrice] = materialPrice + sizePrice + colorPrice;
+    return total;
   }
 
   //------------------------------------------------------REVIEW------------------------------------------------------
 
   async getProductReviews(productId: string) {
     try {
-      const reviews = await this.productModel
+      const reviews = await this.reviewModel
         .find({ productid: productId })
         .exec();
-      if (!reviews) {
+      if (!reviews || reviews.length === 0) {
         throw new NotFoundException('Reviews not found');
       }
       return reviews;
@@ -308,17 +316,19 @@ export class ProductService {
   }
 
   async addReview(
-    userId: string,
     productId: string,
+    userId: string,
     rating: number,
     review: string,
   ) {
+
     try {
-      const product = await this.productModel.findById(productId).exec();
+      const product = await this.productModel.findOne({ _id: productId }).exec();
+
       if (!product) {
         throw new NotFoundException('Product not found');
       }
-      const newReview = new this.productModel({
+      const newReview = new this.reviewModel({
         userid: userId,
         productid: productId,
         rating: rating,
@@ -350,21 +360,25 @@ export class ProductService {
 
   //----------------------CATEGORIES-----------------------------------------
 
-  async getCategories() {
+async getCategories() {
+
     try {
       const categories = await this.categoryModel.find().exec();
+
       if (!categories) {
         throw new NotFoundException('Categories not found');
       }
+
       return categories;
     } catch (error) {
+      console.error('Error:', error);
       throw new NotFoundException('Categories not found');
     }
   }
 
-  async getProductsByCategory(categoryid: string) {
+  async getProductsByCategory(categoryId: string) {
     try {
-      const products = await this.productModel.find({ categoryid }).exec();
+      const products = await this.productModel.find({categoryId: categoryId }).exec();
       if (!products) {
         throw new NotFoundException('Products not found');
       }

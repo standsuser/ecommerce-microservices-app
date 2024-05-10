@@ -14,32 +14,36 @@ export class CatalogService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    // Consume 'featured' topic
+    // Consume 'featured' and 'topoffer' topics
     await this.consumerService.consume(
-      { topics: ['featured'] },
-      {
-        eachMessage: async ({ topic, partition, message }) => {
-          const product = JSON.parse(message.value.toString());
+        { topics: ['featured', 'topoffer'], fromBeginning: true },
+        {
+            eachMessage: async ({ topic, partition, message }) => {
+                try {
+                    const data = JSON.parse(message.value.toString());
+                    console.log(`Received message from ${topic} topic:`, data);
 
-          // Update the featured listing with the product info
-          await this.featuredListingModel.updateOne({ productId: product.productId }, product, { upsert: true });
+                    // Update the appropriate model based on the topic
+                    if (topic === 'featured') {
+                        await this.featuredListingModel.updateOne({ productId: data.productId }, data, { upsert: true });
+                    } else if (topic === 'topoffer') {
+                      await this.topOfferModel.updateOne(
+                        { productId: data.productId },
+                        { 
+                            $set: {
+                                ...data,
+                                discountpercentage: data.discountpercentage 
+                            } 
+                        },
+                        { upsert: true })
+                      }
+                } catch (error) {
+                    console.error(`Error processing message from ${topic} topic:`, error);
+                }
+            },
         },
-      },
     );
-
-    // Consume 'topoffer' topic
-    await this.consumerService.consume(
-      { topics: ['topoffer'] },
-      {
-        eachMessage: async ({ topic, partition, message }) => {
-          const offer = JSON.parse(message.value.toString());
-
-          // Update the top offer with the offer info
-          await this.topOfferModel.updateOne({ productId: offer.productId }, offer, { upsert: true });
-        },
-      },
-    );
-  }
+}
 
   async getFeaturedListings() {
     return this.featuredListingModel.find().exec();

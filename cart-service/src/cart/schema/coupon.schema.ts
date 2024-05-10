@@ -6,10 +6,10 @@ export type CouponDocument = Coupon & Document;
 @Schema()
 export class Coupon {
     @Prop()
-    couponCode: string;
+    coupon_code: string;
 
     @Prop()
-    couponPercentage: number;
+    coupon_percentage: number;
 
     @Prop()
     expires: Date; //implement 
