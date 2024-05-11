@@ -73,7 +73,6 @@ export class PaymobService {
   async getPaymentKey(paymentData: any, orderId: any): Promise<string> {
     paymentData = await this.generatePaymentWithAuthToken(paymentData, orderId); 
     try {
-      console.log('1');
       const response: AxiosResponse<any> = await axios.post(
         'https://accept.paymob.com/api/acceptance/payment_keys',
         paymentData,
@@ -83,13 +82,14 @@ export class PaymobService {
             Authorization: `Bearer ${paymentData.authToken}`,
           },
         }
-      );console.log('2');
+      );
       console.log('Paymob API Response:', response.data);
-      console.log('3');
+      //clear cart by kafka prodcutor yaes
       return response?.data;
     } catch (error) {
       console.error('Error obtaining payment key:', error.message);
       throw new Error('Failed to obtain payment key');
+
     }
   }
 }
