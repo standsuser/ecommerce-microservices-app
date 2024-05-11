@@ -179,6 +179,10 @@ export class UserService {
 
     }
 
+    async startGuestSession() {
+        
+    }
+
     async logout(userID: string) {
         const user = await this.getUserbyID(userID);
         if (!user) {
