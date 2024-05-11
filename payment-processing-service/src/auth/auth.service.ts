@@ -5,26 +5,16 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 @Injectable()
-export class AuthService implements OnModuleInit {
+export class AuthService {
   private username: string;
   private password: string;
   private apiKey: string;
 
-  async onModuleInit() {
+  async authenticate(): Promise<string> {
     try {
       this.username = process.env.AUSERNAME;
       this.password = process.env.PASSWORD;
       this.apiKey = process.env.API_KEY;
-
-      await this.authenticate();
-    } catch (error) {
-      console.error('Error reading .env file:', error);
-      throw new Error('Failed to read authentication details from .env file');
-    }
-  }
-
-  async authenticate(): Promise<string> {
-    try {
       const response: AxiosResponse<any> = await axios.post(
         'https://accept.paymob.com/api/auth/tokens',
         { username: this.username, password: this.password, api_key: this.apiKey },
@@ -32,7 +22,6 @@ export class AuthService implements OnModuleInit {
       );
 
       const token = response?.data?.token;
-      console.log('Authentication token:', token);
       return token;
     } catch (error) {
       console.error('Error during authentication:', error);
@@ -40,4 +29,3 @@ export class AuthService implements OnModuleInit {
     }
   }
 }
-// AUTHENTICATION IS NOW AUTOMATIC
