@@ -1,7 +1,7 @@
 import { Strategy } from "passport-local";
 import { PassportStrategy } from "@nestjs/passport";
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { UserService } from "../user.service";
+import { UserService } from "../user/user.service";
 import { LoginDto } from "../dto/login.dto";
 import { UserNotFoundException } from "../exceptions/userNotfound.exception";
 

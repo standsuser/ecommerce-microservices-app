@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Module } from '@nestjs/common';
+import { Module, Session } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,12 +9,14 @@ import { ErrorInterceptor } from './interceptors/error.interceptor';
 
 import { RolesGuard } from './guards/roles.guard';
 import { Reflector } from '@nestjs/core';
+import { SessionModule } from './session/session.module';
 
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb+srv://omarx10050:12345@users.bez5bwk.mongodb.net/'),
     UserModule,
+    SessionModule,
     ClientsModule.register([
       {
         name: 'USER_SERVICE',

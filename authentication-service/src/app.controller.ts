@@ -1,14 +1,17 @@
 /* eslint-disable prettier/prettier */
-import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Logger, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Roles } from './decorators/role.decorator';
 import { UserService } from './user/user.service';
-import { CreateUserDto } from './user/dto/create.user.dto';
+import { CreateUserDto } from './dto/create.user.dto';
+import { SessionService } from "./session/session.service";
+import { get } from 'http';
+
 
 @Controller('auth')
 export class AppController {
-  constructor(private readonly appService: AppService, private readonly userService: UserService) { }
-
+  constructor(private readonly appService: AppService, private readonly userService: UserService, private readonly sessionService: SessionService 
+) { }
   @Get()
   getHello(): string {
     return this.appService.getHello();
@@ -47,15 +50,23 @@ export class AppController {
 
   @Post('login')
   async login(@Body() user: any): Promise<any> {
-    try {
+   
       // Attempt to login user
+      const getIdc= await this.userService.getUserbyEmail(user.email);
+      const val = await this.sessionService.validateSession(getIdc.id);
+      if(val){
+        return { success: false, message: "Wrong Email or Password or User already logged in" };
+      }if(!val){
+      try {
       const response = await this.userService.login(user);
-      return { success: true, response };
+      const session = await this.sessionService.createSession(response.userID,response.access_token);
+      return { success: true, response , session };
       // Return response
     } catch (error) {
       // Handle any errors thrown during login
       return { success: false, message: error }; // Return error response
     }
+  }
   }
 
   @Post('forgot-password')
@@ -66,6 +77,21 @@ export class AppController {
       return { success: true, response };
     } catch (error) {
       // Handle any errors thrown during password reset
+      return { success: false, message: error }; // Return error response
+    }
+  }
+
+  @Delete('logout')
+  async logout(@Body() user: any): Promise<any> {
+    try {
+      // Attempt to logout user
+      //const response = await this.userService.logout(user);
+      const session = await this.sessionService.deleteSession(user.userID);
+
+
+      return { success: true, /*response , */session};
+    } catch (error) {
+      // Handle any errors thrown during logout
       return { success: false, message: error }; // Return error response
     }
   }

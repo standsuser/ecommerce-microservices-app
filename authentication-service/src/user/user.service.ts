@@ -5,29 +5,35 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prefer-const */
 /* eslint-disable prettier/prettier */
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { User } from './interfaces/user';
-import { CreateUserDto } from './dto/create.user.dto';
-import { LoginDto } from './dto/login.dto';
+import { User } from '../interfaces/user';
+import { CreateUserDto } from '../dto/create.user.dto';
+import { LoginDto } from '../dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { TokenDto } from './dto/token.dto';
-import { UserAlreadyExistsException } from './exceptions/userAlreadyExists.exception';
+import { TokenDto } from '../dto/token.dto';
+import { UserAlreadyExistsException } from '../exceptions/userAlreadyExists.exception';
 import { Mailservice } from './Mail.service';
-import { UserModel } from './user.model';
+import { SessionService } from '../session/session.service';
+import { Console } from 'console';
+
 
 
 @Injectable()
 export class UserService {
     private mailService: Mailservice;
+    private readonly sessionService: SessionService;
+
+
     constructor(
         @Inject('USER_MODEL')
         private userModel: Model<User>,
         private jwtService: JwtService,
+
     ) {
         this.mailService = new Mailservice('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')
-
+        
 
     }
 
@@ -95,6 +101,29 @@ export class UserService {
         }
     }
 
+    async getUserbyID(id: string){
+        try {
+
+            let loginResult = await this.userModel.findOne({_id:id}).exec();
+    
+            if (!loginResult) {
+                throw new Error("User not found");
+            }
+            let { __v, ...userData } = loginResult.toObject();
+    
+            return {
+                id,
+                ...userData
+            };
+        } catch (error) {
+
+            // Handle error appropriately
+            console.error("Error fetching user:", error);
+            throw new Error("Failed to fetch user");
+        }
+    }
+
+    
     //  async findByEmail(email: string): Promise<User> {
     //     const user = await this.userModel.findOne({ email }).exec();
     //     if (!user) {
@@ -103,26 +132,60 @@ export class UserService {
     //      return user;
     //  }
 
-    async login(user: any) {
-        //console.log(command)
-        let payload = {
-            id: user._id,
-            name: user.name,
-            username: user.username,
-            roles: user.roles
+    // async login(user: any) {
+    //     //console.log(command)
+    //     let payload = {
+    //         id: user._id,
+    //         name: user.name,
+    //         username: user.username,
+    //         roles: user.roles
+
+    //     };
+
+    //     var token = this.jwtService.sign(payload);
+    //     var tokenvalue: any = this.jwtService.decode(token);
+
+
+    //     return {
+    //         access_token: token,
+    //         expires_in: tokenvalue.exp,
+
+
+    //     };
+
+    // }
+
+    async login(LoginDto: LoginDto) {
+        const user = await this.validateUser(LoginDto);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        const payload = {
+            email : user.email,
+            sub: user.id,
+            
 
         };
-
-        var token = this.jwtService.sign(payload);
-        var tokenvalue: any = this.jwtService.decode(token);
-
+        const token = this.jwtService.sign(payload);
+        const tokenValue: any = this.jwtService.decode(token);
 
         return {
             access_token: token,
-            expires_in: tokenvalue.exp,
-
+            expires_in: tokenValue.exp,
+            userID: user.id
         };
+      
+   
 
+    }
+
+    async logout(userID: string) {
+        const user = await this.getUserbyID(userID);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        
+        return user;
     }
     validateToken(jwt: string) {
         const validatedToken = this.jwtService.sign(jwt);

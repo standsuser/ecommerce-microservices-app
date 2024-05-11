@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 
 import { Connection } from 'mongoose';
-import { UserModel } from '../user.model';
+import { UserModel } from '../user/user.model';
 
 export const userProvider = [
   {

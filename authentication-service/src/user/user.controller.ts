@@ -4,9 +4,9 @@
 import { Controller, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { LocalAuthGuard } from './strategies/local-auth.guard';
-import { JwtAuthGuard } from './strategies/jwt-auth.guard';
-import { ExistsAuthGuard } from './strategies/exists-auth.guard';
+import { LocalAuthGuard } from '../strategies/local-auth.guard';
+import { JwtAuthGuard } from '../strategies/jwt-auth.guard';
+import { ExistsAuthGuard } from '../strategies/exists-auth.guard';
 //import { Post } from '@nestjs/common';
 
 @Controller()
@@ -41,6 +41,19 @@ export class UserController {
         }
         );
     }
+
+    @UseGuards(LocalAuthGuard)
+    @MessagePattern('logout')
+    async logout(command){
+        console.log('command user: ', command.user);
+        return this.userService.logout({
+            ...command.user,
+            roles:['admin']
+        }
+        );
+    }
+
+
     @UseGuards(JwtAuthGuard)
     @MessagePattern('me')
     async me(command){
