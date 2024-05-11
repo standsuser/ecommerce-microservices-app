@@ -11,7 +11,7 @@ export class PaymobService {
 
   //on listen place order  
   
-  async generateOrderWithAuthToken(orderData: any): Promise<any> {
+  async generateOrderWithAuthToken(orderData: any ): Promise<any> {
     try {
       const authToken = await this.authService.authenticate();
 
@@ -54,26 +54,26 @@ export class PaymobService {
 
   // on listen checkout
 
-  async generatePaymentWithAuthToken(orderData: any): Promise<any> {
+  async generatePaymentWithAuthToken(orderData: any, orderId: any): Promise<any> {
     try {
       // Get the authentication token from the AuthService
+
       const authToken = await this.authService.authenticate();
-
       const config = {
-        ...orderData, // Merge the orderData with additional properties
-        "auth_token": authToken
+        "auth_token": authToken,
+        "orderId": orderId,
+        ...orderData 
       };
-
-      return this.getPaymentKey(config);
+      return config;
     } catch (error) {
       console.error('Error generating config:', error);
       throw new Error('Failed to generate config');
     }
   }
-  async getPaymentKey(paymentData: any): Promise<string> {
-
-
+  async getPaymentKey(paymentData: any, orderId: any): Promise<string> {
+    paymentData = await this.generatePaymentWithAuthToken(paymentData, orderId); 
     try {
+      console.log('1');
       const response: AxiosResponse<any> = await axios.post(
         'https://accept.paymob.com/api/acceptance/payment_keys',
         paymentData,
@@ -83,15 +83,12 @@ export class PaymobService {
             Authorization: `Bearer ${paymentData.authToken}`,
           },
         }
-      );
+      );console.log('2');
       console.log('Paymob API Response:', response.data);
-
-      return response?.data?.token;
+      console.log('3');
+      return response?.data;
     } catch (error) {
-      console.error('Error obtaining payment key:', error?.message);
-      if (error.response) {
-        console.error('Paymob API Error Response:', error.response.data);
-      }
+      console.error('Error obtaining payment key:', error.message);
       throw new Error('Failed to obtain payment key');
     }
   }
