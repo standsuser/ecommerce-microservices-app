@@ -179,6 +179,17 @@ export class UserService {
 
     }
 
+    // async changePassword(userID: string, newPassword: string) {
+    //     const user = await this.getUserbyID(userID);
+    //     if (!user) {
+    //         throw new NotFoundException('User not found');
+    //     }
+    //     const updatedUser = await this.userModel.updateOne({ userId: user._id }, { password: newPassword });
+    //     Logger.log(updatedUser, 'User updated');
+    
+    //     return updatedUser;
+    // }
+    
     async logout(userID: string) {
         const user = await this.getUserbyID(userID);
         if (!user) {

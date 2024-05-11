@@ -69,6 +69,50 @@ export class AppController {
   }
   }
 
+  // @Post('change-password')
+  // async changePassword(@Body() { userID, newPassword }: { userID: string, newPassword: string }): Promise<any> {
+  //   try {
+  //     // Attempt to change password
+  //     const response = await this.userService.changePassword(userID, newPassword);
+  //     return { success: true, response };
+  //   } catch (error) {
+  //     // Handle any errors thrown during password change
+  //     return { success: false, message: error }; // Return error response
+  //   }
+  // }
+
+  //////////////////////////////////////////
+// it launches when the homepages is loaded
+/////////////////////////////////////////////
+
+  @Post('start-guest-session')
+  async startGuestSession(): Promise<any> {
+    try {
+      // Attempt to start guest session
+      const response = await this.sessionService.createGuestSession();
+      return { success: true, response };
+    } catch (error) {
+      // Handle any errors thrown during guest session start
+      return { success: false, message: error }; // Return error response
+    }
+  }
+
+  //////////////////////////////////////////
+  // is called when the user logs in 
+  //////////////////////////////////////////
+
+  @Post('update-session')
+  async updateSession(@Body() { userID, guestID , access_token }: { userID: string, guestID: string , access_token : string }): Promise<any> {
+    try {
+      // Attempt to update session
+      const response = await this.sessionService.updateSession(userID, guestID , access_token);
+      return { success: true, response };
+    } catch (error) {
+      // Handle any errors thrown during session update
+      return { success: false, message: error }; // Return error response
+    }
+  }
+
   @Post('forgot-password')
   async forgotPassword(@Body() { email }: { email: string }): Promise<any> {
     try {

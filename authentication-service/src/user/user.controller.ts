@@ -53,6 +53,12 @@ export class UserController {
         );
     }
 
+    // @MessagePattern('change-password')
+    // async changePassword(command){
+    //     return this.userService.changePassword(command.userID,command.newPassword);
+    // }
+
+
 
     @UseGuards(JwtAuthGuard)
     @MessagePattern('me')

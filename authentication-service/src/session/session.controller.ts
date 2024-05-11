@@ -21,6 +21,17 @@ export class SessionController {
     return this.sessionService.validateSession(command.email);
   }
 
+  @MessagePattern('createGuestSession')
+  async createGuestSession(command){
+    return this.sessionService.createGuestSession();
+
+  }
+
+  @MessagePattern('updateSession')
+  async updateSession(command){
+    return this.sessionService.updateSession(command.userID, command.guestID , command.access_token);
+  }
+
 
 
 }
