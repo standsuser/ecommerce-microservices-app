@@ -9,8 +9,7 @@ export class PaymobController {
   constructor(
     private readonly paymobService: PaymobService,
     private readonly authService: AuthService, // Inject the AuthService
-  ) {}
-
+  ) {} 
 
   @Post('register-order')
   async registerOrder(@Body() orderData: any): Promise<{ orderId: number }> {
@@ -22,7 +21,7 @@ export class PaymobController {
       throw new Error('Failed to register order');
     }
   }
-  @Post('get-payment-key')
+  @Post('get-payment-key') //retrial from here
   async getPaymentKey(@Body() paymentData: any): Promise<{ token: string }> {
     try {
       const token = await this.paymobService.getPaymentKey(paymentData);

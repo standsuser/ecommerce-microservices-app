@@ -5,24 +5,48 @@ export type AddressDocument = Address & Document;
 
 @Schema()
 export class Address {
-    
+
     @Prop()
     userId: string;
 
     @Prop()
-    country: string;
+    apartment: string
 
     @Prop()
-    city: string;
+    email: string
 
     @Prop()
-    street: string;
+    floor: number
 
     @Prop()
-    label: string;
+    first_name: string
 
     @Prop()
-    zipCode: string;
+    street: string
+
+    @Prop()
+    building: string
+
+    @Prop()
+    phone_number: string
+
+    @Prop()
+    postal_code: number
+
+    @Prop()
+    extra_description: string | null
+
+    @Prop()
+    city: string
+
+    @Prop()
+    country: string
+
+    @Prop()
+    last_name: string
+
+    @Prop()
+    state: string
 }
 
 

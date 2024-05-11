@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+// import { Address } from "cluster";
 import { Document, ObjectId } from 'mongoose';
 
 export type OrderDocument = Order & Document;
@@ -13,6 +14,12 @@ enum OrderStatus {
 
 @Schema()
 export class Order {
+    @Prop()
+    user_id: string;
+
+    @Prop()
+    order_id: number;
+
     @Prop()
     delivery_needed: boolean;
 
@@ -32,23 +39,18 @@ export class Order {
     status: string;
 
     @Prop()
-    shipping_data: {
-        apartment: string, email: string, floor: number, first_name: string, street: string, building: string,
-        phone_number: string, postal_code: number, extra_description: string, city: string, country: string, last_name: string, state: string
-    }
+    shipping_data: Address;
     @Prop()
     payment_info: {
         order_id: number, amount_cents: number, expiration: 3600, 
-        billing_data: {
-            apartment: string, email: string, floor: number, first_name: string, street: string, building: string,
-            phone_number: string, shipping_method: string, postal_code: number, city: string, country: string, last_name: string, state: string
-        },
-        currency: string,
-        integration_id: number,
-        lock_order_when_paid: boolean
+        billing_data: Address,
+        currency: 'EGP',
+        integration_id: 4570504,
+        lock_order_when_paid: 'false'
     }
+
     @Prop()
-    shipping_details: { notes: string, number_of_packages: number, weight: number, length: number, width: number, height: number, contents: string }
+    shipping_details: /*{ notes: string, number_of_packages: number, weight: number, length: number, width: number, height: number, contents: string }*/ string
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
