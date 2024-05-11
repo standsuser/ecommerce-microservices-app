@@ -17,9 +17,6 @@ export class CartService {
 
     //rent
 
-    async test(t: string): Promise<any> {
-        return 'joe biden';
-    }
     async addItemToCart(userId: string, addItemDto: AddCartItemDto): Promise<Cart> {
         let cart = await this.getCartByUserId(userId);
 
@@ -158,7 +155,7 @@ export class CartService {
         if( couponCodeApplied.limited ) {
             couponCodeApplied.quantity--;
         }
-        cart.totalPricePostCoupon = cart.totalPricePreCoupon - (cart.totalPricePreCoupon * couponCodeApplied.couponPercentage)
+        cart.total_price_post_coupon = cart.total_price_pre_coupon - (cart.total_price_pre_coupon * couponCodeApplied.coupon_percentage)
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
     } //recheck this later
@@ -168,7 +165,7 @@ export class CartService {
         let couponCodeApplied = await this.getCouponByCode(couponCode);
 
         if( couponCodeApplied.limited ) {
-            throw new Error("You can't use this coupon code as a guest user!, Please create an account if you want to use this coupon.\nthis coupon is for " + couponCodeApplied.couponPercentage + "%")
+            throw new Error("You can't use this coupon code as a guest user!, Please create an account if you want to use this coupon.\nthis coupon is for " + couponCodeApplied.coupon_percentage + "%")
         }
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
@@ -184,58 +181,56 @@ export class CartService {
     //     const updatedCart = cart as CartDocument;
     //     return await updatedCart.save();
     // }
-    async proceedToCheckoutGuest( sessionId: string): Promise<Cart> {
-        
-        let cart = await this.getCartBySessionId(sessionId);
-        if(cart){
-            //divert to sign up page?
-            throw new Error(`Cannot proceed to checkout, because you are not a user`);
-        }
-        
-        // cart.isCheckout = true;
-        // cart.totalPricePostCoupon = cart.totalPricePreCoupon - cart.totalPricePreCoupon * cart.couponPercentage;
-        const updatedCart = cart as CartDocument;
-        return await updatedCart.save();
-    }
-    
 
     async placeOrder(userId: string, orderId: string): Promise<Cart> {
         let cart = await this.getCartByUserId(userId);
-    
-        // if (!cart.isCheckout) {
-        //     throw new NotFoundException('You have not clicked on the checkout button! Please go back and click it!');
-        // }
-        // function generateOrderNumber(): string {
-        //     const timestamp = Date.now().toString();
-        //     const usersId = this.userId.toString();
-        //     const randomDigits = Math.floor(Math.random() * 10000).toString().padStart(4, '0'); 
-        //     return `ORD-${usersId}-${timestamp}-${randomDigits}`;
-        // }
-        // const order = new Order();
-    
-        // order.userId = cart.userId;
-        // order.orderNumber = generateOrderNumber(); 
-        // order.orderDate = new Date();
-        // order.total = cart.totalPricePostCoupon;
-        // order.items = cart.items;
-        // order.status = OrderStatus.PENDING; 
-    
-        // const savedOrder = order as OrderDocument; 
-        // await savedOrder.save();
-    
-        // cart.items = [];
-        // cart.isCheckout = false;
-        // cart.couponCode = null; 
-        // cart.couponPercentage = 0;
-        // cart.totalPricePreCoupon = 0;
-        // cart.totalPricePostCoupon = 0;
 
+        const merchant_order_id = ((num: number) => (num ** 2 * 8) * 10 + Math.random() / Math.random())(userId);
+
+        cart.is_checkout = true;
+        // make kafka call to paymob service
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
         
     }
+//     "delivery_needed": "true",
+//   "amount_cents": "10000",
+//   "currency": "EGP",
+//   "merchant_order_id": 33, 
+//   "items": [
+//     {
+//       "name": "ASC15215",
+//       "amount_cents": "10000",
+//       "description": "Smart Watch",
+//       "quantity": "1"
+//     }
+//   ],
+//   "shipping_data": {
+//     "apartment": "8034",
+//     "email": "claudette09@example.com",
+//     "floor": "42",
+//     "first_name": "Clifford",
+//     "street": "Ethan Land",
+//     "building": "8028",
+//     "phone_number": "+86(8)9135210487",
+//     "postal_code": "01898",
+//     "extra_description": "8 Ram , 128 Giga",
+//     "city": "Jaskolskiburgh",
+//     "country": "CR",
+//     "last_name": "Nicolas",
+//     "state": "Utah"
+//   },
+//   "shipping_details": {
+//     "notes": "test",
+//     "number_of_packages": 1,
+//     "weight": 1,
+//     "weight_unit": "Kilogram",
+//     "length": 1,
+//     "width": 1,
+//     "height": 1,
+//     "contents": "product of some sorts"
+//   }
     
-
     async getCartByUserId(userId: string): Promise<Cart> {
         let cart = await this.cartModel.findOne({ userId }).exec();
         if (!cart) {

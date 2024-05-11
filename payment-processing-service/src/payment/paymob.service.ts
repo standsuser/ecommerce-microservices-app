@@ -9,10 +9,8 @@ export class PaymobService {
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
   ) { }
-  async onModuleInit() {
 
-  }
-
+  //on listen
   async generateConfigWithAuthToken(orderData: any): Promise<any> {
     try {
       // Get the authentication token from the AuthService
@@ -57,8 +55,36 @@ export class PaymobService {
       throw new Error('Failed to obtain payment key');
     }
   }
+  async getPaymentKey(paymentData: any): Promise<string> {
+    const authToken = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RjME9EWXdMQ0p3YUdGemFDSTZJalZpWlRCaVlqa3lORE0wWVdRMVlUZzRaVEZoWmpReFlUQTNNV1ZtT1RjM1l6QTRNRFF5WlRnME4yUmpaakkxTUdNeE9HRTRNV05qWm1KbVlUQmxPVGdpTENKbGVIQWlPakUzTVRVeU5UWTJNamg5LjlLd3lnRHEyRDc4QUN5UVd2VVpRb3g4YVJjRE1Fc2ZFWkhXbVNMV3BVTkYtd3pSaTU2bWc3NmpVenEzLWNxQl9HMDFOU1p6dU9UWFViZVpWMDIyVXRR';
 
-  // hassan 3amal push w shal getPaymentKey // implement tany
+    try {
+      const response: AxiosResponse<any> = await axios.post(
+        'https://accept.paymob.com/api/acceptance/payment_keys',
+        paymentData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      // Log the response data for debugging
+      console.log('Paymob API Response:', response.data);
+
+      // Assuming response includes a token
+      return response?.data?.token;
+    } catch (error) {
+      // Log detailed error message and response for debugging
+      console.error('Error obtaining payment key:', error?.message);
+      if (error.response) {
+        console.error('Paymob API Error Response:', error.response.data);
+      }
+      throw new Error('Failed to obtain payment key');
+    }
+  }
+
   async paymentIFrame(paymentToken: string): Promise<void> {
     try {
       const iframeId: string = '844345'; // Your iframe ID

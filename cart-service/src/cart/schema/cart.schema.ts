@@ -13,7 +13,7 @@ export class Cart {
     sessiond_id?: string ; // For guest users
 
     @Prop()
-    items: CartItem[];
+    items: Product[];
 
     @Prop()
     total_price_pre_coupon: number; //lained
@@ -36,16 +36,3 @@ export class Cart {
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);
-
-export interface CartItem { 
-    productId: string;
-    name: string;
-    amount_cents: number;
-    description: string;
-    color: string;
-    size: string;
-    material: string;
-    quantity: number;
-    rental_duration?: string;
-    is_rented?: boolean;
-}
