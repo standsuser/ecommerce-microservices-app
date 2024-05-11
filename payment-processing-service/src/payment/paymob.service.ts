@@ -58,6 +58,7 @@ export class PaymobService {
     }
   }
 
+  // hassan 3amal push w shal getPaymentKey // implement tany
   async paymentIFrame(paymentToken: string): Promise<void> {
     try {
       const iframeId: string = '844345'; // Your iframe ID

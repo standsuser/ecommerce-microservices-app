@@ -12,9 +12,6 @@ export class Coupon {
     coupon_percentage: number;
 
     @Prop()
-    expires: Date; //implement 
-
-    @Prop()
     limited: boolean;
 
     @Prop({ required: function(this: Coupon) { return this.limited; } })
