@@ -68,6 +68,19 @@ export class AppController {
     }
   }
   }
+
+  // @Post('change-password')
+  // async changePassword(@Body() { userID, newPassword }: { userID: string, newPassword: string }): Promise<any> {
+  //   try {
+  //     // Attempt to change password
+  //     const response = await this.userService.changePassword(userID, newPassword);
+  //     return { success: true, response };
+  //   } catch (error) {
+  //     // Handle any errors thrown during password change
+  //     return { success: false, message: error }; // Return error response
+  //   }
+  // }
+
   //////////////////////////////////////////
 // it launches when the homepages is loaded
 /////////////////////////////////////////////
