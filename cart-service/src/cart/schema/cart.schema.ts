@@ -5,15 +5,15 @@ export type CartDocument = Cart & Document;
 
 @Schema()
 export class Cart {
-    
-    @Prop()
-    user_id?: string ;  // For authenticated users
 
     @Prop()
-    sessiond_id?: string ; // For guest users
+    user_id?: MongooseSchema.Types.ObjectId;  // For authenticated users
 
     @Prop()
-    items: Product[];
+    sessiond_id?: string; // For guest users
+
+    @Prop()
+    items: MongooseSchema.Types.ObjectId[];
 
     @Prop()
     total_price_pre_coupon: number; //lained
@@ -32,7 +32,6 @@ export class Cart {
 
     @Prop({ default: Date.now })
     updated_at: Date;
-
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);
