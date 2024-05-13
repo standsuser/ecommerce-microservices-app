@@ -2,25 +2,28 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Cart, CartDocument } from './schema/cart.schema';
-import { Coupon, CouponDocument }  from './schema/coupon.schema';
+import { Coupon, CouponDocument } from './schema/coupon.schema';
 import { AddCartItemDto } from './dto/addcartitem.dto';
-import { UpdateCartItemDto } from'./dto/updatecartitem.dto';
+import { UpdateCartItemDto } from './dto/updatecartitem.dto';
 // import mongoose, { ObjectId } from 'mongoose';
 import { Order, OrderDocument, OrderStatus } from './schema/order.schema';
+import { ConsumerService } from './kafka/consumer.service';
 
 @Injectable()
 export class CartService {
-    constructor(@InjectModel('Cart') private readonly cartModel: Model<CartDocument>,
+    constructor(
+        private readonly consumerService: ConsumerService,
+        @InjectModel('Cart') private readonly cartModel: Model<CartDocument>,
         @InjectModel('Coupon') private readonly couponModel: Model<CouponDocument>,
-        @InjectModel('Order') private readonly orderModel: Model<OrderDocument>) {}
-  
+        @InjectModel('Order') private readonly orderModel: Model<OrderDocument>) { }
+
 
     //rent
 
     async addItemToCart(userId: string, addItemDto: AddCartItemDto): Promise<Cart> {
         let cart = await this.getCartByUserId(userId);
 
-        const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === addItemDto.productId);        if (existingItemIndex !== -1) {
+        const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === addItemDto.productId); if (existingItemIndex !== -1) {
             // Item already exists in cart, update quantity
             cart.items[existingItemIndex].quantity += addItemDto.quantity;
         } else {
@@ -37,7 +40,7 @@ export class CartService {
             cart = new this.cartModel({ sessionId, items: [] });
         }
 
-        const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === addItemDto.productId);        if (existingItemIndex !== -1) {
+        const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === addItemDto.productId); if (existingItemIndex !== -1) {
             // Item already exists in cart, update quantity
             cart.items[existingItemIndex].quantity += addItemDto.quantity;
         } else {
@@ -52,17 +55,17 @@ export class CartService {
     async rentProduct(userId: string, productId: string, rentalDuration: string): Promise<Cart> {
         // Retrieve the cart for the user
         let cart = await this.getCartByUserId(userId);
-    
+
         // Find the product in the cart
         const existingItem = cart.items.find(item => item.productId.toString() === productId);
         if (!existingItem) {
             throw new NotFoundException('Item not found in cart');
         }
-    
+
         // Update the existing item with rental information
         existingItem.rentalDuration = rentalDuration;
         existingItem.isRented = true;
-    
+
         // Save the updated cart
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
@@ -71,17 +74,17 @@ export class CartService {
     async rentProductGuest(sessionId: string, productId: string, rentalDuration: string): Promise<Cart> {
         // Retrieve the cart for the user
         let cart = await this.getCartBySessionId(sessionId);
-    
+
         // Find the product in the cart
         const existingItem = cart.items.find(item => item.productId.toString() === productId);
         if (!existingItem) {
             throw new NotFoundException('Item not found in cart');
         }
-    
+
         // Update the existing item with rental information
         existingItem.rentalDuration = rentalDuration;
         existingItem.isRented = true;
-    
+
         // Save the updated cart
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
@@ -104,12 +107,12 @@ export class CartService {
                 existingItem.quantity = updateItemDto.quantity;
             }
         }
-        
+
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
     }
-    async updateCartItemGuest( productId: string, updateItemDto: UpdateCartItemDto, sessionId: string): Promise<Cart> {
-        
+    async updateCartItemGuest(productId: string, updateItemDto: UpdateCartItemDto, sessionId: string): Promise<Cart> {
+
         let cart = await this.getCartBySessionId(sessionId);
 
         const existingItem = cart.items.find(item => item.productId.toString() === productId);
@@ -125,7 +128,7 @@ export class CartService {
                 existingItem.quantity = updateItemDto.quantity;
             }
         }
-        
+
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
     }
@@ -139,20 +142,20 @@ export class CartService {
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
     }
-    async removeItemFromCartGuest(productId: string, sessionId: string): Promise<Cart> {    
+    async removeItemFromCartGuest(productId: string, sessionId: string): Promise<Cart> {
         let cart = await this.getCartBySessionId(sessionId);
-    
+
         cart.items = cart.items.filter(item => !item.productId || item.productId.toString() !== productId.toString());
 
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
     }
 
-    async applyCouponCode(userId: string, couponCode: string ): Promise<Cart> {
+    async applyCouponCode(userId: string, couponCode: string): Promise<Cart> {
         let cart = await this.getCartByUserId(userId);
         let couponCodeApplied = await this.getCouponByCode(couponCode);
 
-        if( couponCodeApplied.limited ) {
+        if (couponCodeApplied.limited) {
             couponCodeApplied.quantity--;
         }
         cart.total_price_post_coupon = cart.total_price_pre_coupon - (cart.total_price_pre_coupon * couponCodeApplied.coupon_percentage)
@@ -160,11 +163,11 @@ export class CartService {
         return await updatedCart.save();
     } //recheck this later
 
-    async applyCouponCodeGuest( couponCode: string, sessionId: string): Promise<Cart> {
+    async applyCouponCodeGuest(couponCode: string, sessionId: string): Promise<Cart> {
         let cart = await this.getCartBySessionId(sessionId);
         let couponCodeApplied = await this.getCouponByCode(couponCode);
 
-        if( couponCodeApplied.limited ) {
+        if (couponCodeApplied.limited) {
             throw new Error("You can't use this coupon code as a guest user!, Please create an account if you want to use this coupon.\nthis coupon is for " + couponCodeApplied.coupon_percentage + "%")
         }
         const updatedCart = cart as CartDocument;
@@ -191,46 +194,46 @@ export class CartService {
         // make kafka call to paymob service
         const updatedCart = cart as CartDocument;
         return await updatedCart.save();
-        
+
     }
-//     "delivery_needed": "true",
-//   "amount_cents": "10000",
-//   "currency": "EGP",
-//   "merchant_order_id": 33, 
-//   "items": [
-//     {
-//       "name": "ASC15215",
-//       "amount_cents": "10000",
-//       "description": "Smart Watch",
-//       "quantity": "1"
-//     }
-//   ],
-//   "shipping_data": {
-//     "apartment": "8034",
-//     "email": "claudette09@example.com",
-//     "floor": "42",
-//     "first_name": "Clifford",
-//     "street": "Ethan Land",
-//     "building": "8028",
-//     "phone_number": "+86(8)9135210487",
-//     "postal_code": "01898",
-//     "extra_description": "8 Ram , 128 Giga",
-//     "city": "Jaskolskiburgh",
-//     "country": "CR",
-//     "last_name": "Nicolas",
-//     "state": "Utah"
-//   },
-//   "shipping_details": {
-//     "notes": "test",
-//     "number_of_packages": 1,
-//     "weight": 1,
-//     "weight_unit": "Kilogram",
-//     "length": 1,
-//     "width": 1,
-//     "height": 1,
-//     "contents": "product of some sorts"
-//   }
-    
+    //     "delivery_needed": "true",
+    //   "amount_cents": "10000",
+    //   "currency": "EGP",
+    //   "merchant_order_id": 33, 
+    //   "items": [
+    //     {
+    //       "name": "ASC15215",
+    //       "amount_cents": "10000",
+    //       "description": "Smart Watch",
+    //       "quantity": "1"
+    //     }
+    //   ],
+    //   "shipping_data": {
+    //     "apartment": "8034",
+    //     "email": "claudette09@example.com",
+    //     "floor": "42",
+    //     "first_name": "Clifford",
+    //     "street": "Ethan Land",
+    //     "building": "8028",
+    //     "phone_number": "+86(8)9135210487",
+    //     "postal_code": "01898",
+    //     "extra_description": "8 Ram , 128 Giga",
+    //     "city": "Jaskolskiburgh",
+    //     "country": "CR",
+    //     "last_name": "Nicolas",
+    //     "state": "Utah"
+    //   },
+    //   "shipping_details": {
+    //     "notes": "test",
+    //     "number_of_packages": 1,
+    //     "weight": 1,
+    //     "weight_unit": "Kilogram",
+    //     "length": 1,
+    //     "width": 1,
+    //     "height": 1,
+    //     "contents": "product of some sorts"
+    //   }
+
     async getCartByUserId(userId: string): Promise<Cart> {
         let cart = await this.cartModel.findOne({ userId }).exec();
         if (!cart) {
@@ -239,12 +242,12 @@ export class CartService {
         return cart;
     }
     async getCartBySessionId(sessionId: string): Promise<Cart> {
-        let cart = await this.cartModel.findOne({ sessionId});
-            if (!cart) {
-                throw new NotFoundException('Cart not found');
-            }
-            return cart;
+        let cart = await this.cartModel.findOne({ sessionId });
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
         }
+        return cart;
+    }
     async getCouponByCode(couponCode: string): Promise<Coupon | null> {
         const coupon = await this.couponModel.findOne({ couponCode });
         return coupon ? coupon : null;
