@@ -1,6 +1,6 @@
 // payment.controller.ts
 
-import { Controller, Post, Body, Res, Redirect } from '@nestjs/common';
+import { Controller, Post, Body, Res, Redirect, Param } from '@nestjs/common';
 import { PaymobService } from './paymob.service';
 import { AuthService } from '../auth/auth.service'; // Adjust the import path
 
@@ -9,7 +9,7 @@ export class PaymobController {
   constructor(
     private readonly paymobService: PaymobService,
     private readonly authService: AuthService, // Inject the AuthService
-  ) {} 
+  ) { }
 
   @Post('register-order')
   async registerOrder(@Body() orderData: any): Promise<{ orderId: number }> {
@@ -21,16 +21,17 @@ export class PaymobController {
       throw new Error('Failed to register order');
     }
   }
-  @Post('payment/key')
-  @Redirect() // Using the Redirect decorator
-  async getPaymentKeyAndRedirect(@Body() paymentData: any): Promise<{ url: string }> {
+  @Post('order-payment/:orderId')
+  @Redirect()
+  async getPaymentKeyAndRedirect(@Param('orderId') orderId: string, @Body() paymentData: any): Promise<any/* { url: string } */> {
     try {
-      const paymentKey = await this.paymobService.getPaymentKey(paymentData);
-      const iframeId = '844345'; // Your iframe ID
-      const iframeUrl = `https://accept.paymobsolutions.com/api/acceptance/iframes/${iframeId}?payment_token=${paymentKey}`;
-      
+      const paymentKey = await this.paymobService.getPaymentKey(paymentData, orderId);
+      // const iframeId = '844345'; // Your iframe ID
+      // const iframeUrl = `https://accept.paymobsolutions.com/api/acceptance/iframes/${iframeId}?payment_token=${paymentKey}`;
+
       // Return the URL to redirect to
-      return { url: iframeUrl };
+      // return { url: iframeUrl };
+      return paymentKey;
     } catch (error) {
       // Handle errors here
       console.error('Error in getPaymentKeyAndRedirect:', error);
