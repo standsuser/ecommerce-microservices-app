@@ -15,7 +15,13 @@ export class Wishlist {
   createdAt: Date;
 
   @Prop()
-  selectedSize: string;
+  selectedSize: string;  
+  
+  @Prop()
+  selectedMaterial: string;  
+  
+  @Prop()
+  selectedColor: string;
 }
 
 export const WishlistSchema = SchemaFactory.createForClass(Wishlist);
