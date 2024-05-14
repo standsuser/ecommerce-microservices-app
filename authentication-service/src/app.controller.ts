@@ -1,4 +1,6 @@
 /* eslint-disable prettier/prettier */
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Body, Controller, Delete, Get, Logger, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Roles } from './decorators/role.decorator';
