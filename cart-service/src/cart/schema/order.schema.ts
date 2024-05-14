@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-// import { Address } from "cluster";
-import { Document, ObjectId } from 'mongoose';
+import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 
 export type OrderDocument = Order & Document;
 
@@ -15,7 +14,7 @@ enum OrderStatus {
 @Schema()
 export class Order {
     @Prop()
-    user_id: string;
+    user_id: MongooseSchema.Types.ObjectId;
 
     @Prop()
     order_id: number;
@@ -33,17 +32,21 @@ export class Order {
     merchant_order_id: number;
 
     @Prop()
-    items: { product_id: string, name: string, amount_cents: number /*call the function from laineymclainpants*/ , description: string, color: string, size: string, material: string, quantity: number }[];
+    items: { product_id: MongooseSchema.Types.ObjectId, name: string, amount_cents: number /*call the function from laineymclainpants*/ , description: string, color: string, size: string, material: string, quantity: number }[];
 
     @Prop({ type: String, enum: OrderStatus, default: OrderStatus.PENDING })
     status: string;
 
     @Prop()
-    shipping_data: Address;
+    shipping_data: {apartment: string, email:string, floor:string, first_name: string, street:string, building:string, phone_number:string,
+        postal_code: string, extra_description: string, city: string, country: string, last_name: string, state: string }
+    
+
     @Prop()
     payment_info: {
         order_id: number, amount_cents: number, expiration: 3600, 
-        billing_data: Address,
+        billing_data: {apartment: string, email:string, floor:string, first_name: string, street:string, building:string, phone_number:string,
+            postal_code: string, extra_description: string, city: string, country: string, last_name: string, state: string },
         currency: 'EGP',
         integration_id: 4570504,
         lock_order_when_paid: 'false'

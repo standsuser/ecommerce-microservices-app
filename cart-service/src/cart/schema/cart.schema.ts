@@ -5,15 +5,22 @@ export type CartDocument = Cart & Document;
 
 @Schema()
 export class Cart {
-    
-    @Prop()
-    user_id?: string ;  // For authenticated users
+    save() {
+        throw new Error('Method not implemented.');
+    }
 
     @Prop()
-    sessiond_id?: string ; // For guest users
+    user_id?: MongooseSchema.Types.ObjectId;  // For authenticated users
 
     @Prop()
-    items: Product[];
+    sessiond_id?: string; // For guest users
+
+    @Prop()
+    items: {
+        productId: any;
+        rentalDuration: string;
+        isRented: boolean; name: string, amount_cents: number /*call the function from laineymclainpants*/, description: string, color: string, size: string, material: string, quantity: number
+    }[];
 
     @Prop()
     total_price_pre_coupon: number; //lained
@@ -32,7 +39,6 @@ export class Cart {
 
     @Prop({ default: Date.now })
     updated_at: Date;
-
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);
