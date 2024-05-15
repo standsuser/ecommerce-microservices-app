@@ -4,6 +4,7 @@ import { AddToCartDto } from './dto/addToCart.dto';
 import { UpdateCartItemDto } from './dto/updatecartitem.dto';
 import { Cart } from './schema/cart.schema';
 import { ConvertGuestToUserDto } from './dto/convertGuestToUser.dto';
+import { Order } from './schema/order.schema';
 
 @Controller('cart')
 export class CartController {
@@ -47,15 +48,14 @@ export class CartController {
     ): Promise<Cart> {
         return this.cartService.applyCouponCode(userId, couponCode);
     }
-
-    @Post(':userId/place-order/:orderId')
-    async placeOrder(
+    @Post(':userId/createOrder')
+    async createOrder(
         @Param('userId') userId: string,
-        @Param('orderId') orderId: string,
-    ): Promise<Cart> {
-        const updatedCart = await this.cartService.placeOrder(userId, orderId);
-        return updatedCart;
+        @Body('shipping_data') shippingData: any,
+    ): Promise<Order> {
+        return this.cartService.createOrder(userId, shippingData);
     }
+
 
     @Post(':userId/proceed-to-checkout')
     async proceedToCheckout(
@@ -67,21 +67,21 @@ export class CartController {
 
     @Post('guest/:sessionId/add-item')
     async addItemToGuestCart(
-      @Param('sessionId') sessionId: string,
-      @Body() addItemDto: AddToCartDto,
+        @Param('sessionId') sessionId: string,
+        @Body() addItemDto: AddToCartDto,
     ): Promise<Cart> {
-      return this.cartService.addItemToGuestCart(sessionId, addItemDto, addItemDto.item_id);
+        return this.cartService.addItemToGuestCart(sessionId, addItemDto, addItemDto.item_id);
     }
 
     @Get('guest/:sessionId/items')
     async getItemsFromGuestCart(@Param('sessionId') sessionId: string): Promise<Cart> {
-      return this.cartService.getItemsFromGuestCart(sessionId);
+        return this.cartService.getItemsFromGuestCart(sessionId);
     }
 
     @Post('convert-guest-to-user')
     async convertGuestToUser(@Body() convertGuestToUserDto: ConvertGuestToUserDto): Promise<Cart> {
-      const { userId, sessionId } = convertGuestToUserDto;
-      return this.cartService.convertGuestToUser(userId, sessionId);
+        const { userId, sessionId } = convertGuestToUserDto;
+        return this.cartService.convertGuestToUser(userId, sessionId);
     }
 
 }

@@ -62,7 +62,7 @@ class ShippingData {
     postal_code: string;
 
     @Prop()
-    extra_description: string;
+    extra_description: string | null;
 
     @Prop()
     city: string;
@@ -145,9 +145,6 @@ class PaymentInfo {
 export class Order extends Document {
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
     user_id: MongooseSchema.Types.ObjectId;
-
-    @Prop()
-    order_id: number;
 
     @Prop()
     delivery_needed: boolean;
