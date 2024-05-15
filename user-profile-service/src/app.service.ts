@@ -25,7 +25,7 @@ export class AppService {
 }
 
 @Injectable()
-export class OrderService {
+export class UserService {
   constructor(
     @InjectModel('Order') private readonly orderModel: Model<Order>,
     @InjectModel('User') private readonly userModel: Model<User>,  // Inject the User model
