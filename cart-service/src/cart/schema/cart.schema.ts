@@ -1,14 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 
-export type CartDocument = Cart & Document;
 
 @Schema()
-export class Cart {
-    save() {
-        throw new Error('Method not implemented.');
-    }
-
+export class Cart extends Document{
     @Prop()
     user_id?: MongooseSchema.Types.ObjectId;  // For authenticated users
 

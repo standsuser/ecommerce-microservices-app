@@ -50,6 +50,4 @@ export class Address {
 }
 
 
-
-
 export const AddressSchema = SchemaFactory.createForClass(Address);

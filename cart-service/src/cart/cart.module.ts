@@ -9,12 +9,14 @@ import { Order, OrderSchema } from './schema/order.schema';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: 'Cart', schema: CartSchema }]),
-        MongooseModule.forFeature([{ name: 'Coupon', schema: CouponSchema }]),
-        MongooseModule.forFeature([{ name: 'Order', schema: OrderSchema }])
+        MongooseModule.forFeature([
+            { name: Cart.name, schema: CartSchema },
+            { name: Coupon.name, schema: CouponSchema },
+            { name: Order.name, schema: OrderSchema },
+        ]),
     ],
     controllers: [CartController],
-    providers: [CartService],
-    exports: [CartService]
+    providers: [CartService]
 })
-export class CartModule {}
+export class CartModule { }
+

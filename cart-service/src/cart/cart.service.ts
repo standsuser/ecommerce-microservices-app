@@ -1,11 +1,11 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Cart, CartDocument } from './schema/cart.schema';
-import { Coupon, CouponDocument } from './schema/coupon.schema';
+import { Cart } from './schema/cart.schema';
+import { Coupon  } from './schema/coupon.schema';
 import { AddToCartDto } from './dto/addToCart.dto';
 import { UpdateCartItemDto } from './dto/updatecartitem.dto';
-import { Order, OrderDocument, OrderStatus } from './schema/order.schema';
+import { Order,  OrderStatus } from './schema/order.schema';
 import { ConsumerService } from '../kafka/consumer.service';
 
 
@@ -13,9 +13,9 @@ import { ConsumerService } from '../kafka/consumer.service';
 export class CartService {
     constructor(
         private readonly consumerService: ConsumerService,
-        @InjectModel('Cart') private readonly cartModel: Model<CartDocument>,
-        @InjectModel('Coupon') private readonly couponModel: Model<CouponDocument>,
-        @InjectModel('Order') private readonly orderModel: Model<OrderDocument>) { }
+        @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
+        @InjectModel(Coupon.name) private readonly couponModel: Model<Coupon>,
+        @InjectModel(Order.name) private readonly orderModel: Model<Order>) { }
 
 
     async getCartByUserId(userId: string): Promise<Cart> {
@@ -147,7 +147,7 @@ export class CartService {
 
         cart.is_checkout = true;
         // make kafka call to paymob service
-        const updatedCart = cart as CartDocument;
+        const updatedCart = cart as Cart;
         return updatedCart.save();
     }
 
@@ -158,7 +158,7 @@ export class CartService {
         }
         cart.is_checkout = true;
         // cart.totalPricePostCoupon = cart.totalPricePreCoupon - cart.totalPricePreCoupon * cart.couponPercentage;
-        const updatedCart = cart as CartDocument;
+        const updatedCart = cart as Cart;
         return updatedCart.save();
     }
 
