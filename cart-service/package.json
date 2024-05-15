@@ -24,7 +24,10 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mongoose": "^10.0.6",
     "@nestjs/platform-express": "^10.0.0",
-    "mongoose": "^8.3.4",
+    "docker": "^1.0.0",
+    "mongo": "^0.1.0",
+    "mongodb": "^6.6.2",
+    "mongoose": "^8.3.5",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
   },
