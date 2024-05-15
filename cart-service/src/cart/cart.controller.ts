@@ -3,6 +3,7 @@ import { CartService } from './cart.service';
 import { AddToCartDto } from './dto/addToCart.dto';
 import { UpdateCartItemDto } from './dto/updatecartitem.dto';
 import { Cart } from './schema/cart.schema';
+import { ConvertGuestToUserDto } from './dto/convertGuestToUser.dto';
 
 @Controller('cart')
 export class CartController {
@@ -69,6 +70,18 @@ export class CartController {
       @Param('sessionId') sessionId: string,
       @Body() addItemDto: AddToCartDto,
     ): Promise<Cart> {
-      return this.cartService.addItemToGuestCart(sessionId, addItemDto);
+      return this.cartService.addItemToGuestCart(sessionId, addItemDto, addItemDto.item_id);
     }
+
+    @Get('guest/:sessionId/items')
+    async getItemsFromGuestCart(@Param('sessionId') sessionId: string): Promise<Cart> {
+      return this.cartService.getItemsFromGuestCart(sessionId);
+    }
+
+    @Post('convert-guest-to-user')
+    async convertGuestToUser(@Body() convertGuestToUserDto: ConvertGuestToUserDto): Promise<Cart> {
+      const { userId, sessionId } = convertGuestToUserDto;
+      return this.cartService.convertGuestToUser(userId, sessionId);
+    }
+
 }

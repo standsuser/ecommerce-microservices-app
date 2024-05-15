@@ -25,6 +25,7 @@ export class CartService {
         }
         return cart;
     }
+
     async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
         let cart = await this.getCartByUserId(userId);
         if (!cart) {
@@ -172,13 +173,13 @@ export class CartService {
         return cart;
     }
 
-    async addItemToGuestCart(sessionId: string, addItemDto: AddToCartDto): Promise<Cart> {
+    async addItemToGuestCart(sessionId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
         let cart = await this.getCartBySessionId(sessionId);
         if (!cart) {
             cart = new this.cartModel({ sessiond_id: sessionId, items: [] });
         }
 
-        const existingItemIndex = cart.items.findIndex(item => item.productId === addItemDto.productId);
+        const existingItemIndex = cart.items.findIndex(item => item.productId === addItemDto.item_id);
         const quantity = addItemDto.quantity;
 
         if (existingItemIndex !== -1) {
@@ -205,11 +206,56 @@ export class CartService {
         return cart;
     }
 
-    async getItemsFromGuestCart(sessionId: string): Promise<any[]> {
+    async getItemsFromGuestCart(sessionId: string): Promise<Cart> {
         const cart = await this.cartModel.findOne({ sessiond_id: sessionId }).exec();
-        return cart ? cart.items : [];
-      }
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+        return cart;
+    }
 
+    async removeItemFromGuestCart(sessionId: string, productId: string): Promise<Cart> {
+        const cart = await this.getCartByUserId(sessionId);
+        const updatedItems = cart.items.filter(item => item.productId !== productId);
+        if (updatedItems.length === cart.items.length) {
+            throw new NotFoundException('Item not found in cart');
+        }
+        cart.items = updatedItems;
+        await cart.save();
+        return cart;
+    }
+
+    async convertGuestToUser(userId: string, sessionId: string): Promise<Cart> {
+        const guestCart = await this.getCartBySessionId(sessionId);
+        if (!guestCart) {
+          throw new NotFoundException('Guest cart not found');
+        }
+    
+        let userCart = await this.getCartByUserId(userId);
+        if (userCart) {
+          // Merge guest cart items into existing user cart
+          // const existingItemIndex = cart.items.findIndex(item => item.productId === productId);
+
+          guestCart.items.forEach(guestItem => {
+            const existingItemIndex = userCart.items.findIndex(
+              item => item.productId === guestItem.productId.toString()
+            );
+            if (existingItemIndex !== -1) {
+              userCart.items[existingItemIndex].quantity += guestItem.quantity;
+            } else {
+              userCart.items.push(guestItem);
+            }
+          });
+          await userCart.save();
+          return userCart;
+        } else {
+          // Create a new user cart with guest cart items
+          guestCart.sessiond_id = null;
+          await guestCart.save();
+          return guestCart;
+        }
+      }
+    }
     // async addItemToCartGuest(addItemDto: AddCartItemDto, sessionId: string): Promise<Cart> {
     //     let cart = await this.getCartBySessionId(sessionId);
     //     if (!cart) {
@@ -361,4 +407,3 @@ export class CartService {
     // // }
 
 
-}
