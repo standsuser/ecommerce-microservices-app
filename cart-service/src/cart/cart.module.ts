@@ -5,6 +5,7 @@ import { CartService } from './cart.service';
 import { Cart, CartSchema } from './schema/cart.schema';
 import { Coupon, CouponSchema } from './schema/coupon.schema';
 import { Order, OrderSchema } from './schema/order.schema';
+import { ConsumerService } from '../kafka/consumer.service';
 
 
 @Module({
@@ -16,7 +17,7 @@ import { Order, OrderSchema } from './schema/order.schema';
         ]),
     ],
     controllers: [CartController],
-    providers: [CartService]
+    providers: [CartService, ConsumerService]
 })
 export class CartModule { }
 
