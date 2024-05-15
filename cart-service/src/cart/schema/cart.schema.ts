@@ -14,7 +14,8 @@ export class Cart extends Document{
     items: {
         productId: any;
         rentalDuration: string;
-        isRented: boolean; name: string, amount_cents: number /*call the function from laineymclainpants*/, description: string, color: string, size: string, material: string, quantity: number
+        isRented: boolean; name: string, amount_cents: number, 
+        description: string, color: string, size: string, material: string, quantity: number
     }[];
 
     @Prop()
