@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-const url = 'mongodb://localhost:27017';
+const url = 'mongodb://localhost:27018';
 const dbName = 'cart'; // replace with your database name
 
 const client = new MongoClient(url);
