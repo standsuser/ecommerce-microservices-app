@@ -86,7 +86,7 @@ export class CartService {
     }
     async getCartItems(userId: string): Promise<any> {
         try {
-            const cart = await this.cartModel.find({ userId }).exec();
+            const cart = await this.cartModel.findOne({ userId }).exec();
             if (!cart) {
                 throw new NotFoundException('Cart not found');
             }
@@ -101,6 +101,7 @@ export class CartService {
             throw error;
         }
     }
+
 
     async updateCartItem(userId: string, productId: string, updateCartItemDto: UpdateCartItemDto): Promise<Cart> {
         const cart = await this.getCartItems(userId);
