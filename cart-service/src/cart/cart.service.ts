@@ -191,6 +191,7 @@ export class CartService {
         return cart;
     }
 
+    //TESTED :O
     async createOrder(userId: string, shippingData: any): Promise<Order> {
         const cart = await this.cartModel.findOne({ userId }).exec();
 
