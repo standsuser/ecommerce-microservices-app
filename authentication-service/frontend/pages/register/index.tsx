@@ -3,6 +3,7 @@ import { Link } from '@nextui-org/link';
 import { button as buttonStyles } from '@nextui-org/theme';
 import DefaultLayout from '@/layouts/default';
 import { Input } from '@nextui-org/react';
+import router from 'next/router';
 
 const RegisterPage: React.FC = () => {
     const [userData, setUserData] = useState({
@@ -35,7 +36,7 @@ const RegisterPage: React.FC = () => {
             if (response.ok) {
                 setSuccess(true);
                 setTimeout(() => {
-                    window.location.href = '/login';
+                    router.push('/login'); // Use client-side routing
                 }, 1000); // Pause for 1 second before redirecting
             } else {
                 console.error('Registration failed');
@@ -110,25 +111,21 @@ const RegisterPage: React.FC = () => {
                             type="password"
                             placeholder="Enter your Password"
                         />
-                        <button
-                            className={`${
-                                buttonStyles({
-                                    color: 'primary',
-                                    radius: 'full',
-                                    variant: 'shadow',
-                                })} mt-4`}
+                         <button
+                            className={`${buttonStyles({
+                                color: 'primary',
+                                radius: 'full',
+                                variant: 'shadow',
+                            })} mt-4`}
                             type="submit"
                         >
                             Register
                         </button>
-                        
                     </form>
                     {success && (
                         <div className="mt-4 text-green-500">Registration successful!</div>
                     )}
                 </div>
-
-                
             </section>
         </DefaultLayout>
     );

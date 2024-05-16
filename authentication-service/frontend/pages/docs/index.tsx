@@ -1,5 +1,6 @@
 import { title } from '@/components/primitives'
 import DefaultLayout from '@/layouts/default'
+import { TraceEvent } from 'next/dist/trace'
 
 export default function DocsPage() {
   return (

@@ -42,21 +42,19 @@ export class UserController {
         );
     }
 
-    @UseGuards(LocalAuthGuard)
     @MessagePattern('logout')
     async logout(command){
         console.log('command user: ', command.user);
         return this.userService.logout({
-            ...command.user,
-            roles:['admin']
+            ...command.userID
         }
         );
     }
 
-    // @MessagePattern('change-password')
-    // async changePassword(command){
-    //     return this.userService.changePassword(command.userID,command.newPassword);
-    // }
+    @MessagePattern('change-password')
+    async changePassword(command){
+        return this.userService.changePassword(command.userID,command.newPassword , command.oldPassword);
+    }
 
 
 

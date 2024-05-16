@@ -1,106 +1,121 @@
-import {
-	Button,
-	Kbd,
-	Link,
-	Input,
-	Navbar as NextUINavbar,
-	NavbarContent,
-	NavbarMenu,
-	NavbarMenuToggle,
-	NavbarBrand,
-	NavbarItem,
-	NavbarMenuItem,
-} from "@nextui-org/react";
+import React from "react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button, Dropdown, DropdownTrigger, DropdownItem, DropdownMenu } from "@nextui-org/react";
+import { AcmeLogo } from "./AcmeLogo.jsx";
+import router from "next/router.js";
+//import{getUser} from "@/auth/loginCred.js";
+import{getVer , getUser, setUser} from "@/auth";
+import { handleLogout } from "@/auth/handleLogout";
 
-import { link as linkStyles } from "@nextui-org/theme";
 
-import { siteConfig } from "@/config/site";
-import NextLink from "next/link";
-import clsx from "clsx";
+export default function Nbar() {
 
-import { ThemeSwitch } from "@/components/theme-switch";
-import {
-	GithubIcon,
-	SearchIcon,
-} from "@/components/icons";
+    if (getVer() == true){
 
-import { Logo } from "@/components/icons";
+        return (
 
-export const Navbar = () => {
-	const searchInput = (
-		<Input
-			aria-label="Search"
-			classNames={{
-				inputWrapper: "bg-default-100",
-				input: "text-sm",
-			}}
-			endContent={
-				<Kbd className="hidden lg:inline-block" keys={["command"]}>
-					K
-				</Kbd>
-			}
-			labelPlacement="outside"
-			placeholder="Search..."
-			startContent={
-				<SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-			}
-			type="search"
-		/>
+			<Navbar shouldHideOnScroll>
+      <NavbarBrand>
+	  <Dropdown backdrop="blur">
+          <DropdownTrigger>
+            <Button
+              variant="bordered"
+              className="mr-12" // Add margin to the right
+            >
+              Menu
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu variant="faded" aria-label="Static Actions">
+            <DropdownItem key="change-password" /*onClick={handleChangePassword}*/>Change Password </DropdownItem>
+            <DropdownItem key="delete" className="text-danger" color="danger" onClick={handleLogout}>
+              Logout
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+        
+
+        <AcmeLogo />
+        <p className="font-bold text-inherit">ZANATY</p>
+      </NavbarBrand>
+      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <NavbarItem>
+          <Link color="foreground" href="home">
+            Homepage
+          </Link>
+        </NavbarItem>
+        <NavbarItem isActive>
+          <Link href="productsPage" aria-current="page">
+            Products
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="#">
+            Integrations
+          </Link>
+        </NavbarItem>
+      </NavbarContent>
+      <NavbarContent justify="end">
+        <NavbarItem>
+        </NavbarItem>
+      </NavbarContent>
+    </Navbar>
+        );
+    } else {
+        return (
+<Navbar shouldHideOnScroll>
+      <NavbarBrand>
+        
+
+        <AcmeLogo />
+        <p className="font-bold text-inherit">ZANATY</p>
+      </NavbarBrand>
+      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <NavbarItem>
+          <Link color="foreground" href="home">
+            Homepage
+          </Link>
+        </NavbarItem>
+        <NavbarItem isActive>
+          <Link href="productsPage" aria-current="page">
+            Products
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="#">
+            Integrations
+          </Link>
+        </NavbarItem>
+      </NavbarContent>
+      <NavbarContent justify="end">
+        <NavbarItem>
+          <Button as={Link} color="primary" href="login" variant="flat">
+            Login
+          </Button>
+        </NavbarItem>
+      </NavbarContent>
+    </Navbar> 
 	);
+    }
+}
 
-	return (
-		<NextUINavbar maxWidth="xl" position="sticky">
-			<NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-				<NavbarBrand className="gap-3 max-w-fit">
-					<NextLink className="flex justify-start items-center gap-1" href="/">
-						<Logo />
-						<p className="font-bold text-inherit">ZANATY</p>
-					</NextLink>
-				</NavbarBrand>
-				<div className="hidden lg:flex gap-4 justify-start ml-2">
-					{siteConfig.navItems.map((item) => (
-						<NavbarItem key={item.href}>
-							<NextLink
-								className={clsx(
-									linkStyles({ color: "foreground" }),
-									"data-[active=true]:text-primary data-[active=true]:font-medium"
-								)}
-								color="foreground"
-								href={item.href}
-							>
-								{item.label}
-							</NextLink>
-						</NavbarItem>
-					))}
-				</div>
-			</NavbarContent>
 
-      
 
-			
 
-      <NavbarMenu>
-				{searchInput}
-				<div className="mx-4 mt-2 flex flex-col gap-2">
-					{siteConfig.navMenuItems.map((item, index) => (
-						<NavbarMenuItem key={`${item}-${index}`}>
-							<Link
-								color={
-									index === 2
-										? "primary"
-										: index === siteConfig.navMenuItems.length - 1
-										? "danger"
-										: "foreground"
-								}
-								href="#"
-								size="lg"
-							>
-								{item.label}
-							</Link>
-						</NavbarMenuItem>
-					))}
-				</div>
-			</NavbarMenu>
-		</NextUINavbar>
-	);
-};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
