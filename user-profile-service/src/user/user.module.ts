@@ -12,13 +12,12 @@ import { ProducerService } from 'src/kafka/producer.service';
 @Module({
     imports: [
         MongooseModule.forFeature([
-            { name: Product.name, schema: ProductSchema },
-            { name: Favorite.name, schema: FavoriteSchema }, 
-            { name: Category.name, schema: CategorySchema },
-            { name: Review.name, schema: ReviewSchema },
+            { name: Address.name, schema: AddressSchema },
+            { name: Payment.name, schema: PaymentSchema },
+            { name: Wishlist.name, schema: WishlistSchema }
         ]),
     ],
-    controllers: [ProductController],
-    providers: [ProductService, ConsumerService, ProducerService, TaskService],
+    controllers: [UserController],
+    providers: [UserService, ConsumerService, ProducerService],
 })
-export class ProductModule {}
+export class UserModule {}
