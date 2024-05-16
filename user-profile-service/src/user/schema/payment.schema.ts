@@ -9,9 +9,6 @@ export class Payment {
     
     @Prop({ type: MongooseSchema.Types.ObjectId, required: true })
     userid: MongooseSchema.Types.ObjectId;
-    
-    @Prop()
-    billingAddress: Address; 
 
     @Prop()
     debitOrCredit: string; // "debit" or "credit"
