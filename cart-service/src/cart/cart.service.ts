@@ -22,7 +22,7 @@ export class CartService {
 
 
     async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
-        let cart = await this.getCartItems(userId);
+        let cart = await this.getCartInfo(userId);
         if (!cart) {
             cart = new this.cartModel({ userId, items: [] });
         }
@@ -54,7 +54,7 @@ export class CartService {
     }
 
     async rentProduct(userId: string, addItemDto: AddToCartDto, productId: string, rentalDuration: string): Promise<Cart> {
-        let cart = await this.getCartItems(userId);
+        let cart = await this.getCartInfo(userId);
         if (!cart) {
             cart = new this.cartModel({ userId, items: [] });
         }
@@ -84,13 +84,14 @@ export class CartService {
         await cart.save();
         return cart;
     }
-    async getCartItems(userId: string): Promise<any> {
+
+    //tested :O
+    async getCartInfo(userId: string): Promise<any> {
         try {
             const cart = await this.cartModel.findOne({ userId }).exec();
             if (!cart) {
                 throw new NotFoundException('Cart not found');
             }
-            console.log(JSON.stringify(cart));
             return cart;
         } catch (error) {
             if (error instanceof NotFoundException) {
@@ -102,9 +103,28 @@ export class CartService {
         }
     }
 
+    
+    // Tested :O 
+    async getCartItems(userId: string): Promise<any> {
+        try {
+            const cart = await this.cartModel.findOne({ userId }).exec();
+            if (!cart) {
+                throw new NotFoundException('Cart not found');
+            }
+            console.log(JSON.stringify(cart.items));
+            return cart.items;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                console.error(error.message);
+            } else {
+                console.error(`Error retrieving cart for userId: ${userId}`, error);
+            }
+            throw error;
+        }
+    }
 
     async updateCartItem(userId: string, productId: string, updateCartItemDto: UpdateCartItemDto): Promise<Cart> {
-        const cart = await this.getCartItems(userId);
+        const cart = await this.getCartInfo(userId);
         const itemIndex = cart.items.findIndex(item => item.productId === productId);
         if (itemIndex === -1) {
             throw new NotFoundException('Item not found in cart');
@@ -115,7 +135,7 @@ export class CartService {
     }
 
     async removeItemFromCart(userId: string, productId: string): Promise<Cart> {
-        const cart = await this.getCartItems(userId);
+        const cart = await this.getCartInfo(userId);
         const updatedItems = cart.items.filter(item => item.productId !== productId);
         if (updatedItems.length === cart.items.length) {
             throw new NotFoundException('Item not found in cart');
@@ -126,8 +146,9 @@ export class CartService {
     }
 
 
+    //tested :O
     async applyCouponCode(userId: string, couponCode: string): Promise<Cart> {
-        const cart = await this.getCartItems(userId);
+        const cart = await this.getCartInfo(userId);
         const coupon = await this.couponModel.findOne({ coupon_code: couponCode }).exec();
 
         if (!coupon) {
@@ -138,9 +159,12 @@ export class CartService {
             throw new Error('Coupon code has already been applied');
         }
 
+
         const totalDiscount = cart.total_price_pre_coupon * (coupon.coupon_percentage / 100);
         cart.total_price_post_coupon = cart.total_price_pre_coupon - totalDiscount;
         cart.coupon_code = coupon.coupon_code;
+        cart.coupon_percentage = coupon.coupon_percentage;
+
 
         await cart.save();
         return cart;
@@ -162,7 +186,7 @@ export class CartService {
 
         // Create the order object and fill in the details from the cart
         const order = new this.orderModel({
-            user_id: cart.userId,
+            user_id: cart.userid,
             delivery_needed: 'true',
             amount_cents: cart.total_price_post_coupon,
             currency: 'EGY',
@@ -177,7 +201,7 @@ export class CartService {
     }
 
     async proceedToCheckout(userId: string): Promise<any> {
-        let cart = await this.getCartItems(userId);
+        let cart = await this.getCartInfo(userId);
         if (cart.items.length > 0) {
             throw new Error("Your cart is empty! Please go add new items to your cart")
         }

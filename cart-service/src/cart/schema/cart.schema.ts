@@ -3,9 +3,10 @@ import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 
 
 @Schema()
-export class Cart extends Document{
+export class Cart extends Document {
     @Prop()
-    userId?: MongooseSchema.Types.ObjectId;  // For authenticated users
+    @Prop({ type: MongooseSchema.Types.ObjectId})
+    userid?: MongooseSchema.Types.ObjectId;
 
     @Prop()
     sessiond_id?: string; // For guest users
@@ -14,7 +15,7 @@ export class Cart extends Document{
     items: {
         productId: any;
         rentalDuration: string;
-        isRented: boolean; name: string, amount_cents: number, 
+        isRented: boolean; name: string, amount_cents: number,
         description: string, color: string, size: string, material: string, quantity: number
     }[];
 
@@ -28,7 +29,7 @@ export class Cart extends Document{
     coupon_code: string | null;
 
     @Prop()
-    coupon_percentage: number;
+    coupon_percentage: number| null;
 
     @Prop()
     is_checkout: boolean;

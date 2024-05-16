@@ -19,11 +19,23 @@ export class CartController {
         return this.cartService.addItemToCart(userId, addItemDto, productId);
     }
 
-    @Get('getCartItems/:userId')
-    async getCartItems(@Param('userId') userId: string): Promise<any> {
-        return this.cartService.getCartItems(userId);
+    @Get('get-cart-info/:userId')
+    async getCartInfo(@Param('userId') userId: string): Promise<any> {
+        return this.cartService.getCartInfo(userId);
     }
-
+    @Get('items/:userId')
+    async getCartItems(@Param('userId') userId: string) {
+        try {
+            const items = await this.cartService.getCartItems(userId);
+            return items;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw new NotFoundException(error.message);
+            } else {
+                throw error;
+            }
+        }
+    }
     @Put(':userId/update-item/:productId')
     async updateCartItem(
         @Param('userId') userId: string,
@@ -41,7 +53,7 @@ export class CartController {
         return this.cartService.removeItemFromCart(userId, productId);
     }
 
-    @Post(':userId/apply-coupon/:couponCode')
+    @Post('apply-coupon/:userId/:couponCode')
     async applyCouponCode(
         @Param('userId') userId: string,
         @Param('couponCode') couponCode: string,
