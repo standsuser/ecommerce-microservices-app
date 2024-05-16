@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Cart } from './schema/cart.schema';
@@ -20,37 +20,58 @@ export class CartService {
 
 
 
+    //TESTED :O
 
-    async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
-        let cart = await this.getCartInfo(userId);
-        if (!cart) {
-            cart = new this.cartModel({ userId, items: [] });
-        }
-
-        const existingItemIndex = cart.items.findIndex(item => item.productId === productId);
-        const quantity = addItemDto.quantity;
-
-        if (existingItemIndex !== -1) {
-            cart.items[existingItemIndex].quantity += quantity;
-        } else {
-            const newItem = {
-                productId: productId,
-                rentalDuration: null,
-                isRented: false,
-                name: addItemDto.name,
-                amount_cents: addItemDto.amount_cents,
-                description: addItemDto.description,
-                color: addItemDto.color,
-                size: addItemDto.size,
-                material: addItemDto.material,
-                quantity: quantity,
-            };
-
-            cart.items.push(newItem);
-        }
-        // Save the updated cart
-        await cart.save();
-        return cart;
+        async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
+            const cart = await this.cartModel.findOne({ userId }).exec();
+    
+            if (!cart) {
+                throw new NotFoundException('Cart not found');
+            }
+    
+            const quantity = addItemDto.quantity || 1; // Default quantity to 1 if not provided
+    
+            if (isNaN(quantity) || quantity <= 0) {
+                throw new BadRequestException('Invalid quantity');
+            }
+    
+            if (isNaN(addItemDto.amount_cents) || addItemDto.amount_cents <= 0) {
+                throw new BadRequestException('Invalid amount_cents');
+            }
+    
+            const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+    
+            if (itemIndex > -1) {
+                // Item already exists in cart, update quantity
+                cart.items[itemIndex].quantity += quantity;
+            } else {
+                // Add new item to cart
+                cart.items.push({
+                    productId: productId,
+                    rentalDuration: addItemDto.rentalDuration || 'N/A',
+                    isRented: addItemDto.isRented ?? false,
+                    name: addItemDto.name,
+                    amount_cents: addItemDto.amount_cents,
+                    description: addItemDto.description,
+                    color: addItemDto.color,
+                    size: addItemDto.size,
+                    material: addItemDto.material,
+                    quantity: quantity,
+                });
+            }
+    
+            // Calculate total price pre-coupon
+            cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+    
+            if (isNaN(cart.total_price_pre_coupon)) {
+                throw new BadRequestException('Invalid total price calculation');
+            }
+    
+            // Save updated cart
+            await cart.save();
+    
+            return cart;
+        
     }
 
     async rentProduct(userId: string, addItemDto: AddToCartDto, productId: string, rentalDuration: string): Promise<Cart> {
@@ -103,7 +124,7 @@ export class CartService {
         }
     }
 
-    
+
     // Tested :O 
     async getCartItems(userId: string): Promise<any> {
         try {
@@ -170,34 +191,42 @@ export class CartService {
         return cart;
     }
 
-    async createOrder(userId: string, shipping_data: any,): Promise<Order> {
-        // Get the cart associated with the user
-        const cart = await this.cartModel.findOne({ userId: userId }).exec();
-        if (!cart) {
-            throw new NotFoundException('Cart not found for user');
-        }
-        const maxMerchantOrderId = await this.orderModel.aggregate([
-            { $group: { _id: null, maxOrderId: { $max: '$merchant_order_id' } } },
-        ]);
-        let nextMerchantOrderId = 1;
-        if (maxMerchantOrderId.length > 0) {
-            nextMerchantOrderId = maxMerchantOrderId[0].maxOrderId + 1;
+    //TESTED :O
+    async createOrder(userId: string, shippingData: any): Promise<Order> {
+        const cart = await this.cartModel.findOne({ userId }).exec();
+
+        if (!cart || cart.items.length === 0) {
+            throw new NotFoundException('Cart is empty or not found');
         }
 
-        // Create the order object and fill in the details from the cart
-        const order = new this.orderModel({
-            user_id: cart.userid,
-            delivery_needed: 'true',
-            amount_cents: cart.total_price_post_coupon,
-            currency: 'EGY',
-            merchant_order_id: nextMerchantOrderId,
+        const totalAmountCents = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        const newOrder = new this.orderModel({
+            user_id: userId,
+            delivery_needed: true,
+            amount_cents: totalAmountCents,
+            currency: 'USD', // Set the currency appropriately
+            merchant_order_id: Date.now(), // Example of generating an order ID
             items: cart.items,
             status: OrderStatus.PENDING,
-            shipping_data: shipping_data,
+            shipping_data: shippingData,
+            payment_info: {
+                order_id: Date.now(),
+                amount_cents: totalAmountCents,
+                expiration: 3600, 
+                billing_data: shippingData, 
+                currency: 'EGP',
+                integration_id: 4570504, 
+                lock_order_when_paid: 'true',
+            },
         });
 
-        // Save the order to the database
-        return order.save();
+        await newOrder.save();
+
+        // Optionally, you can clear the cart after creating the order
+        await this.cartModel.updateOne({ userId }, { $set: { items: [] } }).exec();
+
+        return newOrder;
     }
 
     async proceedToCheckout(userId: string): Promise<any> {

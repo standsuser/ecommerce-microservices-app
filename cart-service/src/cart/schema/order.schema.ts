@@ -144,7 +144,7 @@ class PaymentInfo {
 @Schema()
 export class Order extends Document {
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
-    user_id: MongooseSchema.Types.ObjectId;
+    userid: MongooseSchema.Types.ObjectId;
 
     @Prop()
     delivery_needed: boolean;
@@ -170,8 +170,6 @@ export class Order extends Document {
     @Prop({ type: PaymentInfo })
     payment_info: PaymentInfo;
 
-    @Prop()
-    shipping_details: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
