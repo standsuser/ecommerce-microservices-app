@@ -1,7 +1,11 @@
 /* eslint-disable prettier/prettier */
+<<<<<<< HEAD
+import { BadRequestException, Body, Controller, Delete, Get, Logger, Post, Put } from '@nestjs/common';
+=======
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Body, Controller, Delete, Get, Logger, Post } from '@nestjs/common';
+>>>>>>> bd17e4aab283be631952f6ee94f6e0f76829eda2
 import { AppService } from './app.service';
 import { Roles } from './decorators/role.decorator';
 import { UserService } from './user/user.service';
@@ -71,17 +75,17 @@ export class AppController {
   }
   }
 
-  // @Post('change-password')
-  // async changePassword(@Body() { userID, newPassword }: { userID: string, newPassword: string }): Promise<any> {
-  //   try {
-  //     // Attempt to change password
-  //     const response = await this.userService.changePassword(userID, newPassword);
-  //     return { success: true, response };
-  //   } catch (error) {
-  //     // Handle any errors thrown during password change
-  //     return { success: false, message: error }; // Return error response
-  //   }
-  // }
+  @Put('change-password')
+  async changePassword(@Body() { userID, newPassword , oldPassword}: { userID: string, newPassword: string , oldPassword: string }): Promise<any> {
+    try {
+      // Attempt to change password
+      const response = await this.userService.changePassword(userID, newPassword , oldPassword);
+      return { success: true, response };
+    } catch (error) {
+      // Handle any errors thrown during password change
+      return { success: false, message: error }; // Return error response
+    }
+  }
 
   //////////////////////////////////////////
 // it launches when the homepages is loaded
@@ -127,12 +131,12 @@ export class AppController {
     }
   }
 
-  @Delete('logout')
-  async logout(@Body() user: any): Promise<any> {
+  @Post('logout')
+  async logout(@Body() userID: any): Promise<any> {
     try {
       // Attempt to logout user
       //const response = await this.userService.logout(user);
-      const session = await this.sessionService.deleteSession(user.userID);
+      const session = await this.sessionService.deleteSession(userID);
 
 
       return { success: true, /*response , */session};

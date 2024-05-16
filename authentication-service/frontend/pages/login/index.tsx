@@ -3,6 +3,27 @@ import { Link } from '@nextui-org/link';
 import { button as buttonStyles } from '@nextui-org/theme';
 import DefaultLayout from '@/layouts/default';
 import { Input } from "@nextui-org/react";
+import router from 'next/router';
+import { setUser, setVer } from '@/auth';
+import { Console } from 'console';
+
+interface LoginResponse {
+    success: boolean;
+    response: {
+      access_token: string;
+      expires_in: number;
+      userID: string;
+    };
+    session: {
+      userID: string;
+      access_token: string;
+      createdAt: string;
+      isGuest: boolean;
+      _id: string;
+      __v: number;
+    };
+  }
+  
 
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -10,6 +31,9 @@ const LoginPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [loginSuccess, setLoginSuccess] = useState(false);
+
+    
+
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -29,22 +53,25 @@ const LoginPage: React.FC = () => {
             });
 
             if (response.ok) {
+                const data: LoginResponse = await response.json();
                 setLoginSuccess(true);
+                setVer(true);
+                setUser(data.response.userID);
+                console.log(data.response);
                 setTimeout(() => {
-                    console.log('Redirecting to dashboard');
-                    // Redirect to the dashboard
-                    window.location.href = '/blog';
+                  // Redirect to the dashboard
+                  router.push('/docs'); // Use client-side routing
                 }, 1000); // Pause for 1 second
-            } else {
+              } else {
                 setError('Invalid email or password');
-            }
+                setVer(false);
+              }
         } catch (error) {
             setError('An error occurred during login');
         } finally {
             setLoading(false);
         }
     };
-
     return (
         <DefaultLayout>
             <section className="flex flex-col items-center justify-center gap-6 py-8 md:py-10">
@@ -92,8 +119,7 @@ const LoginPage: React.FC = () => {
 
                 <div className="flex gap-2 mt-12">
                     <Link
-                        isExternal
-                        href="/register"
+                        href="/register" // Use client-side routing
                         className={buttonStyles({
                             color: 'primary',
                             radius: 'full',

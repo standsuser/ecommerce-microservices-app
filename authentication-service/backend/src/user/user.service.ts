@@ -17,6 +17,7 @@ import { UserAlreadyExistsException } from '../exceptions/userAlreadyExists.exce
 import { Mailservice } from './Mail.service';
 import { SessionService } from '../session/session.service';
 import { Console } from 'console';
+import { async } from 'rxjs';
 
 
 
@@ -179,16 +180,20 @@ export class UserService {
 
     }
 
-    // async changePassword(userID: string, newPassword: string) {
-    //     const user = await this.getUserbyID(userID);
-    //     if (!user) {
-    //         throw new NotFoundException('User not found');
-    //     }
-    //     const updatedUser = await this.userModel.updateOne({ userId: user._id }, { password: newPassword });
-    //     Logger.log(updatedUser, 'User updated');
+    async changePassword(userID: string, newPassword: string , oldPassword: string)  {
+        const user = await this.getUserbyID(userID);
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        if (user.password !== oldPassword) {
+            throw new Error('Old password is incorrect');
+        }
+        const updatedUser = await this.userModel.findByIdAndUpdate({ userId: user._id }, { password: newPassword }).exec() ;
+        Logger.log(updatedUser, 'User updated');
     
-    //     return updatedUser;
-    // }
+        return updatedUser;
+    }
     
     async logout(userID: string) {
         const user = await this.getUserbyID(userID);
