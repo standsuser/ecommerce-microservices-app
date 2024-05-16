@@ -22,10 +22,14 @@ import {
   export class UserController {
     constructor(private readonly userService: UserService) {}
   
-    @Get('/profile/:userId')
+    @Get('/address/:userId')
     async getAddress(@Param('userId') userId: string) {
       return await this.userService.getAddress(userId);
+    }
 
+    @Get('/profile/:userId')
+    async getProfile(@Param('userId') userId: string) {
+      return await this.userService.getProfile(userId);
     }
 
 

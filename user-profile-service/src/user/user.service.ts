@@ -22,20 +22,41 @@ import {
       private readonly producerService: ProducerService,
     ) {}
   
+    async getProfile(userId: string) {
+      try {
+          const profile = await this.addressModel
+              .find({ userid: userId })
+              .select('userid first_name last_name phone_number email')
+              .exec();
+  
+          if (!profile) {
+              throw new NotFoundException('profile not found');
+          }
+          return profile;
+      } catch (error) {
+          throw new NotFoundException('profile not found');
+      }
+  }
+    
     async getAddress(userId: string){
       try {
-        const profile = await this.addressModel
+        const address = await this.addressModel
           .find({ userid: userId })
           .exec();
           
-        if (!profile) {
+        if (!address) {
           throw new NotFoundException('profile not found');
         }
-        return profile;
+        return address;
       } catch (error) {
         throw new NotFoundException('profile not found');
       }
     }
+
+    //viewmyorderhistory KAFKA
+
+
+
 }
 
 // import { Injectable } from '@nestjs/common';

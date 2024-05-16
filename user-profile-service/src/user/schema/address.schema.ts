@@ -9,6 +9,8 @@ export class Address {
     @Prop({ type: MongooseSchema.Types.ObjectId, required: true })
     userid: MongooseSchema.Types.ObjectId;
 
+    addresslabel: string
+
     @Prop()
     apartment: string
 

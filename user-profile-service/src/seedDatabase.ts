@@ -16,6 +16,7 @@ async function run() {
     const addresses = [
       {
         userid: new ObjectId(),
+        addresslabel: 'Home',
         apartment: '10B',
         email: 'user1@example.com',
         floor: 10,
