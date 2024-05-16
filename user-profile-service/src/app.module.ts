@@ -1,20 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AppService } from './app.service';
 import { AppController } from './app.controller';
-// import { UserSchema, OrderSchema, PaymentMethodSchema, AddressSchema } from './schema';
+import { AppService } from './app.service';
+import { UserModule } from './user/user.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
-    // Connect to MongoDB
-    MongooseModule.forRoot('mongodb://localhost:27017/profile-service'),
-    // Register schemas
-    // MongooseModule.forFeature([
-    //   { name: 'User', schema: UserSchema },
-    //   { name: 'Order', schema: OrderSchema },
-    //   { name: 'PaymentMethod', schema: PaymentMethodSchema },
-    //   { name: 'Address', schema: AddressSchema },
-    // ]),
+    UserModule,
+    MongooseModule.forRoot('mongodb://localhost:27018/user'),
   ],
   controllers: [AppController],
   providers: [AppService],

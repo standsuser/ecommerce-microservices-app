@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema  } from 'mongoose';
 import { Address } from "./address.schema";
 
 export type PaymentDocument = Payment & Document;
@@ -7,8 +7,8 @@ export type PaymentDocument = Payment & Document;
 @Schema()
 export class Payment {
     
-    @Prop()
-    userId: string; 
+    @Prop({ type: MongooseSchema.Types.ObjectId, required: true })
+    userid: MongooseSchema.Types.ObjectId;
     
     @Prop()
     billingAddress: Address; 

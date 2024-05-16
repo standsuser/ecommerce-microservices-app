@@ -1,32 +1,73 @@
-import * as mongoose from 'mongoose';
-import { UserSchema, OrderSchema, AddressSchema } from './schema'; // Adjust the import path as necessary
+import { MongoClient, ObjectId } from 'mongodb';
 
-const User = mongoose.model('User', UserSchema);
-const Order = mongoose.model('Order', OrderSchema);
-const Address = mongoose.model('Address', AddressSchema);
+const url = 'mongodb://localhost:27018';
+const dbName = 'user'; 
 
-async function seedDatabase() {
+const client = new MongoClient(url);
+
+async function run() {
   try {
-    // Connect to MongoDB
-    await mongoose.connect('mongodb://host.docker.internal:27017/software2', {
-      
-     
-    });
+    await client.connect();
+    console.log("Connected successfully to server");
 
-    // Clean up the database before seeding
-    await User.deleteMany({});
-    await Order.deleteMany({});
-    await Address.deleteMany({});
+    const db = client.db(dbName);
 
-    // Add your seeding logic here...
+    // Insert addresses
+    const addresses = [
+      {
+        userid: new ObjectId(),
+        addresslabel: 'Home',
+        apartment: '10B',
+        email: 'user1@example.com',
+        floor: 10,
+        first_name: 'John',
+        street: 'Main St',
+        building: 'A',
+        phone_number: '1234567890',
+        postal_code: 12345,
+        extra_description: null,
+        city: 'New York',
+        country: 'USA',
+        last_name: 'Doe',
+        state: 'NY',
+      },
+      // add more addresses as needed
+    ];
+    const addressResult = await db.collection('addresses').insertMany(addresses);
+    console.log(`${addressResult.insertedCount} addresses were inserted`);
 
-    console.log('Database seeded!');
-  } catch (error) {
-    console.error('Failed to seed database:', error);
+    // Insert payments
+    const payments = [
+      {
+        userid: addressResult.insertedIds[0], // reference to the userId from addresses
+        billingAddress: addressResult.insertedIds[0], // reference to an address
+        debitOrCredit: 'credit',
+        cardNumber: '4111111111111111',
+        cvv: '123',
+        expiryDate: '12/25',
+        cardHolderName: 'John Doe',
+      },
+      // add more payments as needed
+    ];
+    const paymentResult = await db.collection('payments').insertMany(payments);
+    console.log(`${paymentResult.insertedCount} payments were inserted`);
+
+    // Insert wishlists
+    const wishlists = [
+      {
+        userid: addressResult.insertedIds[0], // reference to the userId from addresses
+        productid: new ObjectId(), // replace with actual product ID
+        selectedSize: 'M',
+        selectedMaterial: 'Cotton',
+        selectedColor: 'Blue',
+      },
+      // add more wishlists as needed
+    ];
+    const wishlistResult = await db.collection('wishlists').insertMany(wishlists);
+    console.log(`${wishlistResult.insertedCount} wishlists were inserted`);
   } finally {
-    // Close the connection
-    mongoose.connection.close();
+    await client.close();
   }
 }
 
-seedDatabase();
+run().catch(console.dir);

@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 
-export type OrderDocument = Order & Document;
 
 enum OrderStatus {
     PENDING = 'pending',
@@ -11,13 +10,141 @@ enum OrderStatus {
     DECLINED = 'declined'
 }
 
-@Schema()
-export class Order {
-    @Prop()
-    user_id: MongooseSchema.Types.ObjectId;
+class Item {
+    @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Product' })
+    product_id: MongooseSchema.Types.ObjectId;
 
     @Prop()
+    name: string;
+
+    @Prop()
+    amount_cents: number;
+
+    @Prop()
+    description: string;
+
+    @Prop()
+    color: string;
+
+    @Prop()
+    size: string;
+
+    @Prop()
+    material: string;
+
+    @Prop()
+    quantity: number;
+}
+
+class ShippingData {
+    @Prop()
+    apartment: string;
+
+    @Prop()
+    email: string;
+
+    @Prop()
+    floor: string;
+
+    @Prop()
+    first_name: string;
+
+    @Prop()
+    street: string;
+
+    @Prop()
+    building: string;
+
+    @Prop()
+    phone_number: string;
+
+    @Prop()
+    postal_code: string;
+
+    @Prop()
+    extra_description: string | null;
+
+    @Prop()
+    city: string;
+
+    @Prop()
+    country: string;
+
+    @Prop()
+    last_name: string;
+
+    @Prop()
+    state: string;
+}
+
+class BillingData {
+    @Prop()
+    apartment: string;
+
+    @Prop()
+    email: string;
+
+    @Prop()
+    floor: string;
+
+    @Prop()
+    first_name: string;
+
+    @Prop()
+    street: string;
+
+    @Prop()
+    building: string;
+
+    @Prop()
+    phone_number: string;
+
+    @Prop()
+    postal_code: string;
+
+    @Prop()
+    extra_description: string;
+
+    @Prop()
+    city: string;
+
+    @Prop()
+    country: string;
+
+    @Prop()
+    last_name: string;
+
+    @Prop()
+    state: string;
+}
+
+class PaymentInfo {
+    @Prop()
     order_id: number;
+
+    @Prop()
+    amount_cents: number;
+
+    @Prop()
+    expiration: number;
+
+    @Prop({ type: BillingData })
+    billing_data: BillingData;
+
+    @Prop()
+    currency: string;
+
+    @Prop()
+    integration_id: number;
+
+    @Prop()
+    lock_order_when_paid: string;
+}
+
+@Schema()
+export class Order extends Document {
+    @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
+    userid: MongooseSchema.Types.ObjectId;
 
     @Prop()
     delivery_needed: boolean;
@@ -31,28 +158,20 @@ export class Order {
     @Prop()
     merchant_order_id: number;
 
-    @Prop()
-    items: { product_id: MongooseSchema.Types.ObjectId, name: string, amount_cents: number /*call the function from laineymclainpants*/ , description: string, color: string, size: string, material: string, quantity: number }[];
+    @Prop({ type: [Item] })
+    items: Item[];
 
     @Prop({ type: String, enum: OrderStatus, default: OrderStatus.PENDING })
     status: string;
 
-    @Prop()
-    shipping_data: Address; 
-    
-    @Prop()
-    payment_info: {
-        order_id: number, amount_cents: number, expiration: 3600, 
-        billing_data: Address,
-        currency: 'EGP',
-        integration_id: 4570504,
-        lock_order_when_paid: 'false'
-    }
+    @Prop({ type: ShippingData })
+    shipping_data: ShippingData;
 
-    @Prop()
-    shipping_details: /*{ notes: string, number_of_packages: number, weight: number, length: number, width: number, height: number, contents: string }*/ string
+    @Prop({ type: PaymentInfo })
+    payment_info: PaymentInfo;
+
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
-export { OrderStatus }; 
+export { OrderStatus };
