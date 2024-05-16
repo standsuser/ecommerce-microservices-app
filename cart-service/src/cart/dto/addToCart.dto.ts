@@ -1,35 +1,43 @@
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 
 export class AddToCartDto {
-    @IsOptional()
     @IsString()
-    user_id?: string;
-
-    @IsOptional()
-    @IsString()
-    session_id?: string;
-
-    @IsString()
+    @IsNotEmpty()
     item_id: string;
 
     @IsNumber()
-    quantity?: number;
+    @IsNotEmpty()
+    quantity: number;
 
     @IsString()
+    @IsOptional()
+    rentalDuration: string;
+
+    @IsString()
+    @IsNotEmpty()
     name: string;
 
     @IsNumber()
+    @IsNotEmpty()
     amount_cents: number;
 
     @IsString()
+    @IsNotEmpty()
     description: string;
 
     @IsString()
+    @IsNotEmpty()
     color: string;
 
     @IsString()
+    @IsNotEmpty()
     size: string;
 
     @IsString()
+    @IsNotEmpty()
     material: string;
+
+    @IsBoolean()
+    @IsOptional()
+    isRented?: boolean;
 }

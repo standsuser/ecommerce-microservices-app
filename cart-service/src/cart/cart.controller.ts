@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Get, Put, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, Put, Delete, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AddToCartDto } from './dto/addToCart.dto';
 import { UpdateCartItemDto } from './dto/updatecartitem.dto';
@@ -10,13 +10,20 @@ import { Order } from './schema/order.schema';
 export class CartController {
     constructor(private readonly cartService: CartService) { }
 
-    @Post(':userId/add-item/:productId')
+    @Post('/add-item/:userId/:productId')
     async addItemToCart(
         @Param('userId') userId: string,
         @Param('productId') productId: string,
         @Body() addItemDto: AddToCartDto,
     ): Promise<Cart> {
-        return this.cartService.addItemToCart(userId, addItemDto, productId);
+        try {
+            return await this.cartService.addItemToCart(userId, addItemDto, productId);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
     }
 
     @Get('get-cart-info/:userId')
@@ -59,13 +66,20 @@ export class CartController {
         @Param('couponCode') couponCode: string,
     ): Promise<Cart> {
         return this.cartService.applyCouponCode(userId, couponCode);
-    }
-    @Post(':userId/createOrder')
+        
+    }@Post(':userId/createOrder')
     async createOrder(
         @Param('userId') userId: string,
         @Body('shipping_data') shippingData: any,
     ): Promise<Order> {
-        return this.cartService.createOrder(userId, shippingData);
+        try {
+            return await this.cartService.createOrder(userId, shippingData);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
     }
 
 
