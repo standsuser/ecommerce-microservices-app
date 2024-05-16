@@ -5,7 +5,7 @@ import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 @Schema()
 export class Cart extends Document{
     @Prop()
-    user_id?: MongooseSchema.Types.ObjectId;  // For authenticated users
+    userId?: MongooseSchema.Types.ObjectId;  // For authenticated users
 
     @Prop()
     sessiond_id?: string; // For guest users

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Get, Put, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, Put, Delete, NotFoundException } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AddToCartDto } from './dto/addToCart.dto';
 import { UpdateCartItemDto } from './dto/updatecartitem.dto';
@@ -19,8 +19,8 @@ export class CartController {
         return this.cartService.addItemToCart(userId, addItemDto, productId);
     }
 
-    @Get(':userId')
-    async getCartItems(@Param('userId') userId: string): Promise<Cart> {
+    @Get('getCartItems/:userId')
+    async getCartItems(@Param('userId') userId: string): Promise<any> {
         return this.cartService.getCartItems(userId);
     }
 
