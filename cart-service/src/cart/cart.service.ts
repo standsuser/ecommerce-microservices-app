@@ -7,6 +7,7 @@ import { AddToCartDto } from './dto/addToCart.dto';
 import { UpdateCartItemDto } from './dto/updatecartitem.dto';
 import { Order, OrderStatus } from './schema/order.schema';
 import { ConsumerService } from '../kafka/consumer.service';
+import { error } from 'console';
 
 
 @Injectable()
@@ -83,13 +84,22 @@ export class CartService {
         await cart.save();
         return cart;
     }
-
-    async getCartItems(userId: string): Promise<Cart> {
-        const cart = await this.cartModel.findOne({ user_id: userId }).exec();
-        if (!cart) {
-            throw new NotFoundException('Cart not found');
+    async getCartItems(userId: string): Promise<any> {
+        try {
+            const cart = await this.cartModel.find({ userId }).exec();
+            if (!cart) {
+                throw new NotFoundException('Cart not found');
+            }
+            console.log(JSON.stringify(cart));
+            return cart;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                console.error(error.message);
+            } else {
+                console.error(`Error retrieving cart for userId: ${userId}`, error);
+            }
+            throw error;
         }
-        return cart;
     }
 
     async updateCartItem(userId: string, productId: string, updateCartItemDto: UpdateCartItemDto): Promise<Cart> {
@@ -137,7 +147,7 @@ export class CartService {
 
     async createOrder(userId: string, shipping_data: any,): Promise<Order> {
         // Get the cart associated with the user
-        const cart = await this.cartModel.findOne({ user_id: userId }).exec();
+        const cart = await this.cartModel.findOne({ userId: userId }).exec();
         if (!cart) {
             throw new NotFoundException('Cart not found for user');
         }
@@ -151,7 +161,7 @@ export class CartService {
 
         // Create the order object and fill in the details from the cart
         const order = new this.orderModel({
-            user_id: cart.user_id,
+            user_id: cart.userId,
             delivery_needed: 'true',
             amount_cents: cart.total_price_post_coupon,
             currency: 'EGY',
