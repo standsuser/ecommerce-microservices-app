@@ -21,75 +21,34 @@ export class CartService {
 
 
     //TESTED :O
+    async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
+        const cart = await this.cartModel.findOne({ userId }).exec();
 
-        async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
-            const cart = await this.cartModel.findOne({ userId }).exec();
-    
-            if (!cart) {
-                throw new NotFoundException('Cart not found');
-            }
-    
-            const quantity = addItemDto.quantity || 1; // Default quantity to 1 if not provided
-    
-            if (isNaN(quantity) || quantity <= 0) {
-                throw new BadRequestException('Invalid quantity');
-            }
-    
-            if (isNaN(addItemDto.amount_cents) || addItemDto.amount_cents <= 0) {
-                throw new BadRequestException('Invalid amount_cents');
-            }
-    
-            const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
-    
-            if (itemIndex > -1) {
-                // Item already exists in cart, update quantity
-                cart.items[itemIndex].quantity += quantity;
-            } else {
-                // Add new item to cart
-                cart.items.push({
-                    productId: productId,
-                    rentalDuration: addItemDto.rentalDuration || 'N/A',
-                    isRented: addItemDto.isRented ?? false,
-                    name: addItemDto.name,
-                    amount_cents: addItemDto.amount_cents,
-                    description: addItemDto.description,
-                    color: addItemDto.color,
-                    size: addItemDto.size,
-                    material: addItemDto.material,
-                    quantity: quantity,
-                });
-            }
-    
-            // Calculate total price pre-coupon
-            cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
-    
-            if (isNaN(cart.total_price_pre_coupon)) {
-                throw new BadRequestException('Invalid total price calculation');
-            }
-    
-            // Save updated cart
-            await cart.save();
-    
-            return cart;
-        
-    }
-
-    async rentProduct(userId: string, addItemDto: AddToCartDto, productId: string, rentalDuration: string): Promise<Cart> {
-        let cart = await this.getCartInfo(userId);
         if (!cart) {
-            cart = new this.cartModel({ userId, items: [] });
+            throw new NotFoundException('Cart not found');
         }
 
-        const existingItemIndex = cart.items.findIndex(item => item.productId === productId);
-        const quantity = addItemDto.quantity;
+        const quantity = addItemDto.quantity || 1; // Default quantity to 1 if not provided
 
-        if (existingItemIndex !== -1) {
-            cart.items[existingItemIndex].quantity += quantity;
+        if (isNaN(quantity) || quantity <= 0) {
+            throw new BadRequestException('Invalid quantity');
+        }
+
+        if (isNaN(addItemDto.amount_cents) || addItemDto.amount_cents <= 0) {
+            throw new BadRequestException('Invalid amount_cents');
+        }
+
+        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+
+        if (itemIndex > -1) {
+            // Item already exists in cart, update quantity
+            cart.items[itemIndex].quantity += quantity;
         } else {
-            const newItem = {
+            // Add new item to cart
+            cart.items.push({
                 productId: productId,
-                rentalDuration: rentalDuration,
-                isRented: true,
+                rentalDuration: addItemDto.rentalDuration || 'N/A',
+                isRented: addItemDto.isRented ?? false,
                 name: addItemDto.name,
                 amount_cents: addItemDto.amount_cents,
                 description: addItemDto.description,
@@ -97,14 +56,76 @@ export class CartService {
                 size: addItemDto.size,
                 material: addItemDto.material,
                 quantity: quantity,
-            };
-
-            cart.items.push(newItem);
+            });
         }
-        // Save the updated cart
+
+        // Calculate total price pre-coupon
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        if (isNaN(cart.total_price_pre_coupon)) {
+            throw new BadRequestException('Invalid total price calculation');
+        }
+
+        // Save updated cart
         await cart.save();
+
+        return cart;
+
+    }
+
+
+    // TESTED :O 
+    async rentProduct(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
+        const cart = await this.cartModel.findOne({ userId }).exec();
+
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+
+        const quantity = addItemDto.quantity || 1; // Default quantity to 1 if not provided
+
+        if (isNaN(quantity) || quantity <= 0) {
+            throw new BadRequestException('Invalid quantity');
+        }
+
+        if (isNaN(addItemDto.amount_cents) || addItemDto.amount_cents <= 0) {
+            throw new BadRequestException('Invalid amount_cents');
+        }
+
+        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+
+        if (itemIndex > -1) {
+            // Item already exists in cart, update quantity
+            cart.items[itemIndex].quantity += quantity;
+        } else {
+            // Add new rental item to cart
+            cart.items.push({
+                productId: productId,
+                rentalDuration: addItemDto.rentalDuration || 'N/A',
+                isRented: true, // This indicates the product is rented
+                name: addItemDto.name,
+                amount_cents: addItemDto.amount_cents,
+                description: addItemDto.description,
+                color: addItemDto.color,
+                size: addItemDto.size,
+                material: addItemDto.material,
+                quantity: quantity,
+            });
+        }
+
+        // Calculate total price pre-coupon
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        if (isNaN(cart.total_price_pre_coupon)) {
+            throw new BadRequestException('Invalid total price calculation');
+        }
+
+        // Save updated cart
+        await cart.save();
+
         return cart;
     }
+
 
     //tested :O
     async getCartInfo(userId: string): Promise<any> {
@@ -144,25 +165,71 @@ export class CartService {
         }
     }
 
-    async updateCartItem(userId: string, productId: string, updateCartItemDto: UpdateCartItemDto): Promise<Cart> {
-        const cart = await this.getCartInfo(userId);
-        const itemIndex = cart.items.findIndex(item => item.productId === productId);
+    //TESTED :O
+    async updateCartItem(userId: string, productId: string, updateDto: AddToCartDto): Promise<Cart> {
+        const cart = await this.cartModel.findOne({ userId }).exec();
+
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+
+        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+
         if (itemIndex === -1) {
             throw new NotFoundException('Item not found in cart');
         }
-        cart.items[itemIndex].quantity = updateCartItemDto.quantity;
+
+        const item = cart.items[itemIndex];
+
+        item.quantity = updateDto.quantity ?? item.quantity;
+        item.rentalDuration = updateDto.rentalDuration ?? item.rentalDuration;
+        item.isRented = updateDto.isRented ?? item.isRented;
+        item.name = updateDto.name ?? item.name;
+        item.amount_cents = updateDto.amount_cents ?? item.amount_cents;
+        item.description = updateDto.description ?? item.description;
+        item.color = updateDto.color ?? item.color;
+        item.size = updateDto.size ?? item.size;
+        item.material = updateDto.material ?? item.material;
+
+        // Calculate total price pre-coupon
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        if (isNaN(cart.total_price_pre_coupon)) {
+            throw new BadRequestException('Invalid total price calculation');
+        }
+
+        // Save updated cart
         await cart.save();
+
         return cart;
     }
 
     async removeItemFromCart(userId: string, productId: string): Promise<Cart> {
-        const cart = await this.getCartInfo(userId);
-        const updatedItems = cart.items.filter(item => item.productId !== productId);
-        if (updatedItems.length === cart.items.length) {
+        const cart = await this.cartModel.findOne({ userId }).exec();
+
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+
+        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+
+        if (itemIndex === -1) {
             throw new NotFoundException('Item not found in cart');
         }
-        cart.items = updatedItems;
+
+        // Remove the item from the cart
+        cart.items.splice(itemIndex, 1);
+
+        // Calculate total price pre-coupon
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        if (isNaN(cart.total_price_pre_coupon)) {
+            throw new BadRequestException('Invalid total price calculation');
+        }
+
+        // Save updated cart
         await cart.save();
+
         return cart;
     }
 
@@ -213,10 +280,10 @@ export class CartService {
             payment_info: {
                 order_id: Date.now(),
                 amount_cents: totalAmountCents,
-                expiration: 3600, 
-                billing_data: shippingData, 
+                expiration: 3600,
+                billing_data: shippingData,
                 currency: 'EGP',
-                integration_id: 4570504, 
+                integration_id: 4570504,
                 lock_order_when_paid: 'true',
             },
         });
@@ -229,16 +296,6 @@ export class CartService {
         return newOrder;
     }
 
-    async proceedToCheckout(userId: string): Promise<any> {
-        let cart = await this.getCartInfo(userId);
-        if (cart.items.length > 0) {
-            throw new Error("Your cart is empty! Please go add new items to your cart")
-        }
-        cart.is_checkout = true;
-        // cart.totalPricePostCoupon = cart.totalPricePreCoupon - cart.totalPricePreCoupon * cart.couponPercentage;
-        const updatedCart = cart as Cart;
-        return updatedCart.save();
-    }
 
     //---------------------------------------------------------------------------------------------------------------------------------------------
     //Guest  

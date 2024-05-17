@@ -43,21 +43,36 @@ export class CartController {
             }
         }
     }
-    @Put(':userId/update-item/:productId')
+
+    @Put('/update-item/:userId/:productId')
     async updateCartItem(
         @Param('userId') userId: string,
         @Param('productId') productId: string,
-        @Body() updateCartItemDto: UpdateCartItemDto,
+        @Body() updateDto: AddToCartDto,
     ): Promise<Cart> {
-        return this.cartService.updateCartItem(userId, productId, updateCartItemDto);
+        try {
+            return await this.cartService.updateCartItem(userId, productId, updateDto);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
     }
 
-    @Delete(':userId/remove-item/:productId')
+    @Delete('/remove-item/:userId/:productId')
     async removeItemFromCart(
         @Param('userId') userId: string,
         @Param('productId') productId: string,
     ): Promise<Cart> {
-        return this.cartService.removeItemFromCart(userId, productId);
+        try {
+            return await this.cartService.removeItemFromCart(userId, productId);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
     }
 
     @Post('apply-coupon/:userId/:couponCode')
@@ -66,8 +81,8 @@ export class CartController {
         @Param('couponCode') couponCode: string,
     ): Promise<Cart> {
         return this.cartService.applyCouponCode(userId, couponCode);
-        
-    }@Post(':userId/createOrder')
+
+    } @Post(':userId/createOrder')
     async createOrder(
         @Param('userId') userId: string,
         @Body('shipping_data') shippingData: any,
@@ -82,13 +97,20 @@ export class CartController {
         }
     }
 
-
-    @Post(':userId/proceed-to-checkout')
-    async proceedToCheckout(
+    @Post('/rent-product/:userId/:productId')
+    async rentProduct(
         @Param('userId') userId: string,
+        @Param('productId') productId: string,
+        @Body() addItemDto: AddToCartDto,
     ): Promise<Cart> {
-        const updatedCart = await this.cartService.proceedToCheckout(userId);
-        return updatedCart;
+        try {
+            return await this.cartService.rentProduct(userId, addItemDto, productId);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
     }
 
     @Post('guest/:sessionId/add-item')
