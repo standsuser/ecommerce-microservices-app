@@ -2,15 +2,15 @@ version: '3.4'
 
 services:
 
-  product-service:
-    image: authentication-service
-    build:
-      context: .
-      dockerfile: ./authentication-service/Dockerfile
-    environment:
-      NODE_ENV: authentication
-    ports:
-      - 3080:3080
+  # product-service:
+  #   image: authentication-service
+  #   build:
+  #     context: .
+  #     dockerfile: ./authentication-service/Dockerfile
+  #   environment:
+  #     NODE_ENV: authentication
+  #   ports:
+  #     - 3080:3080
 
   kafka:
     image: docker.io/bitnami/kafka:3.7
