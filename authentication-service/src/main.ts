@@ -3,8 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 //import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
-import * as dotenv from 'dotenv'
-dotenv.config()
+//import * as dotenv from 'dotenv'
+//dotenv.config()
 
 
 /*
@@ -28,7 +28,7 @@ bootstrap();
 
 
 async function bootstrap() {
-  require("dotenv").config();
+ // require("dotenv").config();
 
 
 
