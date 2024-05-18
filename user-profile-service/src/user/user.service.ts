@@ -24,7 +24,7 @@ import {
     ) {}
   
     async onModuleInit() {
-        // Consume 'wishlist' topic
+        // Consume 'wishlist' topic for additions
         await this.consumerService.consume(
           { topics: ['addtowishlist']},
           {
@@ -234,5 +234,22 @@ async deleteWishlistItem(userId: string, wishlistId: string) {
       throw new NotFoundException('wishlist item not found');
 
   }
+}
+
+//getWishlist
+async getWishlist(userId: string) {
+    try {
+        const wishlist = await this.wishlistModel
+            .find({ userid: userId })
+            .exec();
+    
+        if (!wishlist) {
+            throw new NotFoundException('wishlist not found');
+        }
+    
+        return wishlist;
+    } catch (error) {
+        throw new NotFoundException('wishlist not found');
+    }
 }
   }
