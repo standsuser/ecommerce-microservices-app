@@ -84,6 +84,7 @@ export class ProductService {
   ) {
     try {
       // Query the product details
+      console.log('Product ID:', productId);
       const product = await this.productModel.findById(productId).exec();
       if (!product) {
         throw new NotFoundException('Product not found');
@@ -101,7 +102,7 @@ export class ProductService {
 
       // Prepare the record for Kafka
       const record = {
-        topic: 'wishlist',
+        topic: 'addtowishlist',
         messages: [
           {
             value: JSON.stringify({

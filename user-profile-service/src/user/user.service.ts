@@ -11,17 +11,47 @@ import {
   import { Payment } from './schema/payment.schema';
   import { Wishlist } from './schema/wishlist.schema';
   import { ProducerService } from '../kafka/producer.service';
-  
+  import { ConsumerService } from '../kafka/consumer.service';
   
   @Injectable()
   export class UserService {
     constructor(
+        private readonly consumerService: ConsumerService,
       @InjectModel(Address.name) private readonly addressModel: Model<Address>,
       @InjectModel(Payment.name) private readonly paymentModel: Model<Payment>,
       @InjectModel(Wishlist.name) private readonly wishlistModel: Model<Wishlist>,
       private readonly producerService: ProducerService,
     ) {}
   
+    async onModuleInit() {
+        // Consume 'wishlist' topic
+        await this.consumerService.consume(
+          { topics: ['addtowishlist']},
+          {
+            eachMessage: async ({ topic, partition, message }) => {
+              try {
+                const data = JSON.parse(message.value.toString());
+                console.log(`Received message from ${topic} topic:`, data);
+      
+                // Update the appropriate model based on the topic
+                if (topic === 'addtowishlist') {
+                    await this.wishlistModel.create({
+                      userid: data.userId,
+                      productid: data.productId,
+                      selectedColor: data.selectedColor,
+                      selectedMaterial: data.selectedMaterial,
+                      selectedSize: data.selectedSize,
+                      price: data.totalPrice
+                    });
+                  }
+              } catch (error) {
+                console.error(`Error processing message from ${topic} topic:`, error);
+              }
+            },
+          },
+        );
+      }
+
     async getProfile(userId: string) {
       try {
           const profile = await this.addressModel

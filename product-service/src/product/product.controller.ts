@@ -86,10 +86,10 @@ export class ProductController {
     );
   }
 
-  @Post('/wishlist/add')
+  @Post('/wishlist/add/:userId/:productId')
   async addToWishlist(
-    @Body('userId') userId: string,
-    @Body('productId') productId: string,
+    @Param('userId') userId: string,
+    @Param('productId') productId: string,
     @Body('selectedColor') selectedColor: string,
     @Body('selectedMaterial') selectedMaterial: string,
     @Body('selectedSize') selectedSize: string,
