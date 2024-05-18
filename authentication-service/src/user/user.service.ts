@@ -212,12 +212,15 @@ export class UserService {
 
     async register(createUserDto: CreateUserDto): Promise<User> {
         const existingUser = await this.getUserbyEmail(createUserDto.email);
+        Logger.log('ex',existingUser);
         if (existingUser) {
             throw new UserAlreadyExistsException();
         }
 
         // Create a new User document using the Mongoose model
         const newUser = new this.userModel(createUserDto);
+
+        Logger.log(newUser);
         // Save the new user
         const savedUser = await newUser.save() as User;
 

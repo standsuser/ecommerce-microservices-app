@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 //import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
-import cors from 'cors';
 
 /*
 async function bootstrap() {
@@ -32,6 +31,7 @@ async function bootstrap() {
   const cors = require("cors");
 
 
+
   const corsOptions = {
     origin: 'http://localhost:3001', // Allow requests from this origin
     methods: 'GET,POST,DELETE',              // Allow only GET and POST requests
@@ -44,12 +44,6 @@ async function bootstrap() {
 
 
 
-
- 
-
-
-  // Enable CORS globally
-  app.enableCors();
 
   await app.listen(3000);
 }

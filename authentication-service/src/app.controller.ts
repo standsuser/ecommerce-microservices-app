@@ -1,17 +1,13 @@
-/* eslint-disable prettier/prettier */
-<<<<<<< HEAD
 import { BadRequestException, Body, Controller, Delete, Get, Logger, Post, Put } from '@nestjs/common';
-=======
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { BadRequestException, Body, Controller, Delete, Get, Logger, Post } from '@nestjs/common';
->>>>>>> bd17e4aab283be631952f6ee94f6e0f76829eda2
 import { AppService } from './app.service';
 import { Roles } from './decorators/role.decorator';
 import { UserService } from './user/user.service';
 import { CreateUserDto } from './dto/create.user.dto';
 import { SessionService } from "./session/session.service";
+import {LoginDto} from './dto/login.dto';
 import { get } from 'http';
+import { response } from 'express';
 
 
 @Controller('auth')
@@ -39,9 +35,11 @@ export class AppController {
       }
 
       // Check if additional required fields are provided
-      if (!createUserDto.firstname || !createUserDto.lastname || !createUserDto.email || !createUserDto.phonenumber || !createUserDto.address) {
-        throw new BadRequestException('First name, last name, email, phone number, and address are required');
-      }
+      
+    if(!createUserDto.first_name || !createUserDto.last_name || !createUserDto.phonenumber || !createUserDto.company || !createUserDto.apartment || !createUserDto.floor || !createUserDto.street || !createUserDto.building || !createUserDto.postal_code || !createUserDto.extra_description || !createUserDto.city || !createUserDto.country || !createUserDto.addresslabel || !createUserDto.state){
+      throw new BadRequestException('All fields are required');
+    }
+      
 
       // Register user using the provided DTO
       const newUser = await this.userService.register(createUserDto);
@@ -61,7 +59,7 @@ export class AppController {
       const getIdc= await this.userService.getUserbyEmail(user.email);
       const val = await this.sessionService.validateSession(getIdc.id);
       if(val){
-        return { success: false, message: "Wrong Email or Password or User already logged in" };
+        return { success: false, message: "Wrong Email or Password or User already logged in"  , response};
       }if(!val){
       try {
       const response = await this.userService.login(user);
@@ -70,7 +68,7 @@ export class AppController {
       // Return response
     } catch (error) {
       // Handle any errors thrown during login
-      return { success: false, message: error }; // Return error response
+      return { success: false, message: error  }; // Return error response
     }
   }
   }

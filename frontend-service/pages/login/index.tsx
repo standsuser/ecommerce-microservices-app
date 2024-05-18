@@ -52,12 +52,15 @@ const LoginPage: React.FC = () => {
                 credentials: 'include',
             });
 
+            console.log(response);
+
             if (response.ok) {
                 const data: LoginResponse = await response.json();
                 setLoginSuccess(true);
                 setVer(true);
                 setUser(data.response.userID);
-                console.log(data.response);
+                console.log(data);
+
                 setTimeout(() => {
                   // Redirect to the dashboard
                   router.push('/docs'); // Use client-side routing
