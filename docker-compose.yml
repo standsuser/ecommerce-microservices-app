@@ -1,16 +1,16 @@
 version: '3.4'
 
 services:
-  # product-service:
-  #   image: product-service
-  #   build:
-  #     context: .
-  #     dockerfile: ./product-service/Dockerfile
-  #   environment:
-  #     NODE_ENV: production
-  #   ports:
-  #     - 3000:3000
-#TODO: ADD REST OF SERVICES LIKE ABOVE
+
+  product-service:
+    image: authentication-service
+    build:
+      context: .
+      dockerfile: ./authentication-service/Dockerfile
+    environment:
+      NODE_ENV: authentication
+    ports:
+      - 3080:3080
 
   kafka:
     image: docker.io/bitnami/kafka:3.7

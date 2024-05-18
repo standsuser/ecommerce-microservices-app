@@ -1,7 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb';
 
-const url = 'mongodb://localhost:27018';
-const dbName = 'product'; // replace with your database name
+const url = 'mongodb+srv://<mondyelzanaty@gmail.com>:<Mado451880>@cluster0.ypsps7p.mongodb.net/';
+const dbName = 'users'; // replace with your database name
 
 const client = new MongoClient(url);
 

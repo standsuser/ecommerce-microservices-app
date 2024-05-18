@@ -3,6 +3,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 //import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 
 /*
 async function bootstrap() {
@@ -25,6 +28,9 @@ bootstrap();
 
 
 async function bootstrap() {
+  require("dotenv").config();
+
+
 
   const app = await NestFactory.create(AppModule);
   app.useGlobalInterceptors(new ErrorInterceptor());
@@ -33,7 +39,7 @@ async function bootstrap() {
 
 
   const corsOptions = {
-    origin: 'http://localhost:3001', // Allow requests from this origin
+    origin: 'http://localhost:5050', // Allow requests from this origin
     methods: 'GET,POST,DELETE',              // Allow only GET and POST requests
     optionsSuccessStatus: 200,        // Respond with a 200 status for OPTIONS requests
     credentials: true                 // Allow credentials (cookies, authorization headers, etc.)
@@ -45,6 +51,6 @@ async function bootstrap() {
 
 
 
-  await app.listen(3000);
+  await app.listen(3080);
 }
 bootstrap();
