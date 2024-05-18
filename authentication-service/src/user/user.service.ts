@@ -34,7 +34,7 @@ export class UserService {
 
     ) {
         this.mailService = new Mailservice('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')
-        
+
 
     }
 
@@ -102,16 +102,16 @@ export class UserService {
         }
     }
 
-    async getUserbyID(id: string){
+    async getUserbyID(id: string) {
         try {
 
-            let loginResult = await this.userModel.findOne({_id:id}).exec();
-    
+            let loginResult = await this.userModel.findOne({ _id: id }).exec();
+
             if (!loginResult) {
                 throw new Error("User not found");
             }
             let { __v, ...userData } = loginResult.toObject();
-    
+
             return {
                 id,
                 ...userData
@@ -124,7 +124,7 @@ export class UserService {
         }
     }
 
-    
+
     //  async findByEmail(email: string): Promise<User> {
     //     const user = await this.userModel.findOne({ email }).exec();
     //     if (!user) {
@@ -162,9 +162,9 @@ export class UserService {
             throw new NotFoundException('User not found');
         }
         const payload = {
-            email : user.email,
+            email: user.email,
             sub: user.id,
-            
+
 
         };
         const token = this.jwtService.sign(payload);
@@ -175,12 +175,12 @@ export class UserService {
             expires_in: tokenValue.exp,
             userID: user.id
         };
-      
-   
+
+
 
     }
 
-    async changePassword(userID: string, newPassword: string , oldPassword: string)  {
+    async changePassword(userID: string, newPassword: string, oldPassword: string) {
         const user = await this.getUserbyID(userID);
 
         if (!user) {
@@ -189,18 +189,18 @@ export class UserService {
         if (user.password !== oldPassword) {
             throw new Error('Old password is incorrect');
         }
-        const updatedUser = await this.userModel.findByIdAndUpdate({ userId: user._id }, { password: newPassword }).exec() ;
+        const updatedUser = await this.userModel.findByIdAndUpdate({ userId: user._id }, { password: newPassword }).exec();
         Logger.log(updatedUser, 'User updated');
-    
+
         return updatedUser;
     }
-    
+
     async logout(userID: string) {
         const user = await this.getUserbyID(userID);
         if (!user) {
             throw new NotFoundException('User not found');
         }
-        
+
         return user;
     }
     validateToken(jwt: string) {
@@ -212,7 +212,7 @@ export class UserService {
 
     async register(createUserDto: CreateUserDto): Promise<User> {
         const existingUser = await this.getUserbyEmail(createUserDto.email);
-        Logger.log('ex',existingUser);
+        Logger.log('ex', existingUser);
         if (existingUser) {
             throw new UserAlreadyExistsException();
         }
@@ -236,7 +236,7 @@ export class UserService {
 
 
     private async sendVerificationEmail(email: string): Promise<void> {
-        const verificationLink = `https://yourwebsite.com/verify-email/${encodeURIComponent(email)}`;
+        const verificationLink = `http://localhost:3001/login`;
         const mailOptions = {
             from: 'omarx10050@gmail.com', // Sender email address
             to: email,
@@ -252,7 +252,7 @@ export class UserService {
         }
     }
 
-    async forgetPassword(email: string) : Promise<void> {
+    async forgetPassword(email: string): Promise<void> {
         const existingUser = await this.getUserbyEmail(email);
         if (!existingUser) {
             throw new NotFoundException('User not found');
