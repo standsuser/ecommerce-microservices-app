@@ -17,9 +17,6 @@ export class CartService {
         @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
         @InjectModel(Coupon.name) private readonly couponModel: Model<Coupon>,
         @InjectModel(Order.name) private readonly orderModel: Model<Order>) { }
-
-
-
     //TESTED :O
     async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
         const cart = await this.cartModel.findOne({ userId }).exec();
@@ -125,8 +122,6 @@ export class CartService {
 
         return cart;
     }
-
-
     //tested :O
     async getCartInfo(userId: string): Promise<any> {
         try {
@@ -144,8 +139,6 @@ export class CartService {
             throw error;
         }
     }
-
-
     // Tested :O 
     async getCartItems(userId: string): Promise<any> {
         try {
@@ -164,7 +157,6 @@ export class CartService {
             throw error;
         }
     }
-
     //TESTED :O
     async updateCartItem(userId: string, productId: string, updateDto: AddToCartDto): Promise<Cart> {
         const cart = await this.cartModel.findOne({ userId }).exec();
@@ -197,7 +189,6 @@ export class CartService {
         await cart.save();
         return cart;
     }
-
     //TESTED :O
 
     async removeItemFromCart(userId: string, productId: string): Promise<Cart> {
@@ -225,8 +216,6 @@ export class CartService {
         await cart.save();
         return cart;
     }
-
-
     //tested :O
     async applyCouponCode(userId: string, couponCode: string): Promise<Cart> {
         const cart = await this.getCartInfo(userId);
@@ -250,7 +239,6 @@ export class CartService {
         await cart.save();
         return cart;
     }
-
     //TESTED :O
     async createOrder(userId: string, shippingData: any): Promise<Order> {
         const cart = await this.cartModel.findOne({ userId }).exec();
@@ -288,8 +276,6 @@ export class CartService {
 
         return newOrder;
     }
-
-
     //---------------------------------------------------------------------------------------------------------------------------------------------
     //Guest  
 
@@ -343,7 +329,7 @@ export class CartService {
     
         return cart;
     }
-    
+
     async getItemsFromGuestCart(sessionId: string): Promise<any> {
         try {
             const cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
