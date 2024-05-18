@@ -20,6 +20,11 @@ import { ProductModule } from './product.module';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @Get('/all')
+  async getAllProducts() {
+    return await this.productService.getAllProducts();
+  }
+
     //----------------------------CATEGORIES----------------------------------------------
     @Get('/category')
     async getCategories() {

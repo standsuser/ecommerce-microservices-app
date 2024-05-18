@@ -25,6 +25,16 @@ export class ProductService {
     private readonly producerService: ProducerService,
   ) {}
 
+  async getAllProducts() {
+    try {
+      const products = await this.productModel.find().exec();
+      return products;
+    } catch (error) {
+      console.error('Error:', error);
+      throw new NotFoundException('Products not found');
+    }
+  }
+
   async sendTopDiscountedProducts() {
     // Query the top 5 highest discounted products
     const products = await this.productModel
