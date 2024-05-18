@@ -1,0 +1,37 @@
+# version: '3'
+
+# services:
+
+#   traefik:
+#     image: traefik:v2.9
+#     command:
+#       - "--api.insecure=true"
+#       - "--providers.docker=true"
+#       - "--providers.docker.exposedbydefault=false"
+#       - "--entrypoints.web.address=:80"
+#     ports:
+#       - "80:80"
+#       - "8080:8080"
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+#   service1:
+#     build: ./service1
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.http.routers.service1.rule=PathPrefix(/service1)"
+#       - "traefik.http.services.service1.loadbalancer.server.port=8080"
+
+#   service2:
+#     build: ./service2
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.http.routers.service2.rule=PathPrefix(/service2)"
+#       - "traefik.http.services.service2.loadbalancer.server.port=8080"
+
+#   service3:
+#     build: ./service3
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.http.routers.service3.rule=PathPrefix(/service3)"
+#       - "traefik.http.services.service3.loadbalancer.server.port=8080"

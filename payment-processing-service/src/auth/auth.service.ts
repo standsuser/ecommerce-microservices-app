@@ -21,7 +21,7 @@ export class AuthService {
         { headers: { 'Content-Type': 'application/json' } }
       );
 
-      const token = response?.data?.token;
+      const token = response.data.token;
       return token;
     } catch (error) {
       console.error('Error during authentication:', error);
