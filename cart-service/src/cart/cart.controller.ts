@@ -112,18 +112,35 @@ export class CartController {
             throw error;
         }
     }
-
-    @Post('guest/:sessionId/add-item')
+    @Post('/guest/:sessionId/add-item/:productId')
     async addItemToGuestCart(
         @Param('sessionId') sessionId: string,
+        @Param('productId') productId: string,
         @Body() addItemDto: AddToCartDto,
     ): Promise<Cart> {
-        return this.cartService.addItemToGuestCart(sessionId, addItemDto, addItemDto.item_id);
+        try {
+            return await this.cartService.addItemToGuestCart(sessionId, addItemDto, productId);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
     }
 
+
     @Get('guest/:sessionId/items')
-    async getItemsFromGuestCart(@Param('sessionId') sessionId: string): Promise<Cart> {
-        return this.cartService.getItemsFromGuestCart(sessionId);
+    async getItemsFromGuestCart(@Param('sessionId') sessionId: string): Promise<any> {
+        try {
+            const items = await this.cartService.getItemsFromGuestCart(sessionId);
+            return items;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw new NotFoundException(error.message);
+            } else {
+                throw error;
+            }
+        }
     }
 
     @Post('convert-guest-to-user')
