@@ -33,6 +33,8 @@ const RegisterPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+       
         try {
             const response = await fetch('http://localhost:3000/auth/register', {
                 method: 'POST',
@@ -42,10 +44,12 @@ const RegisterPage: React.FC = () => {
                 body: JSON.stringify(userData),
             });
 
+
+            
             if (response.ok) {
                 setSuccess(true);
                 setTimeout(() => {
-                    router.push('/login'); // Use client-side routing
+                //    router.push('/login'); // Use client-side routing
                 }, 1000); // Pause for 1 second before redirecting
             } else {
                 console.error('Registration failed');
@@ -68,6 +72,7 @@ const RegisterPage: React.FC = () => {
                                 variant="bordered"
                                 label="First Name :"
                                 placeholder="Enter your First Name"
+                                isRequired
                             />
                             <Input
                                 name="last_name"
@@ -76,6 +81,7 @@ const RegisterPage: React.FC = () => {
                                 variant="bordered"
                                 label="Last Name :"
                                 placeholder="Enter your Last Name"
+                                isRequired
                             />
                             <Input
                                 name="email"
@@ -84,6 +90,7 @@ const RegisterPage: React.FC = () => {
                                 variant="bordered"
                                 label="Email :"
                                 placeholder="Enter your Email"
+                                isRequired
                             />
                             <Input
                                 name="phonenumber"
@@ -92,6 +99,7 @@ const RegisterPage: React.FC = () => {
                                 variant="bordered"
                                 label="Phone Number :"
                                 placeholder="Enter your Phone Number"
+                                isRequired
                             />
                             <Input
                                 name="company"
@@ -158,6 +166,7 @@ const RegisterPage: React.FC = () => {
                                 variant="bordered"
                                 label="City :"
                                 placeholder="Enter your City"
+
                             />
                             <Input
                                 name="country"
@@ -166,6 +175,7 @@ const RegisterPage: React.FC = () => {
                                 variant="bordered"
                                 label="Country :"
                                 placeholder="Enter your Country"
+                                
                             />
                             <Input
                                 name="addresslabel"
@@ -174,6 +184,7 @@ const RegisterPage: React.FC = () => {
                                 variant="bordered"
                                 label="Address Label :"
                                 placeholder="Enter your Address Label"
+                                isRequired
                             />
                             <Input
                                 name="state"
@@ -191,6 +202,7 @@ const RegisterPage: React.FC = () => {
                                 label="Password :"
                                 type="password"
                                 placeholder="Enter your Password"
+                                isRequired
                             />
                         </div>
                         <button
@@ -205,7 +217,7 @@ const RegisterPage: React.FC = () => {
                         </button>
                     </form>
                     {success && (
-                        <div className="mt-4 text-green-500">Registration successful!</div>
+                     <div className="mt-4 text-green-500">Registration successful..Check your mail for verification</div>
                     )}
                 </div>
             </section>
@@ -215,3 +227,7 @@ const RegisterPage: React.FC = () => {
 };
 
 export default RegisterPage;
+function setError(arg0: string) {
+    throw new Error('Function not implemented.');
+}
+
