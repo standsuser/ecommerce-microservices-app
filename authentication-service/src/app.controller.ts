@@ -36,9 +36,7 @@ export class AppController {
 
       // Check if additional required fields are provided
       
-    if(!createUserDto.first_name || !createUserDto.last_name || !createUserDto.phonenumber || !createUserDto.company || !createUserDto.apartment || !createUserDto.floor || !createUserDto.street || !createUserDto.building || !createUserDto.postal_code || !createUserDto.extra_description || !createUserDto.city || !createUserDto.country || !createUserDto.addresslabel || !createUserDto.state){
-      throw new BadRequestException('All fields are required');
-    }
+    
       
 
       // Register user using the provided DTO

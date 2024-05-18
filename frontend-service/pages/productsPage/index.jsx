@@ -6,7 +6,7 @@ export default function App() {
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {[...Array(15)].map((_, index) => (
+        {[...Array(16)].map((_, index) => (
           <Card key={index} isFooterBlurred radius="lg" className="border-none flex-grow">
             <Image
               alt="Woman listening to music"

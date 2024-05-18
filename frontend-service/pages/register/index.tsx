@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { button as buttonStyles } from '@nextui-org/theme';
 import DefaultLayout from '@/layouts/default';
 import { Input } from '@nextui-org/react';
+import { button } from '@nextui-org/react';
 
 const RegisterPage: React.FC = () => {
     const router = useRouter();
@@ -12,36 +12,23 @@ const RegisterPage: React.FC = () => {
         email: '',
         phonenumber: '',
         company: '',
-        address: {
-            apartment: '',
-            floor: 0,
-            street: '',
-            building: '',
-            postal_code: 0,
-            extra_description: '',
-            city: '',
-            country: '',
-            addresslabel: '',
-            state: '',
-        },
+        apartment: '',
+        floor: '',
+        street: '',
+        building: '',
+        postal_code: '',
+        extra_description: '',
+        city: '',
+        country: '',
+        addresslabel: '',
+        state: '',
         password: '',
     });
     const [success, setSuccess] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        if (name.startsWith('address.')) {
-            const addressField = name.split('.')[1];
-            setUserData({
-                ...userData,
-                address: {
-                    ...userData.address,
-                    [addressField]: value,
-                },
-            });
-        } else {
-            setUserData({ ...userData, [name]: value });
-        }
+        setUserData({ ...userData, [name]: value });
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -115,16 +102,16 @@ const RegisterPage: React.FC = () => {
                                 placeholder="Enter your Company"
                             />
                             <Input
-                                name="address.apartment"
-                                value={userData.address.apartment}
+                                name="apartment"
+                                value={userData.apartment}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="Apartment :"
                                 placeholder="Enter your Apartment"
                             />
                             <Input
-                                name="address.floor"
-                                value={userData.address.floor.toString()}
+                                name="floor"
+                                value={userData.floor}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="Floor :"
@@ -132,24 +119,24 @@ const RegisterPage: React.FC = () => {
                                 type="number"
                             />
                             <Input
-                                name="address.street"
-                                value={userData.address.street}
+                                name="street"
+                                value={userData.street}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="Street :"
                                 placeholder="Enter your Street"
                             />
                             <Input
-                                name="address.building"
-                                value={userData.address.building}
+                                name="building"
+                                value={userData.building}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="Building :"
                                 placeholder="Enter your Building"
                             />
                             <Input
-                                name="address.postal_code"
-                                value={userData.address.postal_code.toString()}
+                                name="postal_code"
+                                value={userData.postal_code}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="Postal Code :"
@@ -157,40 +144,40 @@ const RegisterPage: React.FC = () => {
                                 type="number"
                             />
                             <Input
-                                name="address.extra_description"
-                                value={userData.address.extra_description}
+                                name="extra_description"
+                                value={userData.extra_description}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="Extra Description :"
                                 placeholder="Enter your Extra Description"
                             />
                             <Input
-                                name="address.city"
-                                value={userData.address.city}
+                                name="city"
+                                value={userData.city}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="City :"
                                 placeholder="Enter your City"
                             />
                             <Input
-                                name="address.country"
-                                value={userData.address.country}
+                                name="country"
+                                value={userData.country}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="Country :"
                                 placeholder="Enter your Country"
                             />
                             <Input
-                                name="address.addresslabel"
-                                value={userData.address.addresslabel}
+                                name="addresslabel"
+                                value={userData.addresslabel}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="Address Label :"
                                 placeholder="Enter your Address Label"
                             />
                             <Input
-                                name="address.state"
-                                value={userData.address.state}
+                                name="state"
+                                value={userData.state}
                                 onChange={handleChange}
                                 variant="bordered"
                                 label="State :"
@@ -207,7 +194,7 @@ const RegisterPage: React.FC = () => {
                             />
                         </div>
                         <button
-                            className={`${buttonStyles({
+                            className={`${button({
                                 color: 'primary',
                                 radius: 'full',
                                 variant: 'shadow',
@@ -223,6 +210,7 @@ const RegisterPage: React.FC = () => {
                 </div>
             </section>
         </DefaultLayout>
+        
     );
 };
 

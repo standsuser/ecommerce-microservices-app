@@ -53,9 +53,10 @@ const LoginPage: React.FC = () => {
             });
 
             console.log(response);
+            const data: LoginResponse = await response.json();
 
-            if (response.ok) {
-                const data: LoginResponse = await response.json();
+
+            if (data.success) {
                 setLoginSuccess(true);
                 setVer(true);
                 setUser(data.response.userID);

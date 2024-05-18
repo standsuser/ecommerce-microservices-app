@@ -1,25 +1,51 @@
 /* eslint-disable prettier/prettier */
-
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { IsEmail } from 'class-validator';
+
+import { IsEmail, IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
+
   readonly first_name: string;
+
   readonly last_name: string;
-  readonly email: string; //login using email
+
+  readonly email: string; // login using email
+
   readonly phonenumber: string;
+
   readonly company: string;
-    readonly apartment: string;
-    readonly floor: number;
-    readonly street: string;
-    readonly building: string;
-    readonly postal_code: number;
-    readonly extra_description: string;
-    readonly city: string;
-    readonly country: string;
-    readonly addresslabel: string;
-    readonly state: string;
-  readonly password: string; //login using password
+
+
+  readonly apartment: string;
+
+  readonly floor: string;
+
+  readonly street: string;
+
+  readonly building: string;
+
+  readonly postal_code: string;
+
+
+  readonly extra_description: string;
+
+
+  readonly city: string;
+
+
+  readonly country: string;
+
+
+  readonly addresslabel: string;
+
+
+  readonly state: string;
+
+  
+  readonly password: string;
+
+  
+  
 
   toString(): string {
     return JSON.stringify({
@@ -39,8 +65,6 @@ export class CreateUserDto {
       addresslabel: this.addresslabel,
       state: this.state,
       password: this.password,
-
-      
     });
   }
 }
