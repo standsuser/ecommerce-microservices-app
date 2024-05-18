@@ -22,6 +22,9 @@ export class Wishlist {
   
   @Prop()
   selectedColor: string;
+
+  @Prop()
+  price: number;
 }
 
 export const WishlistSchema = SchemaFactory.createForClass(Wishlist);

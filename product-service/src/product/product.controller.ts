@@ -86,14 +86,22 @@ export class ProductController {
     );
   }
 
-  @Post('wishlist')
+  @Post('/wishlist/add')
   async addToWishlist(
     @Body('userId') userId: string,
     @Body('productId') productId: string,
     @Body('selectedColor') selectedColor: string,
     @Body('selectedMaterial') selectedMaterial: string,
     @Body('selectedSize') selectedSize: string,
-  ) {}
+  ) {
+    return await this.productService.addToWishlist(
+      userId,
+      productId,
+      selectedColor,
+      selectedMaterial,
+      selectedSize,
+    );
+  }
 
   // async shareProduct(@Param('productId') productId: string, @Body() shareOptions: any) {
   //   return await this.productService.shareProduct();
@@ -127,28 +135,24 @@ export class ProductController {
   }
 
 
-
-  /*
-  @Delete(':reviewId') 
-  async deleteReview(@Param('reviewId') reviewId: string) {
-      return await this.productService.deleteReview(reviewId);
+  @Delete('/review/delete/:userId/:reviewId')
+  async deleteMyReview(@Param('userId') userId: string, @Param('reviewId') reviewId: string) {
+    return this.productService.deleteMyReview(userId, reviewId);
   }
 
-  @Put(':reviewId')
-  async updateReview(@Param('reviewId') reviewId: string, @Body() body: { rating: number, review: string }) {
-
-      const { rating, review } = body;
-      return await this.productService.updateReview(reviewId, rating, review);
+  @Patch('/review/update/:userId/:reviewId')
+  async updateMyReview(
+    @Param('userId') userId: string,
+    @Param('reviewId') reviewId: string,
+    @Body('rating') rating: number,
+    @Body('review') review: string
+  ) {
+    return this.productService.updateMyReview(userId, reviewId, rating, review);
   }
 
-  @Get('user/:userId') 
-  async getUserReviews(@Param('userId') userId: string) {
-      return await this.productService.getUserReviews(userId);
+  @Get('/myreviews/:userId')
+  async getMyReviews(@Param('userId') userId: string) {
+    return this.productService.getMyReviews(userId);
   }
 
-  @Get('user/:userId/product/:productId') 
-  async getUserProductReview(@Param('userId') userId: string, @Param('productId') productId: string) {
-      return await this.productService.getUserProductReview(userId, productId);
-  }
-*/
 }

@@ -89,6 +89,16 @@ export class ProductService {
         throw new NotFoundException('Product not found');
       }
 
+      //call calculate total price
+      const totalPrice = this.calculateTotalPrice(
+        productId,
+        selectedSize,
+        selectedColor,
+        selectedMaterial,
+        product.totalPrice,
+      );
+
+
       // Prepare the record for Kafka
       const record = {
         topic: 'wishlist',
@@ -100,6 +110,7 @@ export class ProductService {
               selectedColor,
               selectedMaterial,
               selectedSize,
+              totalPrice,
               eventType: 'WishlistItemAdded',
             }),
           },
@@ -355,6 +366,53 @@ export class ProductService {
       return newReview;
     } catch (error) {
       throw new NotFoundException('Product not found');
+    }
+  }
+
+  async deleteMyReview(userId: string, reviewId: string) {
+    try {
+      const review = await this.reviewModel
+        .findOneAndDelete({
+          userid: userId,
+          _id: reviewId,
+        })
+        .exec();
+      if (!review) {
+        throw new NotFoundException('Review not found');
+      }
+      return review;
+    } catch (error) {
+      throw new NotFoundException('Review not found');
+    }
+  }
+
+  async updateMyReview(userId: string, reviewId: string, rating: number, review: string) {
+    try {
+      const updatedReview = await this.reviewModel
+        .findOneAndUpdate(
+          { _id: reviewId, userid: userId },
+          { rating: rating, review: review },
+          { new: true },
+        )
+        .exec();
+      if (!updatedReview) {
+        throw new NotFoundException('Review not found');
+      }
+      return updatedReview;
+    } catch (error) {
+      throw new NotFoundException('Review not found');
+    }
+  }
+
+  async getMyReviews(userId: string) {
+    try {
+      const reviews = await this.reviewModel.find({ userid: userId }).exec();
+      if (!reviews) {
+        throw new NotFoundException('Reviews not found');
+      }
+      return reviews;
+    } catch (error) {
+      throw new NotFoundException('Reviews not found');
     }
   }
 
