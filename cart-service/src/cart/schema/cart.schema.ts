@@ -9,14 +9,20 @@ export class Cart extends Document {
     userid?: MongooseSchema.Types.ObjectId;
 
     @Prop()
-    sessiond_id?: string; // For guest users
+    session_id?: MongooseSchema.Types.ObjectId; // For guest users
 
     @Prop()
     items: {
         productId: any;
         rentalDuration: string;
-        isRented: boolean; name: string, amount_cents: number,
-        description: string, color: string, size: string, material: string, quantity: number
+        isRented: boolean; 
+        name: string, 
+        amount_cents: number,
+        description: string, 
+        color: string, 
+        size: string, 
+        material: string, 
+        quantity: number
     }[];
 
     @Prop()

@@ -237,7 +237,7 @@ export class UserService {
 
 
     private async sendVerificationEmail(email: string): Promise<void> {
-        const verificationLink = `http://localhost:3001/login`;
+        const verificationLink = `http://localhost:5050/login`;
         const mailOptions = {
             from: 'omarx10050@gmail.com', // Sender email address
             to: email,
