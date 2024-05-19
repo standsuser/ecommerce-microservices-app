@@ -16,17 +16,17 @@ import {
   @Injectable()
   export class UserService {
     constructor(
-        private readonly consumerService: ConsumerService,
       @InjectModel(Address.name) private readonly addressModel: Model<Address>,
       @InjectModel(Payment.name) private readonly paymentModel: Model<Payment>,
       @InjectModel(Wishlist.name) private readonly wishlistModel: Model<Wishlist>,
       private readonly producerService: ProducerService,
+      private readonly consumerService: ConsumerService,
     ) {}
   
     async onModuleInit() {
         // Consume 'wishlist' topic for additions
         await this.consumerService.consume(
-          { topics: ['addtowishlist']},
+          { topics: ['addtowishlist', 'userRegistered']},
           {
             eachMessage: async ({ topic, partition, message }) => {
               try {
@@ -44,6 +44,35 @@ import {
                       price: data.totalPrice
                     });
                   }
+                else if (topic === 'userRegistered'){
+
+// Update the Address model
+if (topic === 'userRegistered') {
+  await this.addressModel.updateOne(
+    { userid: data.userId },
+    {
+      $set: {
+        addresslabel: data.addresslabel,
+        apartment: data.apartment,
+        email: data.email,
+        floor: data.floor,
+        first_name: data.first_name,
+        street: data.street,
+        building: data.building,
+        phone_number: data.phonenumber,
+        postal_code: data.postal_code,
+        extra_description: data.extra_description,
+        city: data.city,
+        country: data.country,
+        last_name: data.last_name,
+        state: data.state,
+      }
+    },
+    { upsert: true })
+
+
+
+                }
               } catch (error) {
                 console.error(`Error processing message from ${topic} topic:`, error);
               }
@@ -252,4 +281,30 @@ async getWishlist(userId: string) {
         throw new NotFoundException('wishlist not found');
     }
 }
+
+
+async onModuleInit() {
+  // Consume 'userRegistered' topic
+  await this.consumerService.consume(
+    { topics: ['userRegistered'], fromBeginning: true },
+    {
+      eachMessage: async ({ topic, partition, message }) => {
+        try {
+          const data = JSON.parse(message.value.toString());
+          console.log(`Received message from ${topic} topic:`, data);
+
+          
+            );
+          }
+        } catch (error) {
+          console.error(`Error processing message from ${topic} topic:`, error);
+        }
+      },
+    },
+  );
+}
+
+// async getAddressByUserId(userId: MongooseSchema.Types.ObjectId) {
+//   return this.addressModel.findOne({ userid: userId }).exec();
+// }
   }
