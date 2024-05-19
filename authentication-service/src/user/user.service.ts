@@ -18,6 +18,7 @@ import { Mailservice } from './Mail.service';
 import { SessionService } from '../session/session.service';
 import { Console } from 'console';
 import { async } from 'rxjs';
+import { ProducerService } from 'src/kafka/producer.service';
 
 
 
@@ -31,6 +32,8 @@ export class UserService {
         @Inject('USER_MODEL')
         private userModel: Model<User>,
         private jwtService: JwtService,
+        private readonly producerService: ProducerService,
+
 
     ) {
         this.mailService = new Mailservice('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')
@@ -210,29 +213,123 @@ export class UserService {
 
 
 
+    // async register(createUserDto: CreateUserDto): Promise<User> {
+    //     const existingUser = await this.getUserbyEmail(createUserDto.email);
+    //     Logger.log('ex', existingUser);
+    //     if (existingUser) {
+    //         throw new UserAlreadyExistsException();
+    //     }
+
+    //     // Create a new User document using the Mongoose model
+    //     const newUser = new this.userModel(createUserDto);
+
+    //     Logger.log(newUser);
+    //     // Save the new user
+    //     const savedUser = await newUser.save() as User;
+
+    //     // Send verification email
+    //     await this.sendVerificationEmail(savedUser.email);
+
+    //     console.log("User saved and verification email sent");
+
+    //     return savedUser;
+    // }
+    
+
+    // async register(createUserDto: CreateUserDto): Promise<User> {
+    //     const existingUser = await this.getUserbyEmail(createUserDto.email);
+    //     Logger.log('ex', existingUser);
+    //     if (existingUser) {
+    //         throw new UserAlreadyExistsException();
+    //     }
+      
+    //     // Create a new User document using the Mongoose model
+    //     const newUser = new this.userModel(createUserDto);
+      
+    //     Logger.log(newUser);
+    //     // Save the new user
+    //     const savedUser = await newUser.save() as User;
+      
+    //     // Send verification email
+    //     await this.sendVerificationEmail(savedUser.email);
+      
+    //     console.log("User saved and verification email sent");
+      
+    //     // Prepare the record for Kafka
+    //     const record = {
+    //       topic: 'userRegistered',
+    //       messages: [
+    //         {
+    //           value: JSON.stringify({
+    //             userId: savedUser._id,
+    //             email: savedUser.email,
+    //             name: savedUser.name,
+    //             // Add other fields from the createUserDto as needed
+    //             eventType: 'UserRegistered',
+    //           }),
+    //         },
+    //       ],
+    //     };
+      
+    //     // Send the record to Kafka
+    //     await this.producerService.produce(record);
+      
+    //     return savedUser;
+    //   }
+
     async register(createUserDto: CreateUserDto): Promise<User> {
         const existingUser = await this.getUserbyEmail(createUserDto.email);
         Logger.log('ex', existingUser);
         if (existingUser) {
             throw new UserAlreadyExistsException();
         }
-
+      
         // Create a new User document using the Mongoose model
         const newUser = new this.userModel(createUserDto);
-
+      
         Logger.log(newUser);
         // Save the new user
         const savedUser = await newUser.save() as User;
-
+      
         // Send verification email
         await this.sendVerificationEmail(savedUser.email);
-
+      
         console.log("User saved and verification email sent");
-
+      
+        // Prepare the record for Kafka
+        const record = {
+          topic: 'userRegistered',
+          messages: [
+            {
+              value: JSON.stringify({
+                userId: savedUser._id,
+                first_name: createUserDto.first_name,
+                last_name: createUserDto.last_name,
+                email: createUserDto.email,
+                phonenumber: createUserDto.phonenumber,
+                company: createUserDto.company,
+                apartment: createUserDto.apartment,
+                floor: createUserDto.floor,
+                street: createUserDto.street,
+                building: createUserDto.building,
+                postal_code: createUserDto.postal_code,
+                extra_description: createUserDto.extra_description,
+                city: createUserDto.city,
+                country: createUserDto.country,
+                addresslabel: createUserDto.addresslabel,
+                state: createUserDto.state,
+                password: createUserDto.password,
+                eventType: 'UserRegistered',
+              }),
+            },
+          ],
+        };
+      
+        // Send the record to Kafka
+        await this.producerService.produce(record);
+      
         return savedUser;
-    }
-
-
+      }
 
 
     private async sendVerificationEmail(email: string): Promise<void> {
