@@ -20,50 +20,50 @@ async function run() {
     console.log(categoryResult.insertedCount + ' categories were inserted');
 
     // Insert products
-    const products = [
-      {
-        name: 'Product 1',
-        description: 'Description 1',
-        imageURL: ['http://example.com/image1.jpg'],
+    const products = [];
+    for (let i = 1; i <= 20; i++) {
+      products.push({
+        name: `Product ${i}`,
+        description: `Description ${i}`,
+        imageURL: [`http://example.com/image${i}.jpg`],
         availability: true,
         discountpercentage: 0,
         categoryId: categoryResult.insertedIds[0], // reference to a category
         sizes: ['S', 'M', 'L'],
         colors: ['Red', 'Blue'],
         materials: ['Cotton'],
-        totalPrice: 100,
+        totalPrice: 100 + i,
         totalRating: 5,
-        totalReviews: 10,
+        totalReviews: 10 + i,
         rating: 5
-      },
-      // add more products as needed
-    ];
+      });
+    }
+
     const productResult = await db.collection('products').insertMany(products);
     console.log(productResult.insertedCount + ' products were inserted');
 
     // Insert reviews
-    const reviews = [
-      {
+    const reviews = [];
+    for (let i = 0; i < 20; i++) {
+      reviews.push({
         userid: new ObjectId(),
-        productid: productResult.insertedIds[0], // reference to a product
+        productid: productResult.insertedIds[i], // reference to a product
         rating: 5,
         review: 'Great product!',
         reviewdate: new Date(),
-      },
-      // add more reviews as needed
-    ];
+      });
+    }
     const reviewResult = await db.collection('reviews').insertMany(reviews);
     console.log(reviewResult.insertedCount + ' reviews were inserted');
 
     // Insert favorites
-    const favorites = [
-      {
+    const favorites = [];
+    for (let i = 0; i < 20; i++) {
+      favorites.push({
         userid: new ObjectId(),
-        productid: productResult.insertedIds[0], // reference to a product
-      },
-      // add more favorites as needed
-    ];
-
+        productid: productResult.insertedIds[i], // reference to a product
+      });
+    }
     const favoriteResult = await db.collection('favorites').insertMany(favorites);
     console.log(favoriteResult.insertedCount + ' favorites were inserted');
   } finally {
