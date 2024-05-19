@@ -12,6 +12,7 @@ import { ExistsStrategy } from '../strategies/exists.strategy';
 import { sessionProvider } from 'src/database/session.providers';
 import { SessionModule } from 'src/session/session.module';
 import { SessionService } from 'src/session/session.service';
+import { ProducerService } from 'src/kafka/producer.service';
 
 
 @Module({
@@ -26,7 +27,7 @@ import { SessionService } from 'src/session/session.service';
   controllers: [UserController],
   providers: [UserService,
     ...userProvider, ...databaseProviders,
-    LocalStrategy, JwtStrategy, ExistsStrategy],
+    LocalStrategy, JwtStrategy, ExistsStrategy, ProducerService],
   exports: [...databaseProviders, UserService],// added User Servcie to exports
 })
 export class UserModule { }
