@@ -14,7 +14,7 @@ import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb+srv://omarx10050:12345@users.bez5bwk.mongodb.net/'),
+    MongooseModule.forRoot('mongodb://localhost:27018/authentication'),
     UserModule,
     SessionModule,
     ClientsModule.register([
