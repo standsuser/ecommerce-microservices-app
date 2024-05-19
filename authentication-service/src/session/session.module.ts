@@ -10,7 +10,12 @@ import { JwtService } from '@nestjs/jwt';
 @Module({
   imports: [],
   controllers: [SessionController],
-  providers: [SessionService, JwtService , ...sessionProvider,...databaseProviders],
-  exports: [SessionService,...databaseProviders],
+  providers: [
+    SessionService,
+    JwtService,
+    ...sessionProvider,
+    ...databaseProviders,
+  ],
+  exports: [SessionService, ...databaseProviders],
 })
 export class SessionModule {}
