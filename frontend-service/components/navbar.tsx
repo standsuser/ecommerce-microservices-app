@@ -53,6 +53,11 @@ export default function Nbar() {
             Integrations
           </Link>
         </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="page">
+            Profile
+          </Link>
+        </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
@@ -67,8 +72,7 @@ export default function Nbar() {
         
 
         <AcmeLogo />
-         <p className="font-bold text-inherit">ECOMMERCE</p> 
-       
+        <p className="font-bold text-inherit">ZANATY</p>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
@@ -84,6 +88,11 @@ export default function Nbar() {
         <NavbarItem>
           <Link color="foreground" href="#">
             Integrations
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="/profile/profile">
+            Profile
           </Link>
         </NavbarItem>
       </NavbarContent>
