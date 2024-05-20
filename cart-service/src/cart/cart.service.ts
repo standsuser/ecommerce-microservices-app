@@ -253,13 +253,11 @@ export class CartService {
             user_id: userId,
             delivery_needed: true,
             amount_cents: totalAmountCents,
-            currency: 'USD', // Set the currency appropriately
-            merchant_order_id: Date.now(), // Example of generating an order ID
+            currency: 'EGP', 
             items: cart.items,
             status: OrderStatus.PENDING,
             shipping_data: shippingData,
             payment_info: {
-                order_id: Date.now(),
                 amount_cents: totalAmountCents,
                 expiration: 3600,
                 billing_data: shippingData,
