@@ -1,8 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Session } from 'inspector';
-import { Model, ObjectId } from 'mongoose';
-import { SessionModel } from './session.model';
-import { JwtService } from '@nestjs/jwt/dist/jwt.service';
+import { Model } from 'mongoose';
+import { Session } from './session.model';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class SessionService {
@@ -34,7 +33,6 @@ export class SessionService {
     return session.save();
   }
 
-  /////here is the concept to add the cart data
   async updateSession(userID: string, guestID: string, access_token: string) {
     const session = await this.findSessionByGuestId(guestID);
     const newSession = new this.sessionModel({
