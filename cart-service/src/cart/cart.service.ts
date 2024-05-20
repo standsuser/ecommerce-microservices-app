@@ -279,6 +279,11 @@ export class CartService {
 
     async addItemToGuestCart(sessionId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
         let cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
+
+        console.log(cart);
+        console.log(sessionId);
+        console.log(addItemDto);
+        console.log(productId);
     
         if (!cart) {
             cart = new this.cartModel({ session_id: sessionId, items: [] });
@@ -294,11 +299,13 @@ export class CartService {
             throw new BadRequestException('Invalid amount_cents');
         }
     
-        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
-    
-        if (itemIndex > -1) {
-            cart.items[itemIndex].quantity += quantity;
+        const existingItem = cart.items.find(item => item.productId.toString() === productId);
+
+        if (existingItem) {
+            existingItem.quantity += quantity;
+            cart.markModified('items'); // Add this line
         } else {
+            // Add new item to cart
             cart.items.push({
                 productId: productId,
                 rentalDuration: addItemDto.rentalDuration || 'N/A',
