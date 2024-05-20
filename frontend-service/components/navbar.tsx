@@ -72,7 +72,7 @@ export default function Nbar() {
         
 
         <AcmeLogo />
-        <p className="font-bold text-inherit">ZANATY</p>
+        <p className="font-bold text-inherit">ECOMMERCE</p>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
