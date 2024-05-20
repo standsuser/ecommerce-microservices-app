@@ -36,7 +36,7 @@ export class CartService {
         }
 
         const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
-
+//comment 
         if (itemIndex > -1) {
             // Item already exists in cart, update quantity
             cart.items[itemIndex].quantity += quantity;
