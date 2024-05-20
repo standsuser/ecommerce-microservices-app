@@ -1,3 +1,6 @@
+/* eslint-disable prettier/prettier */
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, OnApplicationShutdown, OnModuleInit } from "@nestjs/common";
 import { Consumer, ConsumerRunConfig, ConsumerSubscribeTopics, Kafka } from "kafkajs";
 
