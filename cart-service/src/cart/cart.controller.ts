@@ -127,6 +127,7 @@ export class CartController {
             throw error;
         }
     }
+    
 
 
     @Get('guest/:sessionId/items')
@@ -142,11 +143,12 @@ export class CartController {
             }
         }
     }
-
+    
     @Post('convert-guest-to-user')
     async convertGuestToUser(@Body() convertGuestToUserDto: ConvertGuestToUserDto): Promise<Cart> {
         const { userId, sessionId } = convertGuestToUserDto;
         return this.cartService.convertGuestToUser(userId, sessionId);
     }
+    
 
 }

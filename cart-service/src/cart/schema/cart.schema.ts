@@ -1,15 +1,13 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
-
+import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
 @Schema()
 export class Cart extends Document {
-    @Prop()
-    @Prop({ type: MongooseSchema.Types.ObjectId})
-    userid?: MongooseSchema.Types.ObjectId;
+    @Prop({ type: MongooseSchema.Types.ObjectId })
+    userid?: Types.ObjectId;
 
-    @Prop()
-    session_id?: MongooseSchema.Types.ObjectId; // For guest users
+    @Prop({ type: MongooseSchema.Types.ObjectId })
+    session_id?: Types.ObjectId; // For guest users
 
     @Prop()
     items: {
@@ -26,7 +24,7 @@ export class Cart extends Document {
     }[];
 
     @Prop()
-    total_price_pre_coupon: number; //lained
+    total_price_pre_coupon: number;
 
     @Prop()
     total_price_post_coupon: number | null;
@@ -35,7 +33,7 @@ export class Cart extends Document {
     coupon_code: string | null;
 
     @Prop()
-    coupon_percentage: number| null;
+    coupon_percentage: number | null;
 
     @Prop()
     is_checkout: boolean;

@@ -8,7 +8,7 @@ import { UpdateCartItemDto } from './dto/updatecartitem.dto';
 import { Order, OrderStatus } from './schema/order.schema';
 import { ConsumerService } from '../kafka/consumer.service';
 import { error } from 'console';
-
+import { Types } from 'mongoose';
 
 @Injectable()
 export class CartService {
@@ -286,7 +286,7 @@ export class CartService {
             cart = new this.cartModel({ session_id: sessionId, items: [] });
         }
     
-        const quantity = addItemDto.quantity || 1; // Default quantity to 1 if not provided
+        const quantity = addItemDto.quantity || 1;
     
         if (isNaN(quantity) || quantity <= 0) {
             throw new BadRequestException('Invalid quantity');
@@ -299,10 +299,8 @@ export class CartService {
         const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
     
         if (itemIndex > -1) {
-            // Item already exists in cart, update quantity
             cart.items[itemIndex].quantity += quantity;
         } else {
-            // Add new item to cart
             cart.items.push({
                 productId: productId,
                 rentalDuration: addItemDto.rentalDuration || 'N/A',
@@ -317,18 +315,17 @@ export class CartService {
             });
         }
     
-        // Calculate total price pre-coupon
         cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
     
         if (isNaN(cart.total_price_pre_coupon)) {
             throw new BadRequestException('Invalid total price calculation');
         }
     
-        // Save updated cart
         await cart.save();
     
         return cart;
     }
+    
 
     async getItemsFromGuestCart(sessionId: string): Promise<any> {
         try {
@@ -336,7 +333,6 @@ export class CartService {
             if (!cart) {
                 throw new NotFoundException('Cart not found');
             }
-            console.log(JSON.stringify(cart.items));
             return cart.items;
         } catch (error) {
             if (error instanceof NotFoundException) {
@@ -347,6 +343,7 @@ export class CartService {
             throw error;
         }
     }
+    
 
     async removeItemFromGuestCart(sessionId: string, productId: string): Promise<Cart> {
         const cart = await this.getItemsFromGuestCart(sessionId);
@@ -360,20 +357,15 @@ export class CartService {
     }
 
     async convertGuestToUser(userId: string, sessionId: string): Promise<Cart> {
-        const guestCart = await this.getItemsFromGuestCart(sessionId);
+        const guestCart = await this.cartModel.findOne({ session_id: sessionId }).exec();
         if (!guestCart) {
             throw new NotFoundException('Guest cart not found');
         }
-
-        let userCart = await this.getItemsFromGuestCart(userId);
+    
+        let userCart = await this.cartModel.findOne({ userId }).exec();
         if (userCart) {
-            // Merge guest cart items into existing user cart
-            // const existingItemIndex = cart.items.findIndex(item => item.productId === productId);
-
             guestCart.items.forEach(guestItem => {
-                const existingItemIndex = userCart.items.findIndex(
-                    item => item.productId === guestItem.productId.toString()
-                );
+                const existingItemIndex = userCart.items.findIndex(item => item.productId.toString() === guestItem.productId.toString());
                 if (existingItemIndex !== -1) {
                     userCart.items[existingItemIndex].quantity += guestItem.quantity;
                 } else {
@@ -381,12 +373,15 @@ export class CartService {
                 }
             });
             await userCart.save();
+            await this.cartModel.deleteOne({ session_id: sessionId }).exec();
             return userCart;
         } else {
-            // Create a new user cart with guest cart items
+            guestCart.userid = new Types.ObjectId(userId); // Use Types.ObjectId instead of ObjectId
             guestCart.session_id = null;
             await guestCart.save();
             return guestCart;
         }
     }
-}
+    }
+    
+
