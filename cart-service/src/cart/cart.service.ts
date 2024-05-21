@@ -351,15 +351,32 @@ export class CartService {
     
 
     async removeItemFromGuestCart(sessionId: string, productId: string): Promise<Cart> {
-        const cart = await this.getItemsFromGuestCart(sessionId);
-        const updatedItems = cart.items.filter(item => item.productId !== productId);
-        if (updatedItems.length === cart.items.length) {
+        const cart = await this.cartModel.findOne({ session_id: sessionId });
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+    
+        // Ensure cart.items is initialized, if not, handle it as an empty array situation
+        if (!cart.items || cart.items.length === 0) {
+            throw new BadRequestException('No items in cart');
+        }
+    
+        // Find the index of the item to be removed
+        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+        if (itemIndex === -1) {
             throw new NotFoundException('Item not found in cart');
         }
-        cart.items = updatedItems;
+    
+        // Remove the item from the array
+        cart.items.splice(itemIndex, 1);
+    
+        // Save the updated cart
         await cart.save();
         return cart;
     }
+    
+    
+    
 
     async convertGuestToUser(userId: string, sessionId: string): Promise<Cart> {
         const guestCart = await this.cartModel.findOne({ session_id: sessionId }).exec();
