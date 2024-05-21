@@ -20,7 +20,7 @@ import { Order } from './schema/order.schema';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @Post('/add-item/:userId/:productId')
+  @Post('/:userId/add-item/:productId')
   async addItemToCart(
     @Param('userId') userId: string,
     @Param('productId') productId: string,

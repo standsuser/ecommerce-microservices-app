@@ -19,27 +19,32 @@ export class CartService {
         @InjectModel(Order.name) private readonly orderModel: Model<Order>) { }
     //TESTED :O
     async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
-        const cart = await this.cartModel.findOne({ userId }).exec();
+        let cart = await this.cartModel.findOne({ userid: userId }).exec();
 
+        console.log(cart);
+        console.log(userId);
+        console.log(addItemDto);
+        console.log(productId);
+    
         if (!cart) {
-            throw new NotFoundException('Cart not found');
+            cart = new this.cartModel({ userid: userId, items: [] });
         }
-
-        const quantity = addItemDto.quantity || 1; // Default quantity to 1 if not provided
-
+    
+        const quantity = addItemDto.quantity || 1;
+    
         if (isNaN(quantity) || quantity <= 0) {
             throw new BadRequestException('Invalid quantity');
         }
-
+    
         if (isNaN(addItemDto.amount_cents) || addItemDto.amount_cents <= 0) {
             throw new BadRequestException('Invalid amount_cents');
         }
+    
+        const existingItem = cart.items.find(item => item.productId.toString() === productId);
 
-        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
-
-        if (itemIndex > -1) {
-            // Item already exists in cart, update quantity
-            cart.items[itemIndex].quantity += quantity;
+        if (existingItem) {
+            existingItem.quantity += quantity;
+            cart.markModified('items'); // Add this line
         } else {
             // Add new item to cart
             cart.items.push({
@@ -55,19 +60,16 @@ export class CartService {
                 quantity: quantity,
             });
         }
-
-        // Calculate total price pre-coupon
+    
         cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
-
+    
         if (isNaN(cart.total_price_pre_coupon)) {
             throw new BadRequestException('Invalid total price calculation');
         }
-
-        // Save updated cart
+    
         await cart.save();
-
+    
         return cart;
-
     }
     //tested :O
     async getCartInfo(userId: string): Promise<any> {
