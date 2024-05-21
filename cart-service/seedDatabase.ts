@@ -15,10 +15,10 @@ async function run() {
     // Insert carts
     const carts = [
       {
-        userId: new ObjectId('617bf6d02d1842e5388d893f'),
+        userid: new ObjectId(),
         items: [
           {
-            product_id: new ObjectId('615f3a5509d312630bb048f2'),
+            productId: new ObjectId('615f3a5509d312630bb048f2'),
             rentalDuration: '1 week',
             isRented: false,
             name: 'Product 1',
@@ -31,9 +31,32 @@ async function run() {
           }
         ],
         total_price_pre_coupon: 10000,
-        total_price_post_coupon: 9000,
-        coupon_code: 'SALE20',
-        coupon_percentage: 10,
+        total_price_post_coupon: null,
+        coupon_code: '',
+        coupon_percentage: 0,
+        is_checkout: false,
+        updated_at: new Date()
+      },
+      {
+        userid: new ObjectId('617bf6d02d1842e5388d893f'),
+        items: [
+          {
+            productId: new ObjectId('615f3a5509d312630bb048f2'),
+            rentalDuration: '1 week',
+            isRented: false,
+            name: 'Product 1',
+            amount_cents: 5000,
+            description: 'Description of Product 1',
+            color: 'Red',
+            size: 'Medium',
+            material: 'Cotton',
+            quantity: 2
+          }
+        ],
+        total_price_pre_coupon: 10000,
+        total_price_post_coupon: null,
+        coupon_code: '',
+        coupon_percentage: 0,
         is_checkout: false,
         updated_at: new Date()
       },

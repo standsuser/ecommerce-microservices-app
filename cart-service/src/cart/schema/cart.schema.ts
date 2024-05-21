@@ -23,19 +23,19 @@ export class Cart extends Document {
         quantity: number
     }[];
 
-    @Prop()
+    @Prop({ default: 0 })
     total_price_pre_coupon: number;
 
-    @Prop()
-    total_price_post_coupon: number | null;
+    @Prop({ default: null })
+    total_price_post_coupon: number;
 
-    @Prop()
-    coupon_code: string | null;
+    @Prop({ default: null })
+    coupon_code: string;
 
-    @Prop()
-    coupon_percentage: number | null;
+    @Prop({ default: 0 })
+    coupon_percentage: number;
 
-    @Prop()
+    @Prop({ default: false })
     is_checkout: boolean;
 
     @Prop({ default: Date.now })

@@ -101,8 +101,8 @@ export class CartService {
                 if (!guestCart) {
                     throw new NotFoundException('Cart not found');
                 }
-                return guestCart.items;     
-                   }
+                return guestCart.items;
+            }
             // console.log(JSON.stringify(cart.items));
             return cart.items;
         } catch (error) {
@@ -149,7 +149,7 @@ export class CartService {
     //TESTED :O
 
     async removeItemFromCart(userId: string, productId: string): Promise<Cart> {
-        const cart = await this.cartModel.findOne({ userid:userId }).exec();
+        const cart = await this.cartModel.findOne({ userid: userId }).exec();
 
         if (!cart) {
             throw new NotFoundException('Cart not found');
@@ -175,27 +175,30 @@ export class CartService {
     }
     //tested :O
     async applyCouponCode(userId: string, couponCode: string): Promise<Cart> {
-        const cart = await this.getCartInfo(userId);
-        const coupon = await this.couponModel.findOne({ coupon_code: couponCode }).exec();
+        const cart = await this.cartModel.findOne({ userid: userId }).exec();
 
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+
+        const coupon = await this.couponModel.findOne({ coupon_code: couponCode }).exec();
         if (!coupon) {
             throw new NotFoundException('Coupon not found');
         }
 
-        if (cart.total_price_post_coupon !== null) {
-            throw new Error('Coupon code has already been applied');
+        if (cart.total_price_pre_coupon === null || cart.total_price_pre_coupon === undefined) {
+            throw new Error('Cart total price before coupon is not set');
         }
-
 
         const totalDiscount = cart.total_price_pre_coupon * (coupon.coupon_percentage / 100);
         cart.total_price_post_coupon = cart.total_price_pre_coupon - totalDiscount;
         cart.coupon_code = coupon.coupon_code;
         cart.coupon_percentage = coupon.coupon_percentage;
 
-
         await cart.save();
         return cart;
     }
+
     //TESTED :O
     async createOrder(userId: string, shippingData: any): Promise<Order> {
         const cart = await this.cartModel.findOne({ userid: userId }).exec();
@@ -203,8 +206,10 @@ export class CartService {
         if (!cart || cart.items.length === 0) {
             throw new NotFoundException('Cart is empty or not found');
         }
-
-        const totalAmountCents = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+        let totalAmountCents = cart.total_price_pre_coupon;
+        if (cart.total_price_post_coupon !== null) {
+            totalAmountCents = cart.total_price_post_coupon;
+        }
 
         const newOrder = new this.orderModel({
             userid: userId,
