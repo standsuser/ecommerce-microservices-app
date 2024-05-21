@@ -69,59 +69,6 @@ export class CartService {
         return cart;
 
     }
-
-
-    // TESTED :O 
-    async rentProduct(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
-        const cart = await this.cartModel.findOne({ userId }).exec();
-
-        if (!cart) {
-            throw new NotFoundException('Cart not found');
-        }
-
-        const quantity = addItemDto.quantity || 1; // Default quantity to 1 if not provided
-
-        if (isNaN(quantity) || quantity <= 0) {
-            throw new BadRequestException('Invalid quantity');
-        }
-
-        if (isNaN(addItemDto.amount_cents) || addItemDto.amount_cents <= 0) {
-            throw new BadRequestException('Invalid amount_cents');
-        }
-
-        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
-
-        if (itemIndex > -1) {
-            // Item already exists in cart, update quantity
-            cart.items[itemIndex].quantity += quantity;
-        } else {
-            // Add new rental item to cart
-            cart.items.push({
-                productId: productId,
-                rentalDuration: addItemDto.rentalDuration || 'N/A',
-                isRented: true, // This indicates the product is rented
-                name: addItemDto.name,
-                amount_cents: addItemDto.amount_cents,
-                description: addItemDto.description,
-                color: addItemDto.color,
-                size: addItemDto.size,
-                material: addItemDto.material,
-                quantity: quantity,
-            });
-        }
-
-        // Calculate total price pre-coupon
-        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
-
-        if (isNaN(cart.total_price_pre_coupon)) {
-            throw new BadRequestException('Invalid total price calculation');
-        }
-
-        // Save updated cart
-        await cart.save();
-
-        return cart;
-    }
     //tested :O
     async getCartInfo(userId: string): Promise<any> {
         try {
@@ -330,6 +277,9 @@ export class CartService {
     
         return cart;
     }
+
+    
+
     
 
     async getItemsFromGuestCart(sessionId: string): Promise<any> {

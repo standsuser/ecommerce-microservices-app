@@ -127,27 +127,10 @@ export class CartController {
     }
   }
 
-  @Post('/rent-product/:userId/:productId')
-  async rentProduct(
-    @Param('userId') userId: string,
-    @Param('productId') productId: string,
-    @Body() addItemDto: AddToCartDto,
-  ): Promise<Cart> {
-    try {
-      return await this.cartService.rentProduct(userId, addItemDto, productId);
-    } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
-        throw new BadRequestException(error.message);
-      }
-      throw error;
-    }
-  }
 
 
-  
+
+
   @Post('/guest/:sessionId/add-item/:productId')
   async addItemToGuestCart(
     @Param('sessionId') sessionId: string,
