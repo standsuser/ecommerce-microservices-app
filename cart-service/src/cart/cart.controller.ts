@@ -47,6 +47,7 @@ export class CartController {
     async getCartInfo(@Param('userId') userId: string): Promise<any> {
         return this.cartService.getCartInfo(userId);
     }
+    
     @Get('items/:userId')
     async getCartItems(@Param('userId') userId: string) {
         try {

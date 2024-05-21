@@ -95,11 +95,15 @@ export class CartService {
     // Tested :O 
     async getCartItems(userId: string): Promise<any> {
         try {
-            const cart = await this.cartModel.findOne({ userId }).exec();
+            const cart = await this.cartModel.findOne({ userid: userId }).exec();
             if (!cart) {
-                throw new NotFoundException('Cart not found');
-            }
-            console.log(JSON.stringify(cart.items));
+                const guestCart = await this.cartModel.findOne({ session_id: userId }).exec();
+                if (!guestCart) {
+                    throw new NotFoundException('Cart not found');
+                }
+                return guestCart.items;     
+                   }
+            // console.log(JSON.stringify(cart.items));
             return cart.items;
         } catch (error) {
             if (error instanceof NotFoundException) {
