@@ -129,7 +129,7 @@ export class CartController {
 
 
 
-    @Get('/guest/:user_id/orders')
+    @Get('/:user_id/orders')
     async viewOrderHistory(
         @Param('user_id') userId: string,
     ): Promise<Order[]> {

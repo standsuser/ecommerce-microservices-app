@@ -145,7 +145,7 @@ export class CartService {
     //TESTED :O
 
     async removeItemFromCart(userId: string, productId: string): Promise<Cart> {
-        const cart = await this.cartModel.findOne({ userId }).exec();
+        const cart = await this.cartModel.findOne({ userid:userId }).exec();
 
         if (!cart) {
             throw new NotFoundException('Cart not found');
@@ -203,7 +203,7 @@ export class CartService {
         const totalAmountCents = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
 
         const newOrder = new this.orderModel({
-            user_id: userId,
+            userid: userId,
             delivery_needed: true,
             amount_cents: totalAmountCents,
             currency: 'EGP',
@@ -345,7 +345,7 @@ export class CartService {
 
 
     async viewOrderHistory(userId: string): Promise<Order[]> {
-        const orders = await this.orderModel.find({ user_id: userId }).exec();
+        const orders = await this.orderModel.find({ userid: userId }).exec();
         if (!orders) {
             throw new NotFoundException('No orders are linked to your account');
         }
