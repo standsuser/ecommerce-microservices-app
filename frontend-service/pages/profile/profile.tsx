@@ -15,6 +15,7 @@ const ProfilePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [user, setUser] = React.useState(null);
   const [formData, setFormData] = useState<Profile>({ first_name: '', last_name: '', phone_number: '', email: '' });
   const router = useRouter();
 
@@ -32,7 +33,7 @@ const ProfilePage: React.FC = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:3080/user/profile/${userId}`, {
+        const response = await fetch(`http://localhost:3003/user/profile/${userId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -76,7 +77,7 @@ const ProfilePage: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:3080/user/editProfile/${userId}`, {
+      const response = await fetch(`http://localhost:3003/user/editProfile/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
