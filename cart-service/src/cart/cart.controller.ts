@@ -61,28 +61,6 @@ export class CartController {
     }
   }
 
-  @Put('/update-item/:userId/:productId')
-  async updateCartItem(
-    @Param('userId') userId: string,
-    @Param('productId') productId: string,
-    @Body() updateDto: AddToCartDto,
-  ): Promise<Cart> {
-    try {
-      return await this.cartService.updateCartItem(
-        userId,
-        productId,
-        updateDto,
-      );
-    } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
-        throw new BadRequestException(error.message);
-      }
-      throw error;
-    }
-  }
 
   @Delete('/remove-item/:userId/:productId')
   async removeItemFromCart(
@@ -154,21 +132,6 @@ export class CartController {
     }
   }
 
-  @Get('guest/:sessionId/items')
-  async getItemsFromGuestCart(
-    @Param('sessionId') sessionId: string,
-  ): Promise<any> {
-    try {
-      const items = await this.cartService.getItemsFromGuestCart(sessionId);
-      return items;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message);
-      } else {
-        throw error;
-      }
-    }
-  }
 
   @Delete('/guest/:sessionId/remove-item/:productId')
   async removeItemFromGuestCart(
