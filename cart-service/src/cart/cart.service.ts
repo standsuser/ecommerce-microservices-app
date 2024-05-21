@@ -72,7 +72,7 @@ export class CartService {
     //tested :O
     async getCartInfo(userId: string): Promise<any> {
         try {
-            const cart = await this.cartModel.findOne({ userId }).exec();
+            const cart = await this.cartModel.findOne({ userid: userId }).exec();
             if (!cart) {
                 throw new NotFoundException('Cart not found');
             }
