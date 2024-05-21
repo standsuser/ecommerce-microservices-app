@@ -74,7 +74,11 @@ export class CartService {
         try {
             const cart = await this.cartModel.findOne({ userid: userId }).exec();
             if (!cart) {
-                throw new NotFoundException('Cart not found');
+               const guestCart = await this.cartModel.findOne({ session_id: userId }).exec();
+                if (!guestCart) {
+                    throw new NotFoundException('Cart not found');
+                }
+                return guestCart;
             }
             return cart;
         } catch (error) {
