@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { AppProps } from "next/app";
 import { NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
@@ -13,7 +13,7 @@ const generateSessionId = () => {
   });
 };
 
-const getSessionId = () => {
+export const getSessionId = () => {
   let sessionId = localStorage.getItem('sessionId');
   if (!sessionId) {
     sessionId = generateSessionId();
@@ -26,9 +26,12 @@ const getSessionId = () => {
 };
 
 export default function App({ Component, pageProps }: AppProps) {
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
   useEffect(() => {
     try {
-      getSessionId(); // Ensure sessionId is set on initial load
+      const id = getSessionId(); // Ensure sessionId is set on initial load
+      setSessionId(id);
     } catch (error) {
       console.error('Error accessing localStorage', error);
     }

@@ -6,8 +6,8 @@ export class Cart extends Document {
     @Prop({ type: MongooseSchema.Types.ObjectId })
     userid?: Types.ObjectId;
 
-    @Prop({ type: MongooseSchema.Types.ObjectId })
-    session_id?: Types.ObjectId; // For guest users
+    @Prop({ type: String })
+    session_id?: string;
 
     @Prop()
     items: {
