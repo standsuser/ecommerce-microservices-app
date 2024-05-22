@@ -1,12 +1,13 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Cart } from './schema/cart.schema';
 import { Coupon } from './schema/coupon.schema';
 import { AddToCartDto } from './dto/addToCart.dto';
 import { UpdateCartItemDto } from './dto/updatecartitem.dto';
 import { Order, OrderStatus } from './schema/order.schema';
 import { ConsumerService } from '../kafka/consumer.service';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class CartService {
@@ -14,7 +15,8 @@ export class CartService {
         private readonly consumerService: ConsumerService,
         @InjectModel(Cart.name) private readonly cartModel: Model<Cart>,
         @InjectModel(Coupon.name) private readonly couponModel: Model<Coupon>,
-        @InjectModel(Order.name) private readonly orderModel: Model<Order>) { }
+        @InjectModel(Order.name) private readonly orderModel: Model<Order>,
+    ) { }
 
     async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
         let cart = await this.cartModel.findOne({ userid: userId }).exec();
@@ -60,33 +62,57 @@ export class CartService {
         }
 
         await cart.save();
-
         return cart;
     }
 
+
     async getCartInfo(userId: string): Promise<any> {
-        let cart = await this.cartModel.findOne({ userid: userId }).exec();
-        if (!cart) {
-            cart = new this.cartModel({ userid: userId, items: [] });
-            await cart.save();
+        try {
+            const cart = await this.cartModel.findOne({ userid: userId }).exec();
+            if (!cart) {
+                const guestCart = await this.cartModel.findOne({ session_id: userId }).exec();
+                if (!guestCart) {
+                    throw new NotFoundException('Cart not found');
+                }
+                return guestCart;
+            }
+            return cart;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                console.error(error.message);
+            } else {
+                console.error(`Error retrieving cart for userId: ${userId}`, error);
+            }
+            throw error;
         }
-        return cart;
     }
 
     async getCartItems(userId: string): Promise<any> {
-        let cart = await this.cartModel.findOne({ userid: userId }).exec();
-        if (!cart) {
-            cart = new this.cartModel({ userid: userId, items: [] });
-            await cart.save();
+        try {
+            const cart = await this.cartModel.findOne({ userid: userId }).exec();
+            if (!cart) {
+                const guestCart = await this.cartModel.findOne({ session_id: userId }).exec();
+                if (!guestCart) {
+                    throw new NotFoundException('Cart not found');
+                }
+                return guestCart.items;
+            }
+            return cart.items;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                console.error(error.message);
+            } else {
+                console.error(`Error retrieving cart for userId: ${userId}`, error);
+            }
+            throw error;
         }
-        return cart.items;
     }
 
     async updateCartItem(userId: string, productId: string, updateDto: AddToCartDto): Promise<Cart> {
-        let cart = await this.cartModel.findOne({ userid: userId }).exec();
+        const cart = await this.cartModel.findOne({ userId }).exec();
 
         if (!cart) {
-            cart = new this.cartModel({ userid: userId, items: [] });
+            throw new NotFoundException('Cart not found');
         }
 
         const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
@@ -110,13 +136,12 @@ export class CartService {
         if (isNaN(cart.total_price_pre_coupon)) {
             throw new BadRequestException('Invalid total price calculation');
         }
-        cart.markModified('items');
         await cart.save();
         return cart;
     }
 
     async removeItemFromCart(userId: string, productId: string): Promise<Cart> {
-        let cart = await this.cartModel.findOne({ userid: userId }).exec();
+        const cart = await this.cartModel.findOne({ userid: userId }).exec();
 
         if (!cart) {
             throw new NotFoundException('Cart not found');
@@ -142,7 +167,7 @@ export class CartService {
     }
 
     async applyCouponCode(userId: string, couponCode: string): Promise<Cart> {
-        let cart = await this.cartModel.findOne({ userid: userId }).exec();
+        const cart = await this.cartModel.findOne({ userid: userId }).exec();
 
         if (!cart) {
             throw new NotFoundException('Cart not found');
@@ -162,13 +187,12 @@ export class CartService {
         cart.coupon_code = coupon.coupon_code;
         cart.coupon_percentage = coupon.coupon_percentage;
 
-        cart.markModified('items');
         await cart.save();
         return cart;
     }
 
     async createOrder(userId: string, shippingData: any): Promise<Order> {
-        let cart = await this.cartModel.findOne({ userid: userId }).exec();
+        const cart = await this.cartModel.findOne({ userid: userId }).exec();
 
         if (!cart || cart.items.length === 0) {
             throw new NotFoundException('Cart is empty or not found');
@@ -216,8 +240,7 @@ export class CartService {
         return newOrder;
     }
 
-    // Guest operations
-
+    // Guest  
     async addItemToGuestCart(sessionId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
         let cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
 
@@ -262,21 +285,28 @@ export class CartService {
         }
 
         await cart.save();
-
         return cart;
     }
 
     async getItemsFromGuestCart(sessionId: string): Promise<any> {
-        let cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
-        if (!cart) {
-            cart = new this.cartModel({ session_id: sessionId, items: [] });
-            await cart.save();
+        try {
+            const cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
+            if (!cart) {
+                throw new NotFoundException('Cart not found');
+            }
+            return cart.items;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                console.error(error.message);
+            } else {
+                console.error(`Error retrieving cart for sessionId: ${sessionId}`, error);
+            }
+            throw error;
         }
-        return cart.items;
     }
 
     async removeItemFromGuestCart(sessionId: string, productId: string): Promise<Cart> {
-        let cart = await this.cartModel.findOne({ session_id: sessionId });
+        const cart = await this.cartModel.findOne({ session_id: sessionId });
         if (!cart) {
             throw new NotFoundException('Cart not found');
         }
@@ -337,4 +367,63 @@ export class CartService {
             return guestCart;
         }
     }
+
+    async updateItemQuantity(userId: string, productId: string, quantityChange: number): Promise<Cart> {
+        const cart = await this.cartModel.findOne({ userid: userId }).exec();
+
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+
+        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+        if (itemIndex === -1) {
+            throw new NotFoundException('Item not found in cart');
+        }
+
+        const item = cart.items[itemIndex];
+        item.quantity += quantityChange;
+
+        if (item.quantity <= 0) {
+            cart.items.splice(itemIndex, 1);
+        }
+
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        if (isNaN(cart.total_price_pre_coupon)) {
+            throw new BadRequestException('Invalid total price calculation');
+        }
+
+        cart.markModified('items');
+        await cart.save();
+        return cart;
+    }
+    async updateGuestItemQuantity(sessionId: string, productId: string, quantityChange: number): Promise<Cart> {
+        const cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
+    
+        if (!cart) {
+          throw new NotFoundException('Cart not found');
+        }
+    
+        const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+        if (itemIndex === -1) {
+          throw new NotFoundException('Item not found in cart');
+        }
+    
+        const item = cart.items[itemIndex];
+        item.quantity += quantityChange;
+    
+        if (item.quantity <= 0) {
+          cart.items.splice(itemIndex, 1);
+        }
+    
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+    
+        if (isNaN(cart.total_price_pre_coupon)) {
+          throw new BadRequestException('Invalid total price calculation');
+        }
+    
+        cart.markModified('items');
+        await cart.save();
+        return cart;
+      }
 }

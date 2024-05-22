@@ -23,7 +23,7 @@
     "@nestjs/common": "^10.3.8",
     "@nestjs/core": "^10.3.8",
     "@nestjs/mongoose": "^10.0.6",
-    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-express": "^10.3.8",
     "docker": "^1.0.0",
     "mongo": "^0.1.0",
     "mongodb": "^6.6.2",

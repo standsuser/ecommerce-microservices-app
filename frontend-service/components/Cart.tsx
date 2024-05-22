@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getSessionId } from '@/pages/_app'; // Adjust the import based on your directory structure
-import { addOneItem, removeOneItem, getCartItems, applyCoupon } from '@/pages/api/cartApi';
+import { getCartItems, applyCoupon, updateItemQuantity, createOrder } from '@/pages/api/cartApi';
 import { Button, Input } from '@nextui-org/react';
 
 const Cart = () => {
@@ -8,6 +8,7 @@ const Cart = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState<string>('');
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [shippingData, setShippingData] = useState<any>({}); // Add this to capture shipping data
 
   useEffect(() => {
     const fetchSessionId = () => {
@@ -39,17 +40,17 @@ const Cart = () => {
     setTotalPrice(total);
   };
 
-  const handleAddOneItem = async (productId: string) => {
+  const handleAddItem = async (productId: string) => {
     if (sessionId) {
-      const updatedCart = await addOneItem(sessionId, productId);
+      const updatedCart = await updateItemQuantity(sessionId, productId, 1);
       setCartItems(updatedCart.items);
       calculateTotalPrice(updatedCart.items);
     }
   };
 
-  const handleRemoveOneItem = async (productId: string) => {
+  const handleRemoveItem = async (productId: string) => {
     if (sessionId) {
-      const updatedCart = await removeOneItem(sessionId, productId);
+      const updatedCart = await updateItemQuantity(sessionId, productId, -1);
       setCartItems(updatedCart.items);
       calculateTotalPrice(updatedCart.items);
     }
@@ -60,6 +61,19 @@ const Cart = () => {
       const updatedCart = await applyCoupon(sessionId, couponCode);
       setCartItems(updatedCart.items);
       calculateTotalPrice(updatedCart.items);
+    }
+  };
+
+  const handlePlaceOrder = async () => {
+    if (sessionId) {
+      try {
+        const order = await createOrder(sessionId, shippingData);
+        alert('Order placed successfully!');
+        // Optionally, redirect to a confirmation page or clear the cart state
+      } catch (error) {
+        console.error('Failed to place order', error);
+        alert('Failed to place order');
+      }
     }
   };
 
@@ -78,11 +92,11 @@ const Cart = () => {
             <p className="cart-item-quantity">Quantity: {item.quantity}</p>
             <p className="cart-item-price">Price: ${(item.amount_cents / 100).toFixed(2)}</p>
             <div className="cart-item-actions">
-              <Button color="primary" onClick={() => handleAddOneItem(item.productId)}>
+              <Button color="primary" onClick={() => handleAddItem(item.productId)}>
                 Add One
               </Button>
-              <Button color="danger" onClick={() => handleRemoveOneItem(item.productId)}>
-                Remove
+              <Button color="danger" onClick={() => handleRemoveItem(item.productId)}>
+                Remove One
               </Button>
             </div>
           </div>
@@ -99,10 +113,48 @@ const Cart = () => {
           value={couponCode}
           onChange={(e) => setCouponCode(e.target.value)}
         />
-        <Button color="primary" onClick={handleApplyCoupon}>
+        <Button auto color="primary" onClick={handleApplyCoupon}>
           Apply
         </Button>
+      </div>
+      <div className="cart-shipping">
+        {/* Example shipping data inputs */}
+        <Input
+          clearable
+          bordered
+          fullWidth
+          color="primary"
+          size="lg"
+          placeholder="Shipping Address"
+          value={shippingData.address || ''}
+          onChange={(e) => setShippingData({ ...shippingData, address: e.target.value })}
+        />
+        <Input
+          clearable
+          bordered
+          fullWidth
+          color="primary"
+          size="lg"
+          placeholder="City"
+          value={shippingData.city || ''}
+          onChange={(e) => setShippingData({ ...shippingData, city: e.target.value })}
+        />
+        <Input
+          clearable
+          bordered
+          fullWidth
+          color="primary"
+          size="lg"
+          placeholder="Postal Code"
+          value={shippingData.postalCode || ''}
+          onChange={(e) => setShippingData({ ...shippingData, postalCode: e.target.value })}
+        />
+      </div>
+      <div className="cart-total">
         <p className="cart-total-price">Total Price: ${totalPrice.toFixed(2)}</p>
+        <Button color="success" onClick={handlePlaceOrder}>
+          Place Order
+        </Button>
       </div>
     </div>
   );
