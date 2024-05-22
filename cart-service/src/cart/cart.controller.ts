@@ -1,13 +1,5 @@
 import {
-    Controller,
-    Post,
-    Body,
-    Param,
-    Get,
-    Put,
-    Delete,
-    NotFoundException,
-    BadRequestException,
+    Controller, Post, Body, Param, Get, Put, Delete, NotFoundException, BadRequestException,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AddToCartDto } from './dto/addToCart.dto';
@@ -27,27 +19,19 @@ export class CartController {
         @Body() addItemDto: AddToCartDto,
     ): Promise<Cart> {
         try {
-            return await this.cartService.addItemToCart(
-                userId,
-                addItemDto,
-                productId,
-            );
+            return await this.cartService.addItemToCart(userId, addItemDto, productId);
         } catch (error) {
-            if (
-                error instanceof NotFoundException ||
-                error instanceof BadRequestException
-            ) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
                 throw new BadRequestException(error.message);
             }
             throw error;
         }
     }
-
     @Get('get-cart-info/:userId')
     async getCartInfo(@Param('userId') userId: string): Promise<any> {
         return this.cartService.getCartInfo(userId);
     }
-    
+
     @Get('items/:userId')
     async getCartItems(@Param('userId') userId: string) {
         try {
@@ -69,16 +53,25 @@ export class CartController {
         @Body() updateDto: AddToCartDto,
     ): Promise<Cart> {
         try {
-            return await this.cartService.updateCartItem(
-                userId,
-                productId,
-                updateDto,
-            );
+            return await this.cartService.updateCartItem(userId, productId, updateDto);
         } catch (error) {
-            if (
-                error instanceof NotFoundException ||
-                error instanceof BadRequestException
-            ) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
+    }
+
+    @Put('/:userId/update-quantity/:productId')
+    async updateItemQuantity(
+        @Param('userId') userId: string,
+        @Param('productId') productId: string,
+        @Body('quantity') quantity: number,
+    ): Promise<Cart> {
+        try {
+            return await this.cartService.updateItemQuantity(userId, productId, quantity);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
                 throw new BadRequestException(error.message);
             }
             throw error;
@@ -93,10 +86,7 @@ export class CartController {
         try {
             return await this.cartService.removeItemFromCart(userId, productId);
         } catch (error) {
-            if (
-                error instanceof NotFoundException ||
-                error instanceof BadRequestException
-            ) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
                 throw new BadRequestException(error.message);
             }
             throw error;
@@ -110,7 +100,7 @@ export class CartController {
     ): Promise<Cart> {
         return this.cartService.applyCouponCode(userId, couponCode);
     }
-    
+
     @Post(':userId/createOrder')
     async createOrder(
         @Param('userId') userId: string,
@@ -119,27 +109,19 @@ export class CartController {
         try {
             return await this.cartService.createOrder(userId, shippingData);
         } catch (error) {
-            if (
-                error instanceof NotFoundException ||
-                error instanceof BadRequestException
-            ) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
                 throw new BadRequestException(error.message);
             }
             throw error;
         }
     }
 
-    @Get('/:userId/orders')
-    async viewOrderHistory(
-        @Param('userId') userId: string,
-    ): Promise<Order[]> {
+    @Get('/:user_id/orders')
+    async viewOrderHistory(@Param('user_id') userId: string): Promise<Order[]> {
         try {
             return await this.cartService.viewOrderHistory(userId);
         } catch (error) {
-            if (
-                error instanceof NotFoundException ||
-                error instanceof BadRequestException
-            ) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
                 throw new BadRequestException(error.message);
             }
             throw error;
@@ -153,16 +135,9 @@ export class CartController {
         @Body() addItemDto: AddToCartDto,
     ): Promise<Cart> {
         try {
-            return await this.cartService.addItemToGuestCart(
-                sessionId,
-                addItemDto,
-                productId,
-            );
+            return await this.cartService.addItemToGuestCart(sessionId, addItemDto, productId);
         } catch (error) {
-            if (
-                error instanceof NotFoundException ||
-                error instanceof BadRequestException
-            ) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
                 throw new BadRequestException(error.message);
             }
             throw error;
@@ -170,9 +145,7 @@ export class CartController {
     }
 
     @Get('guest/:sessionId/items')
-    async getItemsFromGuestCart(
-        @Param('sessionId') sessionId: string,
-    ): Promise<any> {
+    async getItemsFromGuestCart(@Param('sessionId') sessionId: string): Promise<any> {
         try {
             const items = await this.cartService.getItemsFromGuestCart(sessionId);
             return items;
@@ -185,21 +158,31 @@ export class CartController {
         }
     }
 
+    @Put('/guest/:sessionId/update-quantity/:productId')
+  async updateGuestItemQuantity(
+    @Param('sessionId') sessionId: string,
+    @Param('productId') productId: string,
+    @Body('quantity') quantity: number,
+  ): Promise<Cart> {
+    try {
+      return await this.cartService.updateGuestItemQuantity(sessionId, productId, quantity);
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw new BadRequestException(error.message);
+      }
+      throw error;
+    }
+  }
+
     @Delete('/guest/:sessionId/remove-item/:productId')
     async removeItemFromGuestCart(
         @Param('sessionId') sessionId: string,
         @Param('productId') productId: string,
     ): Promise<Cart> {
         try {
-            return await this.cartService.removeItemFromGuestCart(
-                sessionId,
-                productId,
-            );
+            return await this.cartService.removeItemFromGuestCart(sessionId, productId);
         } catch (error) {
-            if (
-                error instanceof NotFoundException ||
-                error instanceof BadRequestException
-            ) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
                 throw new BadRequestException(error.message);
             }
             throw error;
@@ -207,10 +190,9 @@ export class CartController {
     }
 
     @Post('convert-guest-to-user')
-    async convertGuestToUser(
-        @Body() convertGuestToUserDto: ConvertGuestToUserDto,
-    ): Promise<Cart> {
+    async convertGuestToUser(@Body() convertGuestToUserDto: ConvertGuestToUserDto): Promise<Cart> {
         const { userId, sessionId } = convertGuestToUserDto;
         return this.cartService.convertGuestToUser(userId, sessionId);
     }
+    
 }
