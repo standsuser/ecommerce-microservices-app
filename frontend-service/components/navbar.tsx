@@ -2,134 +2,68 @@ import React from "react";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button, Dropdown, DropdownTrigger, DropdownItem, DropdownMenu } from "@nextui-org/react";
 import { AcmeLogo } from "./AcmeLogo.jsx";
 import router from "next/router.js";
-//import{getUser} from "@/auth/loginCred.js";
-import{getVer , getUser, setUser} from "@/auth";
+import { getVer, getUser, setUser } from "@/auth";
 import { handleLogout } from "@/auth/handleLogout";
 import { title } from "./primitives.js";
 
-
 export default function Nbar() {
 
-    if (getVer() == true){
+  const isAuthenticated = getVer();
 
-        return (
-
-			<Navbar shouldHideOnScroll>
+  return (
+    <Navbar shouldHideOnScroll>
       <NavbarBrand>
-	  <Dropdown backdrop="blur">
-          <DropdownTrigger>
-            <Button
-              variant="bordered"
-              className="mr-12" // Add margin to the right
-            >
-              Menu
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu variant="faded" aria-label="Static Actions">
-            <DropdownItem key="change-password" /*onClick={handleChangePassword}*/>Change Password </DropdownItem>
-            <DropdownItem key="delete" className="text-danger" color="danger" onClick={handleLogout}>
-              Logout
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-        
-
+        {isAuthenticated && (
+          <Dropdown backdrop="blur">
+            <DropdownTrigger>
+              <Button variant="bordered" className="mr-12">Menu</Button>
+            </DropdownTrigger>
+            <DropdownMenu variant="faded" aria-label="Static Actions">
+              <DropdownItem key="change-password">Change Password</DropdownItem>
+              <DropdownItem key="delete" className="text-danger" color="danger" onClick={handleLogout}>
+                Logout
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        )}
         <AcmeLogo />
         <p className="font-bold text-inherit">ECOMMERCE</p>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
-          <Link color="foreground" href="home">
-            Homepage
-          </Link>
+          <Link color="foreground" href="home">Homepage</Link>
         </NavbarItem>
         <NavbarItem isActive>
-          <Link href="productsPage" aria-current="page">
-            Products
-          </Link>
+          <Link href="productsPage" aria-current="page">Products</Link>
         </NavbarItem>
         <NavbarItem>
-          <Link color="foreground" href="#">
-            Integrations
-          </Link>
+          <Link color="foreground" href="#">Integrations</Link>
         </NavbarItem>
         <NavbarItem>
-          <Link color="foreground" href="page">
-            Profile
-          </Link>
+          <Link color="foreground" href="/profile/profile">Profile</Link>
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
+          <Button as={Link} color="primary" href="cart/cartPage" variant="flat">
+            Cart
+          </Button>
         </NavbarItem>
+        {!isAuthenticated && (
+          <>
+            <NavbarItem>
+              <Button as={Link} color="primary" href="login" variant="flat">
+                Login
+              </Button>
+            </NavbarItem>
+            <NavbarItem>
+              <Button as={Link} color="primary" href="register" variant="flat">
+                Register
+              </Button>
+            </NavbarItem>
+          </>
+        )}
       </NavbarContent>
     </Navbar>
-        );
-    } else {
-        return (
-<Navbar shouldHideOnScroll>
-      <NavbarBrand>
-        
-
-        <AcmeLogo />
-        <p className="font-bold text-inherit">ECOMMERCE</p>
-      </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
-          <Link color="foreground" href="home">
-            Homepage
-          </Link>
-        </NavbarItem>
-        <NavbarItem isActive>
-          <Link href="productsPage" aria-current="page">
-            Products
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Integrations
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="/profile/profile">
-            Profile
-          </Link>
-        </NavbarItem>
-      </NavbarContent>
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <Button as={Link} color="primary" href="login" variant="flat">
-            Login
-          </Button>
-          <Button as={Link}  color="primary" href="register" variant="flat">
-            register
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
-    </Navbar> 
-	);
-    }
+  );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
