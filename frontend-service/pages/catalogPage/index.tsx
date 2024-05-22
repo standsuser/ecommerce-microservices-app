@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@nextui-org/react'; // Import button component
+import { Card, CardFooter, Image, Button } from '@nextui-org/react'; // Import Card, CardFooter, Image, and Button components
 import DefaultLayout from '@/layouts/default';
+import { title } from "@/components/primitives";
 
 const CatalogPage: React.FC = () => {
     const [featuredListings, setFeaturedListings] = useState<any[]>([]);
@@ -59,44 +60,58 @@ const CatalogPage: React.FC = () => {
     }, []);
 
     return (
-        <div>
-            <section className="flex flex-col items-center justify-center gap-6 py-8 md:py-10">
-                <div className="max-w-lg text-center">
-                    <h2 className="text-2xl font-bold mb-4">Featured Listings</h2>
-                    <ul className="list-none">
-                        {featuredListings.map((listing, index) => (
-                            <li key={index} className="mb-4">
-                                <img src={listing.imageURL} alt={listing.name} className="w-32 h-32 object-cover mb-2" />
-                                <div>Name: {listing.name}</div>
-                                <div>Rating: {listing.rating}</div>
-                                <div>Price: ${listing.totalPrice}</div>
-                            </li>
-                        ))}
-                    </ul>
-                    <h2 className="text-2xl font-bold mb-4 mt-8">Top Offers</h2>
-                    <ul className="list-none">
-                        {topOffers.map((offer, index) => (
-                            <li key={index} className="mb-4">
-                                <img src={offer.imageURL} alt={offer.name} className="w-32 h-32 object-cover mb-2" />
-                                <div>Name: {offer.name}</div>
-                                <div>Discount Percentage: {offer.discountpercentage}%</div>
-                                <div>Valid Until: {new Date(offer.validityperiod).toLocaleDateString()}</div>
-                                <div>Rating: {offer.rating}</div>
-                                <div>Price: ${offer.totalPrice}</div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <Button
-                    color="primary"
-                    variant="shadow"
-                    onClick={() => {}} // Add functionality if needed
-                    className="mt-8"
-                >
-                    Explore More
-                </Button>
-            </section>
-        </div>
+        <DefaultLayout>
+            <div>
+                <section className="flex flex-col items-center justify-center gap-6 py-8 md:py-10">
+                    <div className="max-w-lg text-center">
+                    <div>
+                        <h1 className={title()}>Welcome to </h1>
+                        <h1 className={title({ color: "violet" })}>Our Website</h1>
+                    </div>                      
+                      <h2 className="text-2xl font-bold mb-4">Featured Listings</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {featuredListings.map((listing, index) => (
+                                <Card key={index} isHoverable>
+                                    <Image src={listing.imageURL} alt={listing.name} width="100%" height={140} />
+                                    <CardFooter>
+                                        <div className="flex flex-col">
+                                            <div><strong>Name:</strong> {listing.name}</div>
+                                            <div><strong>Rating:</strong> {listing.rating}</div>
+                                            <div><strong>Price:</strong> ${listing.totalPrice}</div>
+                                        </div>
+                                    </CardFooter>
+                                </Card>
+                            ))}
+                        </div>
+                        <h2 className="text-2xl font-bold mb-4 mt-8">Top Offers</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {topOffers.map((offer, index) => (
+                                <Card key={index} isHoverable>
+                                    <Image src={offer.imageURL} alt={offer.name} width="100%" height={140} />
+                                    <CardFooter>
+                                        <div className="flex flex-col">
+                                            <div><strong>Name:</strong> {offer.name}</div>
+                                            <div><strong>Discount Percentage:</strong> {offer.discountpercentage}%</div>
+                                            <div><strong>Valid Until:</strong> {new Date(offer.validityperiod).toLocaleDateString()}</div>
+                                            <div><strong>Rating:</strong> {offer.rating}</div>
+                                            <div><strong>Price:</strong> ${offer.totalPrice}</div>
+                                        </div>
+                                    </CardFooter>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                    <Button
+                        color="primary"
+                        variant="shadow"
+                        onClick={() => {}} // Add functionality if needed
+                        className="mt-8"
+                    >
+                        Explore More
+                    </Button>
+                </section>
+            </div>
+        </DefaultLayout>
     );
 };
 
