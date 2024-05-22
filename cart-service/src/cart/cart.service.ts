@@ -95,13 +95,19 @@ export class CartService {
     // Tested :O 
     async getCartItems(userId: string): Promise<any> {
         try {
-            const cart = await this.cartModel.findOne({ userid: userId }).exec();
+            let cart = await this.cartModel.findOne({ userid: userId }).exec();
             if (!cart) {
-                const guestCart = await this.cartModel.findOne({ session_id: userId }).exec();
-                if (!guestCart) {
-                    throw new NotFoundException('Cart not found');
-                }
-                return guestCart.items;
+                cart = new this.cartModel({
+                    userid: userId,
+                    items: [],
+                    total_price_pre_coupon: 0,
+                    total_price_post_coupon: 0,
+                    coupon_code: '',
+                    coupon_percentage: 0,
+                    is_checkout: false,
+                    updated_at: new Date()
+                });
+             
             }
             // console.log(JSON.stringify(cart.items));
             return cart.items;
@@ -311,9 +317,19 @@ export class CartService {
 
     async getItemsFromGuestCart(sessionId: string): Promise<any> {
         try {
-            const cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
+            let cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
             if (!cart) {
-                throw new NotFoundException('Cart not found');
+                cart = new this.cartModel({
+                    session_id: sessionId,
+                    items: [],
+                    total_price_pre_coupon: 0,
+                    total_price_post_coupon: 0,
+                    coupon_code: '',
+                    coupon_percentage: 0,
+                    is_checkout: false,
+                    updated_at: new Date()
+                });
+             
             }
             return cart.items;
         } catch (error) {
