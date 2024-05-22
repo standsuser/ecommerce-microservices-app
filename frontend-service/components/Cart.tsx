@@ -78,7 +78,7 @@ const Cart = () => {
             <p className="cart-item-quantity">Quantity: {item.quantity}</p>
             <p className="cart-item-price">Price: ${(item.amount_cents / 100).toFixed(2)}</p>
             <div className="cart-item-actions">
-              <Button auto color="primary" onClick={() => handleAddOneItem(item.productId)}>
+              <Button color="primary" onClick={() => handleAddOneItem(item.productId)}>
                 Add One
               </Button>
               <Button auto color="error" onClick={() => handleRemoveOneItem(item.productId)}>
@@ -99,7 +99,7 @@ const Cart = () => {
           value={couponCode}
           onChange={(e) => setCouponCode(e.target.value)}
         />
-        <Button auto color="primary" onClick={handleApplyCoupon}>
+        <Button color="primary" onClick={handleApplyCoupon}>
           Apply
         </Button>
         <p className="cart-total-price">Total Price: ${totalPrice.toFixed(2)}</p>

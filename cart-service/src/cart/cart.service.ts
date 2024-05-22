@@ -387,88 +387,130 @@ export class CartService {
             return guestCart;
         }
     }
-    async addOneItem(userId: string, productId: string): Promise<Cart> {
+    // async addItemToCart(userId: string, addItemDto: AddToCartDto, productId: string): Promise<Cart> {
+    //     let cart = await this.cartModel.findOne({ userid: userId }).exec();
+
+    //     if (!cart) {
+    //         cart = new this.cartModel({ userid: userId, items: [] });
+    //     }
+
+    //     const quantity = addItemDto.quantity || 1;
+
+    //     if (isNaN(quantity) || quantity <= 0) {
+    //         throw new BadRequestException('Invalid quantity');
+    //     }
+
+    //     if (isNaN(addItemDto.amount_cents) || addItemDto.amount_cents <= 0) {
+    //         throw new BadRequestException('Invalid amount_cents');
+    //     }
+
+    //     const existingItem = cart.items.find(item => item.productId.toString() === productId);
+
+    //     if (existingItem) {
+    //         existingItem.quantity += quantity;
+    //         cart.markModified('items');
+    //     } else {
+    //         cart.items.push({
+    //             productId: productId,
+    //             rentalDuration: addItemDto.rentalDuration || 'N/A',
+    //             isRented: addItemDto.isRented ?? false,
+    //             name: addItemDto.name,
+    //             amount_cents: addItemDto.amount_cents,
+    //             description: addItemDto.description,
+    //             color: addItemDto.color,
+    //             size: addItemDto.size,
+    //             material: addItemDto.material,
+    //             quantity: quantity,
+    //         });
+    //     }
+
+    //     cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+    //     if (isNaN(cart.total_price_pre_coupon)) {
+    //         throw new BadRequestException('Invalid total price calculation');
+    //     }
+
+    //     await cart.save();
+
+    //     return cart;
+    // }
+
+    // async removeItemFromCart(userId: string, productId: string): Promise<Cart> {
+    //     const cart = await this.cartModel.findOne({ userid: userId }).exec();
+
+    //     if (!cart) {
+    //         throw new NotFoundException('Cart not found');
+    //     }
+
+    //     const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+
+    //     if (itemIndex === -1) {
+    //         throw new NotFoundException('Item not found in cart');
+    //     }
+
+    //     cart.items.splice(itemIndex, 1);
+
+    //     cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+    //     if (isNaN(cart.total_price_pre_coupon)) {
+    //         throw new BadRequestException('Invalid total price calculation');
+    //     }
+
+    //     cart.markModified('items');
+    //     await cart.save();
+    //     return cart;
+    // }
+
+    async increaseItemQuantity(userId: string, productId: string): Promise<Cart> {
         const cart = await this.cartModel.findOne({ userid: userId }).exec();
+
         if (!cart) {
             throw new NotFoundException('Cart not found');
         }
 
-        const item = cart.items.find(item => item.productId.toString() === productId);
-        if (!item) {
+        const existingItem = cart.items.find(item => item.productId.toString() === productId);
+        if (!existingItem) {
             throw new NotFoundException('Item not found in cart');
         }
 
-        item.quantity += 1;
+        existingItem.quantity += 1;
         cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
 
+        if (isNaN(cart.total_price_pre_coupon)) {
+            throw new BadRequestException('Invalid total price calculation');
+        }
+
+        cart.markModified('items');
         await cart.save();
         return cart;
     }
 
-    async removeOneItem(userId: string, productId: string): Promise<Cart> {
+    async decreaseItemQuantity(userId: string, productId: string): Promise<Cart> {
         const cart = await this.cartModel.findOne({ userid: userId }).exec();
+
         if (!cart) {
             throw new NotFoundException('Cart not found');
         }
 
-        const item = cart.items.find(item => item.productId.toString() === productId);
-        if (!item) {
+        const existingItem = cart.items.find(item => item.productId.toString() === productId);
+        if (!existingItem) {
             throw new NotFoundException('Item not found in cart');
         }
 
-        if (item.quantity > 1) {
-            item.quantity -= 1;
+        if (existingItem.quantity > 1) {
+            existingItem.quantity -= 1;
         } else {
-            throw new BadRequestException('Item quantity cannot be less than one');
+            cart.items = cart.items.filter(item => item.productId.toString() !== productId);
         }
 
         cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
 
-        await cart.save();
-        return cart;
-    }
-
-    // Methods for guest cart (similar to above)
-    async addOneItemGuest(sessionId: string, productId: string): Promise<Cart> {
-        const cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
-        if (!cart) {
-            throw new NotFoundException('Cart not found');
+        if (isNaN(cart.total_price_pre_coupon)) {
+            throw new BadRequestException('Invalid total price calculation');
         }
 
-        const item = cart.items.find(item => item.productId.toString() === productId);
-        if (!item) {
-            throw new NotFoundException('Item not found in cart');
-        }
-
-        item.quantity += 1;
-        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
-
-        await cart.save();
-        return cart;
-    }
-
-    async removeOneItemGuest(sessionId: string, productId: string): Promise<Cart> {
-        const cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
-        if (!cart) {
-            throw new NotFoundException('Cart not found');
-        }
-
-        const item = cart.items.find(item => item.productId.toString() === productId);
-        if (!item) {
-            throw new NotFoundException('Item not found in cart');
-        }
-
-        if (item.quantity > 1) {
-            item.quantity -= 1;
-        } else {
-            throw new BadRequestException('Item quantity cannot be less than one');
-        }
-
-        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
-
+        cart.markModified('items');
         await cart.save();
         return cart;
     }
 }
-
-
