@@ -45,16 +45,16 @@ export const applyCoupon = async (sessionId: string, couponCode: string) => {
   return response.json();
 };
 
-export const createOrder = async (userId: string, shipping_data: string) => {
+export const createOrder = async (userId: string, shippingData: any) => {
   const response = await fetch(`${API_URL}/cart/${userId}/createOrder`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ shipping_data: shipping_data }),
+    body: JSON.stringify({ shipping_data: shippingData }),
   });
   if (!response.ok) {
-    throw new Error('Failed to register order');
+    throw new Error('Failed to create order');
   }
   return response.json();
 };

@@ -159,20 +159,20 @@ export class CartController {
     }
 
     @Put('/guest/:sessionId/update-quantity/:productId')
-  async updateGuestItemQuantity(
-    @Param('sessionId') sessionId: string,
-    @Param('productId') productId: string,
-    @Body('quantity') quantity: number,
-  ): Promise<Cart> {
-    try {
-      return await this.cartService.updateGuestItemQuantity(sessionId, productId, quantity);
-    } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
-        throw new BadRequestException(error.message);
-      }
-      throw error;
+    async updateGuestItemQuantity(
+        @Param('sessionId') sessionId: string,
+        @Param('productId') productId: string,
+        @Body('quantity') quantity: number,
+    ): Promise<Cart> {
+        try {
+            return await this.cartService.updateGuestItemQuantity(sessionId, productId, quantity);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
     }
-  }
 
     @Delete('/guest/:sessionId/remove-item/:productId')
     async removeItemFromGuestCart(
@@ -191,8 +191,14 @@ export class CartController {
 
     @Post('convert-guest-to-user')
     async convertGuestToUser(@Body() convertGuestToUserDto: ConvertGuestToUserDto): Promise<Cart> {
-        const { userId, sessionId } = convertGuestToUserDto;
-        return this.cartService.convertGuestToUser(userId, sessionId);
+      const { userId, sessionId } = convertGuestToUserDto;
+      try {
+        return await this.cartService.convertGuestToUser(userId, sessionId);
+      } catch (error) {
+        if (error instanceof NotFoundException || error instanceof BadRequestException) {
+          throw new BadRequestException(error.message);
+        }
+        throw error;
+      }
     }
-    
 }

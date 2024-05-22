@@ -76,35 +76,39 @@
   gap: 10px;
 }
 
-.cart-shipping {
+.cart-total-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.shipping-form {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.cart-total {
+.shipping-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.shipping-form h2 {
+  margin-bottom: 10px;
+}
+
+button.place-order {
   margin-top: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.cart-total-price {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-.cart-total button {
-  padding: 10px 20px;
-  cursor: pointer;
-  border: none;
   background-color: #28a745;
   color: white;
+  padding: 10px 20px;
+  border: none;
   border-radius: 4px;
+  cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.cart-total button:hover {
+button.place-order:hover {
   background-color: #218838;
 }

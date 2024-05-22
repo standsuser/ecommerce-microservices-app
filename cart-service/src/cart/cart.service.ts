@@ -8,6 +8,7 @@ import { UpdateCartItemDto } from './dto/updatecartitem.dto';
 import { Order, OrderStatus } from './schema/order.schema';
 import { ConsumerService } from '../kafka/consumer.service';
 import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class CartService {
@@ -344,29 +345,15 @@ export class CartService {
     async convertGuestToUser(userId: string, sessionId: string): Promise<Cart> {
         const guestCart = await this.cartModel.findOne({ session_id: sessionId }).exec();
         if (!guestCart) {
-            throw new NotFoundException('Guest cart not found');
+          throw new NotFoundException('Guest cart not found');
         }
-
-        let userCart = await this.cartModel.findOne({ userid: userId }).exec();
-        if (userCart) {
-            guestCart.items.forEach(guestItem => {
-                const existingItemIndex = userCart.items.findIndex(item => item.productId.toString() === guestItem.productId.toString());
-                if (existingItemIndex !== -1) {
-                    userCart.items[existingItemIndex].quantity += guestItem.quantity;
-                } else {
-                    userCart.items.push(guestItem);
-                }
-            });
-            await userCart.save();
-            await this.cartModel.deleteOne({ session_id: sessionId }).exec();
-            return userCart;
-        } else {
-            guestCart.userid = new Types.ObjectId(userId);
-            guestCart.session_id = null;
-            await guestCart.save();
-            return guestCart;
-        }
-    }
+    
+        guestCart.userid = new Types.ObjectId(userId);
+        guestCart.session_id = null;
+        await guestCart.save();
+    
+        return guestCart;
+      }
 
     async updateItemQuantity(userId: string, productId: string, quantityChange: number): Promise<Cart> {
         const cart = await this.cartModel.findOne({ userid: userId }).exec();
@@ -399,31 +386,31 @@ export class CartService {
     }
     async updateGuestItemQuantity(sessionId: string, productId: string, quantityChange: number): Promise<Cart> {
         const cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
-    
+
         if (!cart) {
-          throw new NotFoundException('Cart not found');
+            throw new NotFoundException('Cart not found');
         }
-    
+
         const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
         if (itemIndex === -1) {
-          throw new NotFoundException('Item not found in cart');
+            throw new NotFoundException('Item not found in cart');
         }
-    
+
         const item = cart.items[itemIndex];
         item.quantity += quantityChange;
-    
+
         if (item.quantity <= 0) {
-          cart.items.splice(itemIndex, 1);
+            cart.items.splice(itemIndex, 1);
         }
-    
+
         cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
-    
+
         if (isNaN(cart.total_price_pre_coupon)) {
-          throw new BadRequestException('Invalid total price calculation');
+            throw new BadRequestException('Invalid total price calculation');
         }
-    
+
         cart.markModified('items');
         await cart.save();
         return cart;
-      }
+    }
 }

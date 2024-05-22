@@ -1,11 +1,9 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class ConvertGuestToUserDto {
-  @IsNotEmpty()
   @IsString()
-  userId: string;
+  readonly userId: string;
 
-  @IsNotEmpty()
   @IsString()
-  sessionId: string;
+  readonly sessionId: string;
 }
