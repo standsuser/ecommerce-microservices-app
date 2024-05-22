@@ -1,6 +1,3 @@
-/* eslint-disable prettier/prettier */
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -19,7 +16,7 @@ export class CatalogService implements OnModuleInit {
   async onModuleInit() {
     // Consume 'featured' and 'topoffer' topics
     await this.consumerService.consume(
-        { topics: ['featured', 'topoffer'], fromBeginning: true },
+        { topics: ['featured', 'topoffer'] },
         {
             eachMessage: async ({ topic, partition, message }) => {
                 try {

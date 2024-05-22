@@ -25,7 +25,7 @@ async function run() {
       products.push({
         name: `Product ${i}`,
         description: `Description ${i}`,
-        imageURL: [`http://example.com/image${i}.jpg`],
+        imageURL: [`https://nextui.org/images/hero-card.jpeg`],
         availability: true,
         discountpercentage: 0,
         categoryId: categoryResult.insertedIds[0], // reference to a category
