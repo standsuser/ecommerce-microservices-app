@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from '@nextui-org/link';
-import { button as buttonStyles } from '@nextui-org/theme';
+import { button as buttonStyles, user } from '@nextui-org/theme';
 import DefaultLayout from '@/layouts/default';
 import { Input } from "@nextui-org/react";
 import router from 'next/router';
-import { setUser, setVer } from '@/auth';
+import {  setUser, setVer } from '@/auth';
 import { Console } from 'console';
 
 interface LoginResponse {

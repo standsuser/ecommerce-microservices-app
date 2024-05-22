@@ -3,17 +3,28 @@ import { getUser } from ".";
 
 export const handleLogout = async () => {
     const user = getUser();
+
+    
     try {
-        const response = await fetch('http://localhost:3000/auth/logout', {
-            method: 'POST',
+        const responsegetUserbyID = await fetch('http://localhost:3080/auth/getUserbyID', {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ user }),
+            credentials: 'include',
+        });
+
+        console.log(responsegetUserbyID);
+
+        const response = await fetch('http://localhost:3080/auth/logout', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ responsegetUserbyID }),
             credentials: 'include',
             
         });
-        console.log(getUser());
         if (response.ok) {
             console.log('Logout successful');
             setTimeout(() => {

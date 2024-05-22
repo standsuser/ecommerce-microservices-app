@@ -42,6 +42,7 @@ export class CreateUserDto {
   readonly state: string;
 
   
+// hash password
   readonly password: string;
 
   

@@ -11,11 +11,11 @@ export class ExistsStrategy extends PassportStrategy(Strategy, 'exists'){
 constructor(private readonly identityService:UserService){
     super();
 }
-async validate(username:string, password:string):Promise<any>{
+async validate(username:string, password:string , check:boolean):Promise<any>{
     console.log(username,password);
 
     var loginDto:LoginDto ={
-        username,password
+        username,password,check
     }
     const user = await this.identityService.getUserbyUsername(username);
 
@@ -25,6 +25,7 @@ async validate(username:string, password:string):Promise<any>{
     return {
         username:username,
         pasword:password,
+        check:check
     };
 }
 }

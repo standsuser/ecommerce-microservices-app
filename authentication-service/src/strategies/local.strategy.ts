@@ -10,11 +10,11 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local'){
 constructor(private readonly userService:UserService){
     super();
 }
-async validate(username:string, password:string):Promise<any>{
+async validate(username:string, password:string , check : boolean):Promise<any>{
     console.log('validate:' ,username,password);
 
     var loginDto:LoginDto ={
-        username,password
+        username,password,check
     }
     const user = await this.userService.validateUser(loginDto);
 

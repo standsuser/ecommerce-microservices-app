@@ -21,6 +21,10 @@ import { async } from 'rxjs';
 import { ProducerService } from 'src/kafka/producer.service';
 
 
+const bcrypt = require("bcrypt");
+
+
+
 
 @Injectable()
 export class UserService {
@@ -53,7 +57,6 @@ export class UserService {
     async validateUser(loginDto: LoginDto) {
         let loginResult = await this.userModel.findOne({
             username: loginDto.username,
-            password: loginDto.password,
         });
 
         if (loginResult === null) {
@@ -160,6 +163,7 @@ export class UserService {
     // }
 
     async login(LoginDto: LoginDto) {
+
         const user = await this.validateUser(LoginDto);
         if (!user) {
             throw new NotFoundException('User not found');
@@ -198,14 +202,7 @@ export class UserService {
         return updatedUser;
     }
 
-    async logout(userID: string) {
-        const user = await this.getUserbyID(userID);
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-
-        return user;
-    }
+    
     validateToken(jwt: string) {
         const validatedToken = this.jwtService.sign(jwt);
         return validatedToken;
@@ -285,8 +282,33 @@ export class UserService {
         }
       
         // Create a new User document using the Mongoose model
-        const newUser = new this.userModel(createUserDto);
-      
+        // const newUser = new this.userModel(createUserDto);
+
+        //hash the password
+
+
+
+        const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+        const newUser = new this.userModel({
+          first_name: createUserDto.first_name,
+          last_name: createUserDto.last_name,
+          email: createUserDto.email,
+          phonenumber: createUserDto.phonenumber,
+          company: createUserDto.company,
+          apartment: createUserDto.apartment,
+          floor: createUserDto.floor,
+          street: createUserDto.street,
+          building: createUserDto.building,
+          postal_code: createUserDto.postal_code,
+          extra_description: createUserDto.extra_description,
+          city: createUserDto.city,
+          country: createUserDto.country,
+          addresslabel: createUserDto.addresslabel,
+          state: createUserDto.state,
+          password: hashedPassword,
+        });
+
         Logger.log(newUser);
         // Save the new user
         const savedUser = await newUser.save() as User;

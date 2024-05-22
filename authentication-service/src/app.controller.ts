@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Logger, Post, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Logger, Param, Post, Put } from '@nestjs/common';
 
 import { AppService } from './app.service';
 import { Roles } from './decorators/role.decorator';
@@ -8,6 +8,9 @@ import { SessionService } from "./session/session.service";
 import {LoginDto} from './dto/login.dto';
 import { get } from 'http';
 import { response } from 'express';
+
+const bcrypt = require("bcrypt");
+
 
 
 @Controller('auth')
@@ -30,15 +33,11 @@ export class AppController {
   async register(@Body() createUserDto: CreateUserDto): Promise<any> {
     try {
       // Basic validation to ensure required fields are provided
+
       if (!createUserDto.email || !createUserDto.password) {
         throw new BadRequestException('email and password are required');
       }
-
       // Check if additional required fields are provided
-      
-    
-      
-
       // Register user using the provided DTO
       const newUser = await this.userService.register(createUserDto);
 
@@ -60,6 +59,11 @@ export class AppController {
         return { success: false, message: "Wrong Email or Password or User already logged in"  , response};
       }if(!val){
       try {
+        const passwordMatch = await bcrypt.compare( user.password , getIdc.password);
+      if (!passwordMatch) {
+        return { success: false, message: "Wrong Email or Password"  };
+      }
+
       const response = await this.userService.login(user);
       const session = await this.sessionService.createSession(response.userID,response.access_token);
       return { success: true, response , session };
@@ -127,7 +131,7 @@ export class AppController {
     }
   }
 
-  @Post('logout')
+  @Delete('logout')
   async logout(@Body() userID: any): Promise<any> {
     try {
       // Attempt to logout user
@@ -141,6 +145,14 @@ export class AppController {
       return { success: false, message: error }; // Return error response
     }
   }
+
+  
+
+  @Get('/getUserbyID/:userId')
+    async getProfile(@Param('userId') userId: string) {
+      return await this.userService.getUserbyID(userId);
+    }
+
   
 
 

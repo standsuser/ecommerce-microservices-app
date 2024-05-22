@@ -7,6 +7,7 @@ import { MessagePattern } from '@nestjs/microservices';
 import { LocalAuthGuard } from '../strategies/local-auth.guard';
 import { JwtAuthGuard } from '../strategies/jwt-auth.guard';
 import { ExistsAuthGuard } from '../strategies/exists-auth.guard';
+import { get } from 'http';
 //import { Post } from '@nestjs/common';
 
 @Controller()
@@ -42,14 +43,7 @@ export class UserController {
         );
     }
 
-    @MessagePattern('logout')
-    async logout(command){
-        console.log('command user: ', command.user);
-        return this.userService.logout({
-            ...command.userID
-        }
-        );
-    }
+    
 
     @MessagePattern('change-password')
     async changePassword(command){
@@ -75,6 +69,11 @@ export class UserController {
        catch(err){
         return false;
        }
+    }
+
+    @MessagePattern('getUserbyID')
+    async getUserbyID(command){
+        return this.userService.getUserbyID(command.userID);
     }
 
     

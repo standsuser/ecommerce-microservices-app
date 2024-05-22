@@ -67,6 +67,7 @@ async findSessionByGuestId(guestID: string) {
 
 async deleteSession(userID: string) {
     const session = await this.findSessionByUserId(userID);
+    Logger.log(session)
     if (session) {
         await this.sessionModel.findByIdAndDelete(session._id)
         return "Session deleted successfully";

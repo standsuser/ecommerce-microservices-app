@@ -4,12 +4,14 @@
 export class LoginDto{
     readonly username: String;
     readonly password: String; 
+    readonly check: boolean;
 
     toString(){
         return JSON.stringify({
             
             username:this.username,
-            password:this.password}
+            password:this.password,
+            check:this.check}
         );
     }
 }
