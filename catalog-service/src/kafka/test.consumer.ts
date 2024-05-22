@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { ConsumerService } from "./consumer.service";
 

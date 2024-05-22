@@ -5,6 +5,7 @@ import router from "next/router.js";
 //import{getUser} from "@/auth/loginCred.js";
 import{getVer , getUser, setUser} from "@/auth";
 import { handleLogout } from "@/auth/handleLogout";
+import { title } from "./primitives.js";
 
 
 export default function Nbar() {
@@ -34,7 +35,7 @@ export default function Nbar() {
         
 
         <AcmeLogo />
-        <p className="font-bold text-inherit">ZANATY</p>
+        <p className="font-bold text-inherit">ECOMMERCE</p>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
@@ -50,6 +51,11 @@ export default function Nbar() {
         <NavbarItem>
           <Link color="foreground" href="#">
             Integrations
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="page">
+            Profile
           </Link>
         </NavbarItem>
       </NavbarContent>
@@ -66,7 +72,7 @@ export default function Nbar() {
         
 
         <AcmeLogo />
-        <p className="font-bold text-inherit">ZANATY</p>
+        <p className="font-bold text-inherit">ECOMMERCE</p>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
@@ -84,11 +90,19 @@ export default function Nbar() {
             Integrations
           </Link>
         </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="/profile/profile">
+            Profile
+          </Link>
+        </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
           <Button as={Link} color="primary" href="login" variant="flat">
             Login
+          </Button>
+          <Button as={Link}  color="primary" href="register" variant="flat">
+            register
           </Button>
         </NavbarItem>
       </NavbarContent>

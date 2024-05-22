@@ -1,4 +1,6 @@
 /* eslint-disable prettier/prettier */
+
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 //import { MicroserviceOptions, Transport } from '@nestjs/microservices';

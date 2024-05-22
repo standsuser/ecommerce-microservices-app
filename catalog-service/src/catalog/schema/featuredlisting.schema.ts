@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 // featuredlisting.schema.ts
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';

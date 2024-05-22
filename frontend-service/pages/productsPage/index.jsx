@@ -1,4 +1,7 @@
 import React from "react";
+import Link from 'next/link';
+import { button as buttonStyles } from '@nextui-org/theme';
+
 import { Card, CardFooter, Image, Button } from "@nextui-org/react";
 import DefaultLayout from "@/layouts/default";
 
@@ -28,8 +31,10 @@ export default function App() {
               </Button>
             </CardFooter>
           </Card>
+          
         ))}
       </div>
-    </DefaultLayout>
+     
+         </DefaultLayout>
   );
 }
