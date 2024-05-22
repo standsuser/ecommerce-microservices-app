@@ -19,6 +19,9 @@ export class Product extends Document {
   @Prop({ default: 0 })
   discountpercentage: number;
 
+  @Prop({ default: null })
+  validityperiod: Date;
+
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category' })
   categoryId: MongooseSchema.Types.ObjectId;
 

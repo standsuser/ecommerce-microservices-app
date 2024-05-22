@@ -80,6 +80,7 @@ const CatalogPage: React.FC = () => {
                                 <img src={offer.imageURL} alt={offer.name} className="w-32 h-32 object-cover mb-2" />
                                 <div>Name: {offer.name}</div>
                                 <div>Discount Percentage: ${offer.discountpercentage}</div>
+                                <div>Valid Until: {new Date(offer.validityperiod).toLocaleDateString()}</div>
                                 <div>Rating: {offer.rating}</div>
                                 <div>Price: ${offer.totalPrice}</div>
                             </li>
