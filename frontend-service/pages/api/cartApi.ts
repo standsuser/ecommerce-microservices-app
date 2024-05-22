@@ -8,13 +8,13 @@ export const getCartItems = async (sessionId: string) => {
   return response.json();
 };
 
-export const addItemToCart = async (sessionId: string, productId: string, addItemDto: any) => {
+export const addOneItem = async (sessionId: string, productId: string) => {
   const response = await fetch(`${API_URL}/cart/guest/${sessionId}/add-item/${productId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(addItemDto),
+    body: JSON.stringify({ quantity: 1, amount_cents: 1000 }), // Adjust the amount_cents based on your product data
   });
   if (!response.ok) {
     throw new Error('Failed to add item to cart');
@@ -22,7 +22,7 @@ export const addItemToCart = async (sessionId: string, productId: string, addIte
   return response.json();
 };
 
-export const removeItemFromCart = async (sessionId: string, productId: string) => {
+export const removeOneItem = async (sessionId: string, productId: string) => {
   const response = await fetch(`${API_URL}/cart/guest/${sessionId}/remove-item/${productId}`, {
     method: 'DELETE',
   });
@@ -41,26 +41,6 @@ export const applyCoupon = async (sessionId: string, couponCode: string) => {
   });
   if (!response.ok) {
     throw new Error('Failed to apply coupon');
-  }
-  return response.json();
-};
-
-export const addOneItem = async (sessionId: string, productId: string) => {
-  const response = await fetch(`${API_URL}/cart/guest/${sessionId}/add-one/${productId}`, {
-    method: 'POST',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to add one item');
-  }
-  return response.json();
-};
-
-export const removeOneItem = async (sessionId: string, productId: string) => {
-  const response = await fetch(`${API_URL}/cart/guest/${sessionId}/remove-one/${productId}`, {
-    method: 'POST',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to remove one item');
   }
   return response.json();
 };

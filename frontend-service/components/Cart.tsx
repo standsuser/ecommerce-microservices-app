@@ -81,8 +81,8 @@ const Cart = () => {
               <Button color="primary" onClick={() => handleAddOneItem(item.productId)}>
                 Add One
               </Button>
-              <Button auto color="error" onClick={() => handleRemoveOneItem(item.productId)}>
-                Remove One
+              <Button color="danger" onClick={() => handleRemoveOneItem(item.productId)}>
+                Remove
               </Button>
             </div>
           </div>
