@@ -1,12 +1,37 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const getCartItems = async (sessionId: string) => {
-  const response = await fetch(`${API_URL}/cart/guest/${sessionId}/items`);
+export const getCartItems = async (identifier: string, isUser: boolean) => {
+  let url = isUser 
+    ? `${API_URL}/cart/items/${identifier}` 
+    : `${API_URL}/cart/guest/${identifier}/items`;
+
+  let response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok && isUser && response.status === 404) {
+    // Try fetching guest cart if user cart not found
+    url = `${API_URL}/cart/guest/${identifier}/items`;
+    response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+  }
+
   if (!response.ok) {
     throw new Error('Failed to fetch cart items');
   }
+
   return response.json();
 };
+
 
 export const addItemToCart = async (sessionId: string, productId: string, addItemDto: any) => {
   const response = await fetch(`${API_URL}/cart/guest/${sessionId}/add-item/${productId}`, {

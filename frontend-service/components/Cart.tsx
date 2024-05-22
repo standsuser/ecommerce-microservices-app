@@ -9,7 +9,7 @@ const Cart = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState<string>('');
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const [userId, setUserId] = useState<string>('exampleUserId'); // Replace with actual user ID retrieval logic
+  const [userId, setUserId] = useState<string | null>(null); // Replace with actual user ID retrieval logic
   const [shippingData, setShippingData] = useState<any>({
     apartment: '',
     email: '',
@@ -42,15 +42,23 @@ const Cart = () => {
 
   useEffect(() => {
     const fetchCartItems = async () => {
-      if (sessionId) {
-        const items = await getCartItems(sessionId);
-        setCartItems(items);
-        calculateTotalPrice(items);
+      try {
+        if (userId) {
+          const items = await getCartItems(userId, true);
+          setCartItems(items);
+          calculateTotalPrice(items);
+        } else if (sessionId) {
+          const items = await getCartItems(sessionId, false);
+          setCartItems(items);
+          calculateTotalPrice(items);
+        }
+      } catch (error) {
+        console.error('Failed to fetch cart items:', error);
       }
     };
 
     fetchCartItems();
-  }, [sessionId]);
+  }, [userId, sessionId]);
 
   const calculateTotalPrice = (items: any) => {
     const total = items.reduce((acc: number, item: any) => acc + (item.amount_cents * item.quantity), 0) / 100;
@@ -82,6 +90,10 @@ const Cart = () => {
   };
 
   const handlePlaceOrder = async () => {
+    if (!userId) {
+      alert('User is not logged in');
+      return;
+    }
     try {
       const order = await createOrder(userId, shippingData);
       alert('Order placed successfully');
@@ -123,7 +135,7 @@ const Cart = () => {
               <Button color="primary" onClick={() => handleAddItem(item.productId)}>
                 Add One
               </Button>
-              <Button color="danger" onClick={() => handleRemoveItem(item.productId)}>
+              <Button color="primary" onClick={() => handleRemoveItem(item.productId)}>
                 Remove One
               </Button>
             </div>
