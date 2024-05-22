@@ -1,3 +1,81 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.cart-container {
+    padding: 20px;
+  }
+  
+  .cart-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .cart-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .cart-item {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .cart-item-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .cart-item-name {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .cart-item-description,
+  .cart-item-details,
+  .cart-item-quantity,
+  .cart-item-price {
+    margin: 5px 0;
+  }
+  
+  .cart-item-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .cart-item-actions button {
+    padding: 5px 10px;
+    cursor: pointer;
+    border: none;
+    background-color: #0070f3;
+    color: white;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .cart-item-actions button:hover {
+    background-color: #005bb5;
+  }
+  
+  .cart-coupon {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .cart-total-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }

@@ -47,7 +47,7 @@ export class CartController {
     async getCartInfo(@Param('userId') userId: string): Promise<any> {
         return this.cartService.getCartInfo(userId);
     }
-    
+
     @Get('items/:userId')
     async getCartItems(@Param('userId') userId: string) {
         try {
@@ -110,7 +110,7 @@ export class CartController {
     ): Promise<Cart> {
         return this.cartService.applyCouponCode(userId, couponCode);
     }
-    
+
     @Post(':userId/createOrder')
     async createOrder(
         @Param('userId') userId: string,
@@ -210,7 +210,65 @@ export class CartController {
             throw error;
         }
     }
+    @Post('/:userId/add-one/:productId')
+    async addOneItem(
+        @Param('userId') userId: string,
+        @Param('productId') productId: string,
+    ): Promise<Cart> {
+        try {
+            return await this.cartService.addOneItem(userId, productId);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
+    }
 
+    @Post('/:userId/remove-one/:productId')
+    async removeOneItem(
+        @Param('userId') userId: string,
+        @Param('productId') productId: string,
+    ): Promise<Cart> {
+        try {
+            return await this.cartService.removeOneItem(userId, productId);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
+    }
+
+    @Post('/guest/:sessionId/add-one/:productId')
+    async addOneItemGuest(
+        @Param('sessionId') sessionId: string,
+        @Param('productId') productId: string,
+    ): Promise<Cart> {
+        try {
+            return await this.cartService.addOneItemGuest(sessionId, productId);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
+    }
+
+    @Post('/guest/:sessionId/remove-one/:productId')
+    async removeOneItemGuest(
+        @Param('sessionId') sessionId: string,
+        @Param('productId') productId: string,
+    ): Promise<Cart> {
+        try {
+            return await this.cartService.removeOneItemGuest(sessionId, productId);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                throw new BadRequestException(error.message);
+            }
+            throw error;
+        }
+    }
     @Post('convert-guest-to-user')
     async convertGuestToUser(
         @Body() convertGuestToUserDto: ConvertGuestToUserDto,
