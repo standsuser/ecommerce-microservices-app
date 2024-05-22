@@ -4,7 +4,7 @@ import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class TaskService implements OnModuleInit {
-    constructor(private readonly productService: ProductService) {}
+    constructor(private readonly productService: ProductService) { }
 
     onModuleInit() {
         console.log('onModuleInit called');

@@ -62,6 +62,7 @@ const CatalogPage: React.FC = () => {
     return (
         <DefaultLayout>
             <div>
+               
                 <section className="flex flex-col items-center justify-center gap-6 py-8 md:py-10">
                     <div className="max-w-lg text-center">
                     <div>
@@ -109,6 +110,7 @@ const CatalogPage: React.FC = () => {
                     >
                         Explore More
                     </Button>
+                
                 </section>
             </div>
         </DefaultLayout>

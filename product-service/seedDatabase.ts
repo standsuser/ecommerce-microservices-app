@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { MongoClient, ObjectId } from 'mongodb';
 
 const url = 'mongodb://localhost:27018';
