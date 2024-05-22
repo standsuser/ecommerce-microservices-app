@@ -7,6 +7,21 @@ const CatalogPage: React.FC = () => {
     const [topOffers, setTopOffers] = useState<any[]>([]);
 
     useEffect(() => {
+        const fetchProductDetails = async (productId: string) => {
+            try {
+                const response = await fetch(`http://localhost:3000/product/${productId}`, {
+                    method: 'GET',
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch product details');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching details for product ID ${productId}:`, error);
+                return null;
+            }
+        };
+
         const fetchFeaturedListings = async () => {
             try {
                 const response = await fetch('http://localhost:3001/catalog/featured', {
@@ -15,11 +30,9 @@ const CatalogPage: React.FC = () => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch featured listings');
                 }
-                
                 const data = await response.json();
-                console.log(data);
-                setFeaturedListings(data);
-
+                const detailedListings = await Promise.all(data.map((listing: any) => fetchProductDetails(listing.productId)));
+                setFeaturedListings(detailedListings.filter((listing: any) => listing !== null));
             } catch (error) {
                 console.error('Error fetching featured listings:', error);
             }
@@ -34,11 +47,8 @@ const CatalogPage: React.FC = () => {
                     throw new Error('Failed to fetch top offers');
                 }
                 const data = await response.json();
-                console.log(data);
-
-                setTopOffers(data);
-                console.log(response)
-
+                const detailedOffers = await Promise.all(data.map((offer: any) => fetchProductDetails(offer.productId)));
+                setTopOffers(detailedOffers.filter((offer: any) => offer !== null));
             } catch (error) {
                 console.error('Error fetching top offers:', error);
             }
@@ -57,9 +67,9 @@ const CatalogPage: React.FC = () => {
                         {featuredListings.map((listing, index) => (
                             <li key={index} className="mb-4">
                                 <img src={listing.imageURL} alt={listing.name} className="w-32 h-32 object-cover mb-2" />
-                                <div>name: {listing.name}</div>
+                                <div>Name: {listing.name}</div>
                                 <div>Rating: {listing.rating}</div>
-                                <div>Price: ${listing.price}</div>
+                                <div>Price: ${listing.totalPrice}</div>
                             </li>
                         ))}
                     </ul>
@@ -68,9 +78,10 @@ const CatalogPage: React.FC = () => {
                         {topOffers.map((offer, index) => (
                             <li key={index} className="mb-4">
                                 <img src={offer.imageURL} alt={offer.name} className="w-32 h-32 object-cover mb-2" />
-                                <div> name: {offer.name}</div>
+                                <div>Name: {offer.name}</div>
+                                <div>Discount Percentage: ${offer.discountpercentage}</div>
                                 <div>Rating: {offer.rating}</div>
-                                <div>Price: ${offer.price}</div>
+                                <div>Price: ${offer.totalPrice}</div>
                             </li>
                         ))}
                     </ul>
