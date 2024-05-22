@@ -3,25 +3,24 @@ import { getUser } from ".";
 
 export const handleLogout = async () => {
     const user = getUser();
-
     
     try {
-        const responsegetUserbyID = await fetch('http://localhost:3080/auth/getUserbyID', {
+        const responsegetUserbyID = await fetch(`http://localhost:3080/auth/getUserbyID/${user}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include',
         });
 
-        console.log(responsegetUserbyID);
+        const data = await responsegetUserbyID.json();
+        console.log(data);
 
         const response = await fetch('http://localhost:3080/auth/logout', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ responsegetUserbyID }),
+            body: JSON.stringify({ data }),
             credentials: 'include',
             
         });
@@ -36,7 +35,7 @@ export const handleLogout = async () => {
             console.log(response);
         }
     } catch (error) {
-        console.log(error);
+        console.log("Error " , error);
     }
   };
 

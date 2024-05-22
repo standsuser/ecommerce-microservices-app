@@ -7,25 +7,23 @@ import { LoginDto } from "../dto/login.dto";
 import { UserAlreadyExistsException } from "../exceptions/userAlreadyExists.exception";
 
 @Injectable()
-export class ExistsStrategy extends PassportStrategy(Strategy, 'exists'){
-constructor(private readonly identityService:UserService){
-    super();
-}
-async validate(username:string, password:string , check:boolean):Promise<any>{
-    console.log(username,password);
+export class ExistsStrategy extends PassportStrategy(Strategy, 'exists') {
+  constructor(private readonly userService: UserService) {
+    super({
+      usernameField: 'email',
+      passwordField: 'password',
+    });
+  }
 
-    var loginDto:LoginDto ={
-        username,password,check
-    }
-    const user = await this.identityService.getUserbyUsername(username);
+  async validate(email: string, password: string, check: boolean): Promise<any> {
+    console.log(email, password);
 
-    if(!user||user !==null){
-        throw new UserAlreadyExistsException();
+    const user = await this.userService.getUserbyEmail(email);
+
+    if (user) {
+      throw new UserAlreadyExistsException();
     }
-    return {
-        username:username,
-        pasword:password,
-        check:check
-    };
-}
+
+    return { email, password, check };
+  }
 }

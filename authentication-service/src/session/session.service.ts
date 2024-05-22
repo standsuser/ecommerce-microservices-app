@@ -58,14 +58,8 @@ export class SessionService {
   }
 
   async deleteSession(userID: string) {
-    const session = await this.findSessionByUserId(userID);
-    Logger.log(session)
-    if (session) {
-      await this.sessionModel.findByIdAndDelete(session._id);
-      return 'Session deleted successfully';
-    } else {
-      return 'Session not found';
-    }
+    return this.sessionModel.findOneAndDelete({ userID });
+
   }
 
   async generateRandomString(length) {

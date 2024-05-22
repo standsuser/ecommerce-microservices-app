@@ -6,22 +6,23 @@ import { LoginDto } from "../dto/login.dto";
 import { UserNotFoundException } from "../exceptions/userNotfound.exception";
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy, 'local'){
-constructor(private readonly userService:UserService){
-    super();
-}
-async validate(username:string, password:string , check : boolean):Promise<any>{
-    console.log('validate:' ,username,password);
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
+  constructor(private readonly userService: UserService) {
+    super({
+      usernameField: 'email',
+      passwordField: 'password',
+    });
+  }
 
-    var loginDto:LoginDto ={
-        username,password,check
-    }
-    const user = await this.userService.validateUser(loginDto);
+  async validate(email: string, password: string): Promise<any> {
+    console.log('validate:', email, password);
 
-    if(!user || user === null){
-        throw new UserNotFoundException();
+    const user = await this.userService.validateUser(email, password);
+
+    if (!user || user === null) {
+      throw new UserNotFoundException();
     }
     console.log('validated user:', user);
     return user;
-}
+  }
 }

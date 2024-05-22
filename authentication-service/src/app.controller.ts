@@ -8,6 +8,7 @@ import { SessionService } from "./session/session.service";
 import {LoginDto} from './dto/login.dto';
 import { get } from 'http';
 import { response } from 'express';
+import { user } from '@nextui-org/react';
 
 const bcrypt = require("bcrypt");
 
@@ -64,8 +65,14 @@ export class AppController {
         return { success: false, message: "Wrong Email or Password"  };
       }
 
-      const response = await this.userService.login(user);
-      const session = await this.sessionService.createSession(response.userID,response.access_token);
+      Logger.log("user : " ,user)
+
+
+      const response = await this.userService.login(user.email , user.password);
+
+
+
+      const session = await this.sessionService.createSession(user.id, response.access_token);
       return { success: true, response , session };
       // Return response
     } catch (error) {
@@ -74,7 +81,7 @@ export class AppController {
     }
   }
   }
-
+/*
   @Put('change-password')
   async changePassword(@Body() { userID, newPassword , oldPassword}: { userID: string, newPassword: string , oldPassword: string }): Promise<any> {
     try {
@@ -86,6 +93,8 @@ export class AppController {
       return { success: false, message: error }; // Return error response
     }
   }
+
+  */
 
   //////////////////////////////////////////
 // it launches when the homepages is loaded
@@ -132,11 +141,11 @@ export class AppController {
   }
 
   @Delete('logout')
-  async logout(@Body() userID: any): Promise<any> {
+  async logout(@Body() user: any): Promise<any> {
     try {
       // Attempt to logout user
       //const response = await this.userService.logout(user);
-      const session = await this.sessionService.deleteSession(userID);
+      const session = await this.sessionService.deleteSession(user.userID);
 
 
       return { success: true, /*response , */session};
@@ -149,7 +158,7 @@ export class AppController {
   
 
   @Get('/getUserbyID/:userId')
-    async getProfile(@Param('userId') userId: string) {
+    async getUserbyID(@Param('userId') userId: string) {
       return await this.userService.getUserbyID(userId);
     }
 
