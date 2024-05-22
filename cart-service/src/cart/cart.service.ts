@@ -387,6 +387,88 @@ export class CartService {
             return guestCart;
         }
     }
+    async addOneItem(userId: string, productId: string): Promise<Cart> {
+        const cart = await this.cartModel.findOne({ userid: userId }).exec();
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+
+        const item = cart.items.find(item => item.productId.toString() === productId);
+        if (!item) {
+            throw new NotFoundException('Item not found in cart');
+        }
+
+        item.quantity += 1;
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        await cart.save();
+        return cart;
+    }
+
+    async removeOneItem(userId: string, productId: string): Promise<Cart> {
+        const cart = await this.cartModel.findOne({ userid: userId }).exec();
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+
+        const item = cart.items.find(item => item.productId.toString() === productId);
+        if (!item) {
+            throw new NotFoundException('Item not found in cart');
+        }
+
+        if (item.quantity > 1) {
+            item.quantity -= 1;
+        } else {
+            throw new BadRequestException('Item quantity cannot be less than one');
+        }
+
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        await cart.save();
+        return cart;
+    }
+
+    // Methods for guest cart (similar to above)
+    async addOneItemGuest(sessionId: string, productId: string): Promise<Cart> {
+        const cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+
+        const item = cart.items.find(item => item.productId.toString() === productId);
+        if (!item) {
+            throw new NotFoundException('Item not found in cart');
+        }
+
+        item.quantity += 1;
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        await cart.save();
+        return cart;
+    }
+
+    async removeOneItemGuest(sessionId: string, productId: string): Promise<Cart> {
+        const cart = await this.cartModel.findOne({ session_id: sessionId }).exec();
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+
+        const item = cart.items.find(item => item.productId.toString() === productId);
+        if (!item) {
+            throw new NotFoundException('Item not found in cart');
+        }
+
+        if (item.quantity > 1) {
+            item.quantity -= 1;
+        } else {
+            throw new BadRequestException('Item quantity cannot be less than one');
+        }
+
+        cart.total_price_pre_coupon = cart.items.reduce((total, item) => total + (item.amount_cents * item.quantity), 0);
+
+        await cart.save();
+        return cart;
+    }
 }
 
 
