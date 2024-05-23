@@ -62,6 +62,21 @@ const Cart = () => {
       console.error('Failed to add item:', error);
     }
   };
+  const handleRemoveOneItem = async (productId: string) => {
+    try {
+      if (userId) {
+        const updatedCart = await updateItemQuantity(userId, true, productId, -1);
+        setCartItems(updatedCart.items);
+        calculateTotalPrice(updatedCart.items, getCouponDiscount());
+      } else if (sessionId) {
+        const updatedCart = await updateItemQuantity(sessionId, false, productId, -1);
+        setCartItems(updatedCart.items);
+        calculateTotalPrice(updatedCart.items, getCouponDiscount());
+      }
+    } catch (error) {
+      console.error('Failed to remove one item:', error);
+    }
+  };
 
   const handleRemoveItem = async (productId: string) => {
     try {
@@ -139,7 +154,7 @@ const Cart = () => {
               <Button color="primary" onClick={() => handleAddItem(item.productId)}>
                 Add One
               </Button>
-              <Button color="primary" onClick={() => handleRemoveItem(item.productId)}>
+              <Button color="primary" onClick={() => handleRemoveOneItem(item.productId)}>
                 Remove One
               </Button>
               <Button color="primary" onClick={() => handleRemoveItem(item.productId)}>
