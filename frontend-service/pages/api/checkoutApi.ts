@@ -1,4 +1,4 @@
-const PROFILE_API_URL = 'http://localhost:3003';
+const PROFILE_API_URL = 'http://localhost:3019';
 
 export const getUserAddresses = async (userId: string) => {
   const response = await fetch(`${PROFILE_API_URL}/user/address/${userId}`, {

@@ -51,11 +51,11 @@ const CheckoutPage: React.FC = () => {
     const [selectedAddress, setSelectedAddress] = useState<string>('');
 
     useEffect(() => {
-        setUserId(localStorage.getItem('user'));
-        setSessionId(localStorage.getItem('sessionId'));
-      }, []);
+        const userIdFromStorage = localStorage.getItem('user');
+        const sessionIdFromStorage = localStorage.getItem('sessionId');
+        setUserId(userIdFromStorage);
+        setSessionId(sessionIdFromStorage);
 
-    useEffect(() => {
         if (router.query.cartItems) {
             setCartItems(JSON.parse(router.query.cartItems as string));
         }
@@ -64,25 +64,16 @@ const CheckoutPage: React.FC = () => {
         }
 
         const fetchAddresses = async () => {
-            const userId = localStorage.getItem('user');
-            if (userId) {
+            if (userIdFromStorage) {
                 try {
-                    const addresses = await getUserAddresses(userId);
+                    const addresses = await getUserAddresses(userIdFromStorage);
                     setAddresses(addresses);
                 } catch (error) {
                     console.error('Failed to fetch addresses:', error);
                 }
             }
         };
-        // if (userId) {
-        //     const items = await getCartItems(userId, true);
-        //     setCartItems(items);
-        //     calculateTotalPrice(items, getCouponDiscount());
-        //   } else if (sessionId) {
-        //     const items = await getCartItems(sessionId, false);
-        //     setCartItems(items);
-        //     calculateTotalPrice(items, getCouponDiscount());
-        //   }
+
         fetchAddresses();
     }, [router.query.cartItems, router.query.discountedTotal]);
 
