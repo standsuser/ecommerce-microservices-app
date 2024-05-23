@@ -105,7 +105,7 @@ const CatalogPage: React.FC = () => {
                     <Button
                         color="primary"
                         variant="shadow"
-                        onClick={() => {}} // Add functionality if needed
+                        onClick={() => {}} // Add functionality if needed mycomment
                         className="mt-8"
                     >
                         Explore More
