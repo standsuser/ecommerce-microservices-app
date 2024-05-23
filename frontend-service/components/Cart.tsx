@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { setUser } from '@/auth/index';
 import { getSessionId } from '@/pages/_app'; // Adjust the import based on your directory structure
 import { getCartItems, applyCoupon, updateItemQuantity, createOrder } from '@/pages/api/cartApi';
 import { Button, Input } from '@nextui-org/react';
@@ -9,7 +10,7 @@ const Cart = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState<string>('');
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const [userId, setUserId] = useState<string | null>(null); // Replace with actual user ID retrieval logic
+  const [userId, setUser] = useState<string | null>(null);
   const [shippingData, setShippingData] = useState<any>({
     apartment: '',
     email: '',
@@ -28,16 +29,10 @@ const Cart = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchSessionId = () => {
-      try {
-        const id = getSessionId();
-        setSessionId(id);
-      } catch (error) {
-        console.error('Error accessing localStorage', error);
-      }
-    };
 
-    fetchSessionId();
+    setUser(localStorage.getItem('user'));
+    setSessionId(localStorage.getItem('sessionId'));
+
   }, []);
 
   useEffect(() => {
@@ -57,8 +52,11 @@ const Cart = () => {
       }
     };
 
-    fetchCartItems();
+    if (userId !== null || sessionId !== null) {
+      fetchCartItems();
+    }
   }, [userId, sessionId]);
+
 
   const calculateTotalPrice = (items: any) => {
     const total = items.reduce((acc: number, item: any) => acc + (item.amount_cents * item.quantity), 0) / 100;

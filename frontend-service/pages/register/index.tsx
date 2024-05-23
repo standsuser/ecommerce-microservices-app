@@ -24,14 +24,6 @@ const RegisterPage: React.FC = () => {
     password: '',
   });
   const [success, setSuccess] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const sessionId = router.query.sessionId as string;
-    if (sessionId) {
-      setSessionId(sessionId);
-    }
-  }, [router.query.sessionId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,9 +45,10 @@ const RegisterPage: React.FC = () => {
       if (response.ok) {
         const result = await response.json();
         const userId = result.userId; // Get the user ID from the response
-        if (sessionId) {
-          await convertGuestToUser(userId, sessionId);
-        }
+        console.log(userId);
+        // Set userId in localStorage
+        localStorage.setItem('userId', userId);
+
         setSuccess(true);
         setTimeout(() => {
           router.push('/login'); // Use client-side routing
@@ -65,24 +58,6 @@ const RegisterPage: React.FC = () => {
       }
     } catch (error) {
       console.error('An error occurred during registration:', error);
-    }
-  };
-
-  const convertGuestToUser = async (userId: string, sessionId: string) => {
-    try {
-      const response = await fetch('http://localhost:3015/cart/convert-guest-to-user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId, sessionId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to convert guest to user');
-      }
-    } catch (error) {
-      console.error('Error converting guest to user:', error);
     }
   };
 

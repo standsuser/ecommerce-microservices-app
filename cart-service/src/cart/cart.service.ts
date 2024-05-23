@@ -343,12 +343,13 @@ export class CartService {
     }
 
     async convertGuestToUser(userId: string, sessionId: string): Promise<Cart> {
+        console.log(userId);
         const guestCart = await this.cartModel.findOne({ session_id: sessionId }).exec();
         if (!guestCart) {
           throw new NotFoundException('Guest cart not found');
         }
     
-        guestCart.userid = new Types.ObjectId(userId);
+        guestCart.userid = new ObjectId(userId);
         guestCart.session_id = null;
         await guestCart.save();
     

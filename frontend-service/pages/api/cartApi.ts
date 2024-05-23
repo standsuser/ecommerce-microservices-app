@@ -13,20 +13,22 @@ export const getCartItems = async (identifier: string, isUser: boolean) => {
     credentials: 'include',
   });
 
-  if (!response.ok && isUser && response.status === 404) {
-    // Try fetching guest cart if user cart not found
-    url = `${API_URL}/cart/guest/${identifier}/items`;
-    response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-  }
-
   if (!response.ok) {
-    throw new Error('Failed to fetch cart items');
+    // If user cart is not found, try fetching guest cart
+    if (isUser && response.status === 404) {
+      url = `${API_URL}/cart/guest/${identifier}/items`;
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+    }
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch cart items');
+    }
   }
 
   return response.json();
