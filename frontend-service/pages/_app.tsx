@@ -39,11 +39,6 @@ export default function App({ Component, pageProps }: AppProps) {
     }
   }, []);
 
-  useEffect(() => {
-    if (router.pathname === '/') {
-      router.push('/home');
-    }
-  }, []);
 
   return (
     <NextUIProvider>
