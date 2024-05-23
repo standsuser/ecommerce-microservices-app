@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = 'http://localhost:3015';
 
 export const getCartItems = async (identifier: string, isUser: boolean) => {
   let url = isUser 
