@@ -59,16 +59,19 @@ export const removeItemFromCart = async (sessionId: string, productId: string) =
   return response.json();
 };
 
-export const applyCoupon = async (userId: string, couponCode: string) => {
+export const applyCouponCode = async (userId: string, couponCode: string) => {
   const response = await fetch(`${API_URL}/cart/apply-coupon/${userId}/${couponCode}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
   });
+
   if (!response.ok) {
-    throw new Error('Failed to apply coupon');
+    throw new Error('Failed to apply coupon code');
   }
+
   return response.json();
 };
 
@@ -86,19 +89,26 @@ export const createOrder = async (userId: string, shippingData: any) => {
   return response.json();
 };
 
-// export const updateItemQuantity = async (sessionId: string, productId: string, quantityChange: number) => {
-//   const response = await fetch(`${API_URL}/cart/guest/${sessionId}/update-quantity/${productId}`, {
-//     method: 'PUT',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({ quantity: quantityChange }),
-//   });
-//   if (!response.ok) {
-//     throw new Error('Failed to update item quantity');
-//   }
-//   return response.json();
-// };
+export const removeCartItem = async (identifier: string, isUser: boolean, productId: string) => {
+  const url = isUser 
+    ? `${API_URL}/cart/remove-item/${identifier}/${productId}`
+    : `${API_URL}/cart/guest/${identifier}/remove-item/${productId}`;
+
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to remove item from cart');
+  }
+
+  return response.json();
+};
+
 export const updateItemQuantity = async (identifier: string, isUser: boolean, productId: string, quantityChange: number) => {
   let url = isUser 
     ? `${API_URL}/cart/${identifier}/update-quantity/${productId}` 
