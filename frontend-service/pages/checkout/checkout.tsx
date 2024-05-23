@@ -50,6 +50,7 @@ const CheckoutPage: React.FC = () => {
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddress, setSelectedAddress] = useState<string>('');
     const [addressDetails, setAddressDetails] = useState<Address | null>(null);
+    const [orderId, setOrderId] = useState<number | null>(null);
 
     useEffect(() => {
         const userIdFromStorage = localStorage.getItem('user');
@@ -120,7 +121,8 @@ const CheckoutPage: React.FC = () => {
         };
 
         try {
-            await registerOrder(orderData);
+            const response = await registerOrder(orderData);
+            setOrderId(response.orderId.id);
             setOrderSubmitted(true);
         } catch (error) {
             console.error('Failed to submit order:', error);
@@ -142,6 +144,7 @@ const CheckoutPage: React.FC = () => {
                     <Card style={{ maxWidth: "400px", padding: "20px" }}>
                         <h1 className={title()}>Thank You!</h1>
                         <p>Your order has been submitted successfully.</p>
+                        <p>Order ID: {orderId}</p>
                         <Spacer y={1} />
                         <Link href="/" className={buttonStyles({ color: "primary", radius: "full", variant: "shadow" })}>
                             Return to Home
@@ -204,7 +207,7 @@ const CheckoutPage: React.FC = () => {
                         placeholder="Select Address"
                         value={selectedAddress}
                         onChange={(e) => handleAddressChange(e.target.value)}
-                        className="w-full"
+                        className="w-full" // Add this line to make the select element full-width
                     >
                         <option value="" disabled>Select Address</option>
                         {addresses.map(address => (
