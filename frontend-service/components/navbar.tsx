@@ -31,7 +31,7 @@ export default function Nbar() {
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
-          <Link color="foreground" href="home">Homepage</Link>
+          <Link color="foreground" href="/">Homepage</Link>
         </NavbarItem>
         <NavbarItem isActive>
           <Link href="productsPage" aria-current="page">Products</Link>
