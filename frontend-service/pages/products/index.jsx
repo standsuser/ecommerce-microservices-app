@@ -55,6 +55,7 @@ const ProductPage = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-16">
         {products.map((product, index) => (
+         <Link href={`/productDetails`}> 
           <div key={index} className="relative">
             <div onClick={() => handleProductClick(product.id)}>
               <Card isFooterBlurred radius="lg" className="border-none flex-grow cursor-pointer">
@@ -93,6 +94,7 @@ const ProductPage = () => {
               </Button>
             </div>
           </div>
+          </Link>
         ))}
       </div>
       <div className="bg-gray-900 text-white py-6 text-center">
