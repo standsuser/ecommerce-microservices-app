@@ -40,9 +40,11 @@ export default function Nbar() {
         <NavbarItem isActive={router.pathname === '/products'}>
           <Link href="/products" style={linkStyle(router.pathname === '/products')} aria-current={router.pathname === '/products' ? "page" : undefined}>Products</Link>
         </NavbarItem>
-        <NavbarItem isActive={router.pathname === '/profile'}>
-          <Link href="/profile" style={linkStyle(router.pathname === '/profile')} aria-current={router.pathname === '/profile' ? "page" : undefined}>Profile</Link>
-        </NavbarItem>
+        {isAuthenticated && (
+          <NavbarItem isActive={router.pathname === '/profile'}>
+            <Link href="/profile" style={linkStyle(router.pathname === '/profile')} aria-current={router.pathname === '/profile' ? "page" : undefined}>Profile</Link>
+          </NavbarItem>
+        )}
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
