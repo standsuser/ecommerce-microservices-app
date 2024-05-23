@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
 export type AddressDocument = Address & Document;
 
@@ -7,7 +7,7 @@ export type AddressDocument = Address & Document;
 export class Address {
 
     @Prop({ type: MongooseSchema.Types.ObjectId, required: true })
-    userid: MongooseSchema.Types.ObjectId;
+    userid: Types.ObjectId;
 
     addresslabel: string
 
