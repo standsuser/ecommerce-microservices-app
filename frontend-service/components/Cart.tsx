@@ -144,8 +144,7 @@ const Cart = () => {
       </div>
       <div className="cart-coupon">
         <Input
-          clearable
-          bordered
+          isClearable
           fullWidth
           color="primary"
           size="lg"
