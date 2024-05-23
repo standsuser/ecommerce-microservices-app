@@ -7,6 +7,6 @@ async function bootstrap() {
     origin: 'http://localhost:5050', // Replace with your frontend URL
     credentials: true,
   });
-  await app.listen(3019);
+  await app.listen(3010);
 }
 bootstrap();

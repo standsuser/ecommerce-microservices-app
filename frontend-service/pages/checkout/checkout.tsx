@@ -4,7 +4,7 @@ import { Link } from "@nextui-org/link";
 import { button as buttonStyles } from "@nextui-org/theme";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
-import { Button, Progress, Card, Spacer, Select } from "@nextui-org/react";
+import { Button, Progress, Card, Spacer, Input } from "@nextui-org/react";
 import { getUserAddresses } from "@/pages/api/checkoutApi";
 
 type CartItem = {
@@ -49,6 +49,7 @@ const CheckoutPage: React.FC = () => {
     const [orderSubmitted, setOrderSubmitted] = useState(false);
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddress, setSelectedAddress] = useState<string>('');
+    const [addressDetails, setAddressDetails] = useState<Address | null>(null);
 
     useEffect(() => {
         const userIdFromStorage = localStorage.getItem('user');
@@ -76,6 +77,12 @@ const CheckoutPage: React.FC = () => {
 
         fetchAddresses();
     }, [router.query.cartItems, router.query.discountedTotal]);
+
+    const handleAddressChange = (addressId: string) => {
+        setSelectedAddress(addressId);
+        const selected = addresses.find(address => address._id === addressId);
+        setAddressDetails(selected || null);
+    };
 
     const handleOrderSubmit = () => {
         // Add order submission logic here
@@ -155,18 +162,37 @@ const CheckoutPage: React.FC = () => {
                     )}
 
                     <h2 className="text-xl font-semibold mt-8">Pick Address</h2>
-                    <Select
+                    <select
                         placeholder="Select Address"
                         value={selectedAddress}
-                        onChange={(e) => setSelectedAddress(e.target.value)}
-                        fullWidth
+                        onChange={(e) => handleAddressChange(e.target.value)}
+                        className="w-full"
                     >
+                        <option value="" disabled>Select Address</option>
                         {addresses.map(address => (
                             <option key={address._id} value={address._id}>
                                 {address.addresslabel}
                             </option>
                         ))}
-                    </Select>
+                    </select>
+
+                    {addressDetails && (
+                        <div className="mt-4">
+                            <Input readOnly fullWidth label="First Name" value={addressDetails.first_name} />
+                            <Input readOnly fullWidth label="Last Name" value={addressDetails.last_name} />
+                            <Input readOnly fullWidth label="Email" value={addressDetails.email} />
+                            <Input readOnly fullWidth label="Phone Number" value={addressDetails.phone_number} />
+                            <Input readOnly fullWidth label="Street" value={addressDetails.street} />
+                            <Input readOnly fullWidth label="Building" value={addressDetails.building} />
+                            <Input readOnly fullWidth label="Apartment" value={addressDetails.apartment} />
+                            <Input readOnly fullWidth label="Floor" value={addressDetails.floor.toString()} />
+                            <Input readOnly fullWidth label="Postal Code" value={addressDetails.postal_code.toString()} />
+                            <Input readOnly fullWidth label="City" value={addressDetails.city} />
+                            <Input readOnly fullWidth label="State" value={addressDetails.state} />
+                            <Input readOnly fullWidth label="Country" value={addressDetails.country} />
+                            <Input readOnly fullWidth label="Extra Description" value={addressDetails.extra_description} />
+                        </div>
+                    )}
 
                     <Button
                         className={buttonStyles({
