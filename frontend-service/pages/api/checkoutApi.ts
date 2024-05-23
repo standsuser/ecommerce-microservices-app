@@ -32,3 +32,21 @@ export const registerOrder = async (orderData: any) => {
 
   return response.json();
 };
+
+export const getPaymentKeyAndRedirect = async (orderId: string, paymentData: any) => {
+  const API_URL = 'http://localhost:3010';
+
+  const response = await fetch(`${API_URL}/payment/order-payment/${orderId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(paymentData),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get payment key and redirect');
+  }
+
+  return response.json();
+};
