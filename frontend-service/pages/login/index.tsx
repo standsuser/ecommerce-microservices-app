@@ -61,7 +61,7 @@ const LoginPage: React.FC = () => {
                 setVer(true);
                 setUser(data.response.userID);
                 console.log(data);
-
+                localStorage.setItem('user', data.response.userID);
                 setTimeout(() => {
                   // Redirect to the dashboard
                   router.push('/docs'); // Use client-side routing
