@@ -103,19 +103,14 @@ const Cart = () => {
     }
   };
 
-  const handlePlaceOrder = async () => {
-    if (!userId) {
-      alert('User is not logged in');
-      return;
-    }
-    try {
-      const order = await createOrder(userId, {});
-      alert('Order placed successfully');
-      // You can also navigate to a confirmation page or clear the cart
-    } catch (error) {
-      console.error('Failed to place order', error);
-      alert('Failed to place order');
-    }
+  const handlePlaceOrder = () => {
+    router.push({
+      pathname: '/checkout/checkout',
+      query: { 
+        cartItems: JSON.stringify(cartItems), 
+        discountedTotal: discountedTotal.toFixed(2) 
+      }
+    });
   };
 
   const handleSignUp = () => {

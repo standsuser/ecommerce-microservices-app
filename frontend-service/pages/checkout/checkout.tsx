@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from 'next/router';
 import { Link } from "@nextui-org/link";
 import { button as buttonStyles } from "@nextui-org/theme";
@@ -22,36 +22,8 @@ type CartItem = {
 
 const CheckoutPage: React.FC = () => {
     const router = useRouter();
-    const [cartItems, setCartItems] = useState<CartItem[]>([
-        {
-            id: "1",
-            productId: "product1",
-            rentalDuration: "1 week",
-            isRented: false,
-            name: "Item 1",
-            amount_cents: 1000,
-            description: "Description for Item 1",
-            color: "Red",
-            size: "M",
-            material: "Cotton",
-            quantity: 1,
-        },
-        {
-            id: "2",
-            productId: "product2",
-            rentalDuration: "2 weeks",
-            isRented: false,
-            name: "Item 2",
-            amount_cents: 2000,
-            description: "Description for Item 2",
-            color: "Blue",
-            size: "L",
-            material: "Polyester",
-            quantity: 2,
-        },
-        // Add more items as needed
-    ]);
-
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [discountedTotal, setDiscountedTotal] = useState<string>('0.00');
     const [shippingInfo, setShippingInfo] = useState({
         name: "",
         address: "",
@@ -59,15 +31,22 @@ const CheckoutPage: React.FC = () => {
         state: "",
         zip: "",
     });
-
     const [paymentInfo, setPaymentInfo] = useState({
         cardNumber: "",
         expiryDate: "",
         cvv: "",
     });
-
     const [paymentMethod, setPaymentMethod] = useState("card");
     const [orderSubmitted, setOrderSubmitted] = useState(false);
+
+    useEffect(() => {
+        if (router.query.cartItems) {
+            setCartItems(JSON.parse(router.query.cartItems as string));
+        }
+        if (router.query.discountedTotal) {
+            setDiscountedTotal(router.query.discountedTotal as string);
+        }
+    }, [router.query.cartItems, router.query.discountedTotal]);
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -143,6 +122,10 @@ const CheckoutPage: React.FC = () => {
                                 <tr>
                                     <td colSpan={3} style={{ textAlign: "right", padding: "8px" }}>Total</td>
                                     <td style={{ padding: "8px" }}>${getTotalPrice()}</td>
+                                </tr>
+                                <tr>
+                                    <td colSpan={3} style={{ textAlign: "right", padding: "8px" }}>Total after Coupon</td>
+                                    <td style={{ padding: "8px" }}>${discountedTotal}</td>
                                 </tr>
                             </tfoot>
                         </table>
