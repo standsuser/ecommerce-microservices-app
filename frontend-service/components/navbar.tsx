@@ -1,14 +1,18 @@
 import React from "react";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button, Dropdown, DropdownTrigger, DropdownItem, DropdownMenu } from "@nextui-org/react";
 import { AcmeLogo } from "./AcmeLogo.jsx";
-import router from "next/router.js";
 import { getVer, getUser, setUser } from "@/auth";
 import { handleLogout } from "@/auth/handleLogout";
 import { title } from "./primitives.js";
+import { useRouter } from 'next/router';
 
 export default function Nbar() {
-
   const isAuthenticated = getVer();
+  const router = useRouter();
+
+  const linkStyle = (isActive: boolean) => ({
+    color: isActive ? 'purple' : 'inherit',
+  });
 
   return (
     <Navbar shouldHideOnScroll>
@@ -30,17 +34,14 @@ export default function Nbar() {
         <p className="font-bold text-inherit">ECOMMERCE</p>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
-          <Link color="foreground" href="/">Homepage</Link>
+        <NavbarItem isActive={router.pathname === '/'}>
+          <Link href="/" style={linkStyle(router.pathname === '/')} aria-current={router.pathname === '/' ? "page" : undefined}>Homepage</Link>
         </NavbarItem>
-        <NavbarItem isActive>
-          <Link href="productsPage" aria-current="page">Products</Link>
+        <NavbarItem isActive={router.pathname === '/products'}>
+          <Link href="/products" style={linkStyle(router.pathname === '/products')} aria-current={router.pathname === '/products' ? "page" : undefined}>Products</Link>
         </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">Integrations</Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="/profile/profile">Profile</Link>
+        <NavbarItem isActive={router.pathname === '/profile'}>
+          <Link href="/profile" style={linkStyle(router.pathname === '/profile')} aria-current={router.pathname === '/profile' ? "page" : undefined}>Profile</Link>
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
