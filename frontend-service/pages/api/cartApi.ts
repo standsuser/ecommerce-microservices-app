@@ -59,8 +59,8 @@ export const removeItemFromCart = async (sessionId: string, productId: string) =
   return response.json();
 };
 
-export const applyCoupon = async (sessionId: string, couponCode: string) => {
-  const response = await fetch(`${API_URL}/cart/apply-coupon/${sessionId}/${couponCode}`, {
+export const applyCoupon = async (userId: string, couponCode: string) => {
+  const response = await fetch(`${API_URL}/cart/apply-coupon/${userId}/${couponCode}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -86,16 +86,51 @@ export const createOrder = async (userId: string, shippingData: any) => {
   return response.json();
 };
 
-export const updateItemQuantity = async (sessionId: string, productId: string, quantityChange: number) => {
-  const response = await fetch(`${API_URL}/cart/guest/${sessionId}/update-quantity/${productId}`, {
+// export const updateItemQuantity = async (sessionId: string, productId: string, quantityChange: number) => {
+//   const response = await fetch(`${API_URL}/cart/guest/${sessionId}/update-quantity/${productId}`, {
+//     method: 'PUT',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({ quantity: quantityChange }),
+//   });
+//   if (!response.ok) {
+//     throw new Error('Failed to update item quantity');
+//   }
+//   return response.json();
+// };
+export const updateItemQuantity = async (identifier: string, isUser: boolean, productId: string, quantityChange: number) => {
+  let url = isUser 
+    ? `${API_URL}/cart/${identifier}/update-quantity/${productId}` 
+    : `${API_URL}/cart/guest/${identifier}/update-quantity/${productId}`;
+
+  let response = await fetch(url, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ quantity: quantityChange }),
+    credentials: 'include',
   });
+
   if (!response.ok) {
-    throw new Error('Failed to update item quantity');
+    // If user cart is not found, try updating guest cart
+    if (isUser && response.status === 404) {
+      url = `${API_URL}/cart/guest/${identifier}/update-quantity/${productId}`;
+      response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantity: quantityChange }),
+        credentials: 'include',
+      });
+    }
+
+    if (!response.ok) {
+      throw new Error('Failed to update item quantity');
+    }
   }
+
   return response.json();
 };

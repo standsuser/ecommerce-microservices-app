@@ -64,18 +64,34 @@ const Cart = () => {
   };
 
   const handleAddItem = async (productId: string) => {
-    if (sessionId) {
-      const updatedCart = await updateItemQuantity(sessionId, productId, 1);
-      setCartItems(updatedCart.items);
-      calculateTotalPrice(updatedCart.items);
+    try {
+      if (userId) {
+        const updatedCart = await updateItemQuantity(userId, true, productId, 1);
+        setCartItems(updatedCart.items);
+        calculateTotalPrice(updatedCart.items);
+      } else if (sessionId) {
+        const updatedCart = await updateItemQuantity(sessionId, false, productId, 1);
+        setCartItems(updatedCart.items);
+        calculateTotalPrice(updatedCart.items);
+      }
+    } catch (error) {
+      console.error('Failed to add item:', error);
     }
   };
 
   const handleRemoveItem = async (productId: string) => {
-    if (sessionId) {
-      const updatedCart = await updateItemQuantity(sessionId, productId, -1);
-      setCartItems(updatedCart.items);
-      calculateTotalPrice(updatedCart.items);
+    try {
+      if (userId) {
+        const updatedCart = await updateItemQuantity(userId, true, productId, -1);
+        setCartItems(updatedCart.items);
+        calculateTotalPrice(updatedCart.items);
+      } else if (sessionId) {
+        const updatedCart = await updateItemQuantity(sessionId, false, productId, -1);
+        setCartItems(updatedCart.items);
+        calculateTotalPrice(updatedCart.items);
+      }
+    } catch (error) {
+      console.error('Failed to remove item:', error);
     }
   };
 
