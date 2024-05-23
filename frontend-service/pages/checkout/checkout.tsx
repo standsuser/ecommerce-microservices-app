@@ -5,7 +5,7 @@ import { button as buttonStyles } from "@nextui-org/theme";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
 import { Button, Progress, Card, Spacer, Input } from "@nextui-org/react";
-import { getUserAddresses } from "@/pages/api/checkoutApi";
+import { getUserAddresses, registerOrder } from "@/pages/api/checkoutApi";
 
 type CartItem = {
     id: string;
@@ -84,10 +84,48 @@ const CheckoutPage: React.FC = () => {
         setAddressDetails(selected || null);
     };
 
-    const handleOrderSubmit = () => {
-        // Add order submission logic here
-        console.log("Order submitted with:", { cartItems, discountedTotal, selectedAddress });
-        setOrderSubmitted(true);
+    const handleOrderSubmit = async () => {
+        if (!addressDetails) {
+            alert('Please select an address.');
+            return;
+        }
+
+        const orderData = {
+            delivery_needed: "true",
+            amount_cents: (parseFloat(discountedTotal) * 100).toFixed(0),
+            currency: "EGP",
+            items: cartItems.map(item => ({
+                name: item.name,
+                amount_cents: (item.amount_cents).toFixed(0),
+                size: item.size,
+                material: item.material,
+                description: item.description,
+                quantity: item.quantity.toString(),
+            })),
+            shipping_data: {
+                apartment: addressDetails.apartment,
+                email: addressDetails.email,
+                floor: addressDetails.floor.toString(),
+                first_name: addressDetails.first_name,
+                street: addressDetails.street,
+                building: addressDetails.building,
+                phone_number: addressDetails.phone_number,
+                postal_code: addressDetails.postal_code.toString(),
+                extra_description: addressDetails.extra_description,
+                city: addressDetails.city,
+                country: addressDetails.country,
+                last_name: addressDetails.last_name,
+                state: addressDetails.state
+            }
+        };
+
+        try {
+            await registerOrder(orderData);
+            setOrderSubmitted(true);
+        } catch (error) {
+            console.error('Failed to submit order:', error);
+            alert('Failed to submit order. Please try again.');
+        }
     };
 
     const getTotalPrice = () => {
