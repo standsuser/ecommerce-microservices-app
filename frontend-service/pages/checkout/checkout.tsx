@@ -4,7 +4,8 @@ import { Link } from "@nextui-org/link";
 import { button as buttonStyles } from "@nextui-org/theme";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
-import { Input, Button, Progress, Card, Spacer } from "@nextui-org/react";
+import { Button, Progress, Card, Spacer, Select } from "@nextui-org/react";
+import { getUserAddresses } from "@/pages/api/checkoutApi";
 
 type CartItem = {
     id: string;
@@ -20,24 +21,39 @@ type CartItem = {
     quantity: number;
 };
 
+type Address = {
+    _id: string;
+    userid: string;
+    addresslabel: string;
+    apartment: string;
+    email: string;
+    floor: number;
+    first_name: string;
+    street: string;
+    building: string;
+    phone_number: string;
+    postal_code: number;
+    extra_description: string;
+    city: string;
+    country: string;
+    last_name: string;
+    state: string;
+};
+
 const CheckoutPage: React.FC = () => {
     const router = useRouter();
+    const [userId, setUserId] = useState<string | null>(null);
+    const [sessionId, setSessionId] = useState<string | null>(null);
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [discountedTotal, setDiscountedTotal] = useState<string>('0.00');
-    const [shippingInfo, setShippingInfo] = useState({
-        name: "",
-        address: "",
-        city: "",
-        state: "",
-        zip: "",
-    });
-    const [paymentInfo, setPaymentInfo] = useState({
-        cardNumber: "",
-        expiryDate: "",
-        cvv: "",
-    });
-    const [paymentMethod, setPaymentMethod] = useState("card");
     const [orderSubmitted, setOrderSubmitted] = useState(false);
+    const [addresses, setAddresses] = useState<Address[]>([]);
+    const [selectedAddress, setSelectedAddress] = useState<string>('');
+
+    useEffect(() => {
+        setUserId(localStorage.getItem('user'));
+        setSessionId(localStorage.getItem('sessionId'));
+      }, []);
 
     useEffect(() => {
         if (router.query.cartItems) {
@@ -46,19 +62,33 @@ const CheckoutPage: React.FC = () => {
         if (router.query.discountedTotal) {
             setDiscountedTotal(router.query.discountedTotal as string);
         }
-    }, [router.query.cartItems, router.query.discountedTotal]);
 
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        setInfo: React.Dispatch<React.SetStateAction<any>>
-    ) => {
-        const { name, value } = e.target;
-        setInfo((prevInfo: any) => ({ ...prevInfo, [name]: value }));
-    };
+        const fetchAddresses = async () => {
+            const userId = localStorage.getItem('user');
+            if (userId) {
+                try {
+                    const addresses = await getUserAddresses(userId);
+                    setAddresses(addresses);
+                } catch (error) {
+                    console.error('Failed to fetch addresses:', error);
+                }
+            }
+        };
+        // if (userId) {
+        //     const items = await getCartItems(userId, true);
+        //     setCartItems(items);
+        //     calculateTotalPrice(items, getCouponDiscount());
+        //   } else if (sessionId) {
+        //     const items = await getCartItems(sessionId, false);
+        //     setCartItems(items);
+        //     calculateTotalPrice(items, getCouponDiscount());
+        //   }
+        fetchAddresses();
+    }, [router.query.cartItems, router.query.discountedTotal]);
 
     const handleOrderSubmit = () => {
         // Add order submission logic here
-        console.log("Order submitted with:", { cartItems, shippingInfo, paymentInfo, paymentMethod });
+        console.log("Order submitted with:", { cartItems, discountedTotal, selectedAddress });
         setOrderSubmitted(true);
     };
 
@@ -133,126 +163,19 @@ const CheckoutPage: React.FC = () => {
                         <p>Your cart is empty.</p>
                     )}
 
-                    <h2 className="text-xl font-semibold mt-8">Shipping Information</h2>
-                    <form className="flex flex-col gap-4 mt-4">
-                        <Input
-                            fullWidth
-                            isClearable
-                            label="Name"
-                            placeholder="John Doe"
-                            name="name"
-                            value={shippingInfo.name}
-                            onChange={(e) => handleInputChange(e, setShippingInfo)}
-                        />
-                        <Input
-                            fullWidth
-                            isClearable
-                            label="Address"
-                            placeholder="123 Main St"
-                            name="address"
-                            value={shippingInfo.address}
-                            onChange={(e) => handleInputChange(e, setShippingInfo)}
-                        />
-                        <Input
-                            fullWidth
-                            isClearable
-                            label="City"
-                            placeholder="Anytown"
-                            name="city"
-                            value={shippingInfo.city}
-                            onChange={(e) => handleInputChange(e, setShippingInfo)}
-                        />
-                        <Input
-                            fullWidth
-                            isClearable
-                            label="State"
-                            placeholder="CA"
-                            name="state"
-                            value={shippingInfo.state}
-                            onChange={(e) => handleInputChange(e, setShippingInfo)}
-                        />
-                        <Input
-                            fullWidth
-                            isClearable
-                            label="ZIP Code"
-                            placeholder="12345"
-                            name="zip"
-                            value={shippingInfo.zip}
-                            onChange={(e) => handleInputChange(e, setShippingInfo)}
-                        />
-                    </form>
-
-                    <h2 className="text-xl font-semibold mt-8">Payment Information</h2>
-                    <form className="flex flex-col gap-4 mt-4">
-                        <div>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="card"
-                                    checked={paymentMethod === "card"}
-                                    onChange={() => setPaymentMethod("card")}
-                                />
-                                Credit/Debit Card
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="cash"
-                                    checked={paymentMethod === "cash"}
-                                    onChange={() => setPaymentMethod("cash")}
-                                />
-                                Cash on Delivery
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="fawry"
-                                    checked={paymentMethod === "fawry"}
-                                    onChange={() => setPaymentMethod("fawry")}
-                                />
-                                Fawry
-                            </label>
-                        </div>
-
-                        {paymentMethod === "card" && (
-                            <>
-                                <Input
-                                    fullWidth
-                                    isClearable
-                                    label="Card Number"
-                                    placeholder="1234 5678 9012 3456"
-                                    name="cardNumber"
-                                    value={paymentInfo.cardNumber}
-                                    onChange={(e) => handleInputChange(e, setPaymentInfo)}
-                                />
-                                <Input
-                                    fullWidth
-                                    isClearable
-                                    label="Expiry Date"
-                                    placeholder="MM/YY"
-                                    name="expiryDate"
-                                    value={paymentInfo.expiryDate}
-                                    onChange={(e) => handleInputChange(e, setPaymentInfo)}
-                                />
-                                <Input
-                                    fullWidth
-                                    isClearable
-                                    label="CVV"
-                                    placeholder="123"
-                                    name="cvv"
-                                    value={paymentInfo.cvv}
-                                    onChange={(e) => handleInputChange(e, setPaymentInfo)}
-                                />
-                            </>
-                        )}
-                    </form>
+                    <h2 className="text-xl font-semibold mt-8">Pick Address</h2>
+                    <Select
+                        placeholder="Select Address"
+                        value={selectedAddress}
+                        onChange={(e) => setSelectedAddress(e.target.value)}
+                        fullWidth
+                    >
+                        {addresses.map(address => (
+                            <option key={address._id} value={address._id}>
+                                {address.addresslabel}
+                            </option>
+                        ))}
+                    </Select>
 
                     <Button
                         className={buttonStyles({
@@ -262,6 +185,7 @@ const CheckoutPage: React.FC = () => {
                         })}
                         onClick={handleOrderSubmit}
                         style={{ marginTop: "20px" }}
+                        disabled={!selectedAddress}
                     >
                         Submit Order
                     </Button>
