@@ -50,8 +50,8 @@ export class UserService {
                   { userid: data.userId },
                   {
                     $set: {
-                      addresslabel: data.addresslabel,
                       apartment: data.apartment,
+                      addresslabel: data.addresslabel,
                       email: data.email,
                       floor: data.floor,
                       first_name: data.first_name,
@@ -114,8 +114,8 @@ export class UserService {
     try {
       const address = new this.addressModel({
         userid: userId,
-        addresslabel: body.addresslabel,
         apartment: body.apartment,
+        addresslabel: body.addresslabel,
         email: body.email,
         floor: body.floor,
         first_name: body.first_name,

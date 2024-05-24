@@ -86,6 +86,16 @@ export const createOrder = async (userId: string, shippingData: any) => {
   if (!response.ok) {
     throw new Error('Failed to create order');
   }
+  const hiddenResponse = await fetch(`${API_URL}/cart/${userId}/createOrder`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ shipping_data: shippingData }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create order');
+  }
   return response.json();
 };
 
