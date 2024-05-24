@@ -142,7 +142,7 @@ const ProductPage = () => {
                   <p>Sizes: {product.sizes.join(", ")}</p>
                   <p>Colors: {product.colors.join(", ")}</p>
                   <p>Materials: {product.materials.join(", ")}</p>
-                  <p>Rating: {calculateAverageRating(product)}</p>
+                  <p>Rating: {product.rating}</p>
                 </div>
               </Card>
             </Link>
