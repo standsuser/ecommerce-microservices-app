@@ -14,6 +14,10 @@ export default function Nbar() {
     color: isActive ? 'purple' : 'inherit',
   });
 
+  const handleChangePassword = () => {
+    router.push('/changePassword');
+  };
+
   return (
     <Navbar shouldHideOnScroll>
       <NavbarBrand>
@@ -23,7 +27,7 @@ export default function Nbar() {
               <Button variant="bordered" className="mr-12">Menu</Button>
             </DropdownTrigger>
             <DropdownMenu variant="faded" aria-label="Static Actions">
-              <DropdownItem key="change-password">Change Password</DropdownItem>
+              <DropdownItem key="change-password" onClick={handleChangePassword}>Change Password </DropdownItem>
               <DropdownItem key="delete" className="text-danger" color="danger" onClick={handleLogout}>
                 Logout
               </DropdownItem>

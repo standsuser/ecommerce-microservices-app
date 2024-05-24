@@ -15,9 +15,14 @@ export class UserController {
     return this.userService.register(command.data);
   }
 
-  @MessagePattern('forgot-password')
+  @MessagePattern('forgetPassword')
   async forgetPassword(command) {
-    return this.userService.forgetPassword(command.data);
+    return this.userService.forgetPassword(command.email, command.newPassword, command.otp);
+  }
+
+  @MessagePattern('sendPasswordResetEmail')
+  async sendPasswordResetEmail(command) {
+    return this.userService.sendPasswordResetEmail(command.email);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -48,4 +53,15 @@ export class UserController {
   async getUserbyID(command) {
     return this.userService.getUserbyID(command.userID);
   }
+
+  @MessagePattern('updatePassword')
+  async updatePassword(command) {
+    return this.userService.updatePassword(command.email, command.password);
+  }
+
+
+
+
+
+
 }

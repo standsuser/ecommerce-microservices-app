@@ -16,6 +16,8 @@ import { SessionService } from '../session/session.service';
 import { ProducerService } from 'src/kafka/producer.service';
 
 const bcrypt = require("bcrypt");
+import { v4 as uuidv4 } from 'uuid';
+import { text } from 'stream/consumers';
 
 
 
@@ -24,6 +26,8 @@ const bcrypt = require("bcrypt");
 export class UserService {
     private mailService: Mailservice;
     private readonly sessionService: SessionService;
+    private otpStore: Map<string, { otp: string, expires: Date }> = new Map();
+
 
 
     constructor(
@@ -118,30 +122,7 @@ export class UserService {
     }
   }
 
-  async forgetPassword(email: string): Promise<void> {
-    const existingUser = await this.getUserbyEmail(email);
-    if (!existingUser) {
-      throw new NotFoundException('User not found');
-    }
-    await this.sendPasswordResetEmail(email);
-  }
-
-  private async sendPasswordResetEmail(email: string): Promise<void> {
-    const resetLink = `https://yourwebsite.com/reset-password/${encodeURIComponent(email)}`;
-    const mailOptions = {
-      from: 'omarx10050@gmail.com',
-      to: email,
-      subject: 'Reset Your Password',
-      text: `Please click on the following link to reset your password: ${resetLink}`,
-    };
-    try {
-      await this.mailService.sendMail(mailOptions);
-    } catch (error) {
-      Logger.error('Error sending password reset email:', error);
-      throw new Error('Failed to send password reset email');
-    }
-  }
-
+  
   private async sendUserRegisteredEvent(user: User): Promise<void> {
     const record = {
       topic: 'userRegistered',
@@ -165,4 +146,86 @@ export class UserService {
     const validatedToken = this.jwtService.verify(jwt);
     return validatedToken;
   }
+
+  async updatePassword(email: string, password: string) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await this.userModel.updateOne({ email }, { password: hashedPassword }).exec();
+
+    return "Password updated successfully" ;
+  }
+
+  async forgetPassword(email: string , otp: string , newPassword: string): Promise<void> {
+    const existingUser = await this.getUserbyEmail(email);
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
+    if (!await this.verifyOtp(email, otp)) {
+      throw new Error('Invalid OTP');
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userModel.updateOne({
+      email,
+    }, {
+      password: hashedPassword,
+    }).exec();
+
+  }
+
+
+   async sendPasswordResetEmail(email: string): Promise<void> {
+    const otp = this.generateOtp();
+    const otpExpiration = new Date();
+    otpExpiration.setMinutes(otpExpiration.getMinutes() + 15); // OTP valid for 15 minutes
+
+    this.otpStore.set(email, { otp, expires: otpExpiration });
+    const resetLink = `http://localhost:5050/forgetPassword`;
+    const mailOptions = {
+      from: 'omarx10050@gmail.com',
+      to: email,
+      subject: 'Reset Your Password',
+      text: `Your OTP code is: ${otp} . Please click on the following link to reset your password: ${resetLink}`,
+    };
+    try {
+      await this.mailService.sendMail(mailOptions);
+    } catch (error) {
+      Logger.error('Error sending password reset email:', error);
+      throw new Error('Failed to send password reset email');
+    }
+  }
+
+
+
+  private generateOtp(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+
+
+  private async verifyOtp(email: string, otp: string): Promise<boolean> {
+    const storedOtpData = this.otpStore.get(email);
+
+    if (!storedOtpData) {
+      throw new Error('No OTP found for this email');
+    }
+
+    const { otp: storedOtp, expires } = storedOtpData;
+
+    if (new Date() > expires) {
+      this.otpStore.delete(email);
+      throw new Error('OTP has expired');
+    }
+
+    if (storedOtp !== otp) {
+      throw new Error('Invalid OTP');
+    }
+
+    // OTP is valid
+    this.otpStore.delete(email);
+    return true;
+  }
+
+  
 }
+
+
+

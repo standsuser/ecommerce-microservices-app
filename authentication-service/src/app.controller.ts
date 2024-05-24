@@ -128,17 +128,6 @@ export class AppController {
     }
   }
 
-  @Post('forgot-password')
-  async forgotPassword(@Body() { email }: { email: string }): Promise<any> {
-    try {
-      // Attempt to send password reset email
-      const response = await this.userService.forgetPassword(email);
-      return { success: true, response };
-    } catch (error) {
-      // Handle any errors thrown during password reset
-      return { success: false, message: error }; // Return error response
-    }
-  }
 
   @Delete('logout')
   async logout(@Body() user: any): Promise<any> {
@@ -160,6 +149,50 @@ export class AppController {
   @Get('/getUserbyID/:userId')
     async getUserbyID(@Param('userId') userId: string) {
       return await this.userService.getUserbyID(userId);
+    }
+
+
+    @Put('updatePassword')
+    async updatePassword(@Body() { email, oldPassword ,newPassword }: { email: string, newPassword: string  , oldPassword : string}): Promise<any> {
+      try {
+        const user= await this.userService.getUserbyEmail(email);
+
+        // Attempt to change password
+        const passwordMatch = await bcrypt.compare(oldPassword , user.password);
+        Logger.log("passwordMatch : " , passwordMatch);
+        if (passwordMatch) {
+          const response = await this.userService.updatePassword(email, newPassword);
+          Logger.log("response : " , response);
+          return { success: true, response , message : "Password updated successfully"};
+        }
+      } catch (error) {
+        // Handle any errors thrown during password change
+        return { success: false, message: error }; // Return error response
+      }
+    }
+
+    @Put('forgetPassword')
+    async forgetPassword(@Body() { email, otp , newPassword }: { email: string, otp: string , newPassword: string }): Promise<any> {
+      try {
+        // Attempt to change password
+        const response = await this.userService.forgetPassword(email, otp , newPassword);
+        return { success: true, response };
+      } catch (error) {
+        // Handle any errors thrown during password change
+        return { success: false, message: error }; // Return error response
+      }
+    }
+
+    @Post('sendPasswordResetEmail')
+    async sendPasswordResetEmail(@Body() { email }: { email: string }): Promise<any> {
+      try {
+        // Attempt to send password reset email
+        const response = await this.userService.sendPasswordResetEmail(email);
+        return { success: true, response };
+      } catch (error) {
+        // Handle any errors thrown during password reset
+        return { success: false, message: error }; // Return error response
+      }
     }
 
   

@@ -42,7 +42,7 @@ async function bootstrap() {
 
   const corsOptions = {
     origin: 'http://localhost:5050', // Allow requests from this origin
-    methods: 'GET,POST,DELETE',              // Allow only GET and POST requests
+    methods: 'GET,POST,DELETE,PUT',              // Allow only GET and POST requests
     optionsSuccessStatus: 200,        // Respond with a 200 status for OPTIONS requests
     credentials: true                 // Allow credentials (cookies, authorization headers, etc.)
   };
