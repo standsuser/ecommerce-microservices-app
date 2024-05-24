@@ -252,8 +252,8 @@ export const updateMyReview = async (userId: string, reviewId: string, rating: n
   }
 };
 
-export const updateUserProfile = async (userId: string, updateData: any) => {
-  const url = `${AUTH_API_URL}/update/${userId}`;
+export const updateProfile = async (userId: string, updateData: any) => {
+  const url = `http://localhost:3080/editProfile/${userId}`;
   try {
     const response = await fetch(url, {
       method: 'PUT',
