@@ -6,15 +6,21 @@ import DefaultLayout from '@/layouts/default';
 const Favorites = () => {
   const [favoritesItems, setFavoritesItems] = useState<any[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true); // Add loading state
   const router = useRouter();
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('user');
     setUserId(storedUserId);
-    if (storedUserId) {
+
+    if (!storedUserId) {
+      alert('You need to login first');
+      router.push('/login');
+    } else {
       fetchFavoritesItems(storedUserId);
+      setLoading(false); // Set loading to false after fetching items
     }
-  }, []);
+  }, [router]);
 
   const fetchFavoritesItems = async (userId: string) => {
     try {
@@ -70,13 +76,13 @@ const Favorites = () => {
         quantity: 1,
         rentalDuration: "",
         name: item.productDetails.name,
-        amount_cents: item.productDetails.totalPrice * 100, // multiply totalPrice by 1000
+        amount_cents: item.productDetails.totalPrice * 100, // multiply totalPrice by 100
         description: item.productDetails.description,
         color: "red",
         size: "medium",
         material: "plastic"
       };
-  
+
       const response = await fetch(`http://localhost:3015/cart/${userId}/add-item/${productId}`, {
         method: 'POST',
         headers: {
@@ -84,16 +90,20 @@ const Favorites = () => {
         },
         body: JSON.stringify(payload)
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to add item to cart');
       }
-  
+
       alert('Item added to cart successfully');
     } catch (error) {
       console.error('Failed to add item to cart:', error);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading message while checking authentication
+  }
 
   return (
     <DefaultLayout>

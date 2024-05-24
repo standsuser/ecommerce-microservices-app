@@ -139,7 +139,7 @@ const Cart = () => {
 
   const handlePlaceOrder = () => {
     router.push({
-      pathname: '/checkout/checkout',
+      pathname: '/checkout',
       query: { 
         cartItems: JSON.stringify(cartItems), 
         discountedTotal: discountedTotal.toFixed(2) 
