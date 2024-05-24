@@ -22,15 +22,13 @@ export class PaymobController {
     }
   }
   @Post('order-payment/:orderId')
-  @Redirect()
   async getPaymentKeyAndRedirect(@Param('orderId') orderId: string, @Body() paymentData: any): Promise<any/* { url: string } */> {
     try {
       const paymentKey = await this.paymobService.getPaymentKey(paymentData, orderId);
-      // const iframeId = '844345'; // Your iframe ID
-      // const iframeUrl = `https://accept.paymobsolutions.com/api/acceptance/iframes/${iframeId}?payment_token=${paymentKey}`;
+      const iframeId = '844345'; // Your iframe ID
+      const iframeUrl = `${paymentKey}`;
 
-      // Return the URL to redirect to
-      // return { url: iframeUrl };
+      return { url: iframeUrl };
       return paymentKey;
     } catch (error) {
       // Handle errors here

@@ -29,6 +29,38 @@ export const registerOrder = async (orderData: any) => {
   if (!response.ok) {
     throw new Error('Failed to register order');
   }
+  return response.json();
+};
+export const cartRegisterOrder = async (userId: string, orderData: any) => {
+  const response = await fetch(`http://localhost:3015/cart/${userId}/createOrder`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(orderData),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to register order in cart');
+  }
+  return response.json();
+}
+
+export const getPaymentKeyAndRedirect = async (orderId: string, paymentData: any) => {
+  const API_URL = 'http://localhost:3010';
+
+  const response = await fetch(`${API_URL}/payment/order-payment/${orderId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(paymentData),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get payment key and redirect');
+  }
+
 
   return response.json();
 };

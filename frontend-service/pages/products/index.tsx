@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { Card, CardFooter, Image, Button } from "@nextui-org/react";
 import DefaultLayout from "@/layouts/default";
-import { title } from "@/components/primitives";
+
+interface Product {
+  _id: string;
+  imageURL: string[];
+  name: string;
+  totalPrice: number;
+  availability: boolean;
+  description: string;
+  sizes: string[];
+  colors: string[];
+  materials: string[];
+}
 
 const ProductPage = () => {
-  const [products, setProducts] = useState([]);
-  const router = useRouter();
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -25,41 +34,23 @@ const ProductPage = () => {
     fetchProducts();
   }, []);
 
-  const handleProductClick = async (productId) => {
-    try {
-      const response = await fetch(`http://localhost:3000/product/${productId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch product details");
-      }
-      const productData = await response.json();
-      // Navigate to the product details page or handle the data as needed
-      console.log("Product Details:", productData);
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-      // Handle error
-    }
-  };
-
-  const handleAddToCart = (productId) => {
-    // Add functionality to add product to cart
+  const handleAddToCart = (productId: string) => {
     console.log("Adding product to cart:", productId);
   };
 
-  const handleRent = (productId) => {
-    // Add functionality to rent the product
+  const handleRent = (productId: string) => {
     console.log("Renting product:", productId);
   };
 
   return (
     <DefaultLayout>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-16">
         {products.map((product, index) => (
-          <div key={index} className="relative">
-            <div onClick={() => handleProductClick(product.id)}>
+          <Link href={`/productDetails?id=${product._id}`} key={index}>
+            <div className="relative">
               <Card isFooterBlurred radius="lg" className="border-none flex-grow cursor-pointer">
                 <Image
-                  src={product.imageURL}
+                  src={product.imageURL[0]}
                   alt={product.name}
                   width="100%"
                   height={200}
@@ -77,22 +68,22 @@ const ProductPage = () => {
                   </div>
                 </CardFooter>
               </Card>
+              <div className="text-center mt-4 space-x-4">
+                <Button
+                  onClick={() => handleAddToCart(product._id)}
+                  className="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
+                >
+                  Add to cart
+                </Button>
+                <Button
+                  onClick={() => handleRent(product._id)}
+                  className="text-sm text-white bg-green-500 hover:bg-green-600 focus:bg-green-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
+                >
+                  Rent
+                </Button>
+              </div>
             </div>
-            <div className="text-center mt-4 space-x-4">
-              <Button
-                onClick={() => handleAddToCart(product.id)}
-                className="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
-              >
-                Add to cart
-              </Button>
-              <Button
-                onClick={() => handleRent(product.id)}
-                className="text-sm text-white bg-green-500 hover:bg-green-600 focus:bg-green-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
-              >
-                Rent
-              </Button>
-            </div>
-          </div>
+          </Link>
         ))}
       </div>
       <div className="bg-gray-900 text-white py-6 text-center">

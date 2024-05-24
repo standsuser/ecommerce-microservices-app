@@ -4,7 +4,7 @@ import { getCartItems, updateItemQuantity, createOrder, applyCouponCode, removeC
 import { Button, Input } from '@nextui-org/react';
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState<any[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState<string>('');
   const [totalPrice, setTotalPrice] = useState<number>(0);
@@ -23,11 +23,11 @@ const Cart = () => {
       try {
         if (userId) {
           const items = await getCartItems(userId, true);
-          setCartItems(items);
+          setCartItems(await enrichCartItems(items));
           calculateTotalPrice(items, getCouponDiscount());
         } else if (sessionId) {
           const items = await getCartItems(sessionId, false);
-          setCartItems(items);
+          setCartItems(await enrichCartItems(items));
           calculateTotalPrice(items, getCouponDiscount());
         }
       } catch (error) {
@@ -40,7 +40,28 @@ const Cart = () => {
     }
   }, [userId, sessionId]);
 
-  const calculateTotalPrice = (items: any, discountPercentage: number) => {
+  const enrichCartItems = async (items: any[]) => {
+    const enrichedItems = await Promise.all(items.map(async (item) => {
+      const productDetails = await fetchProductDetails(item.productId);
+      return { ...item, ...productDetails };
+    }));
+    return enrichedItems;
+  };
+
+  const fetchProductDetails = async (productId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/product/${productId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch product details');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+      return {};
+    }
+  };
+
+  const calculateTotalPrice = (items: any[], discountPercentage: number) => {
     const total = items.reduce((acc: number, item: any) => acc + (item.amount_cents * item.quantity), 0) / 100;
     setTotalPrice(total);
     const discounted = total - (total * (discountPercentage / 100));
@@ -49,31 +70,44 @@ const Cart = () => {
 
   const handleAddItem = async (productId: string) => {
     try {
+      let updatedCart;
       if (userId) {
-        const updatedCart = await updateItemQuantity(userId, true, productId, 1);
-        setCartItems(updatedCart.items);
-        calculateTotalPrice(updatedCart.items, getCouponDiscount());
+        updatedCart = await updateItemQuantity(userId, true, productId, 1);
       } else if (sessionId) {
-        const updatedCart = await updateItemQuantity(sessionId, false, productId, 1);
-        setCartItems(updatedCart.items);
-        calculateTotalPrice(updatedCart.items, getCouponDiscount());
+        updatedCart = await updateItemQuantity(sessionId, false, productId, 1);
       }
+      setCartItems(await enrichCartItems(updatedCart.items));
+      calculateTotalPrice(updatedCart.items, getCouponDiscount());
     } catch (error) {
       console.error('Failed to add item:', error);
     }
   };
 
+  const handleRemoveOneItem = async (productId: string) => {
+    try {
+      let updatedCart;
+      if (userId) {
+        updatedCart = await updateItemQuantity(userId, true, productId, -1);
+      } else if (sessionId) {
+        updatedCart = await updateItemQuantity(sessionId, false, productId, -1);
+      }
+      setCartItems(await enrichCartItems(updatedCart.items));
+      calculateTotalPrice(updatedCart.items, getCouponDiscount());
+    } catch (error) {
+      console.error('Failed to remove one item:', error);
+    }
+  };
+
   const handleRemoveItem = async (productId: string) => {
     try {
+      let updatedCart;
       if (userId) {
-        const updatedCart = await removeCartItem(userId, true, productId);
-        setCartItems(updatedCart.items);
-        calculateTotalPrice(updatedCart.items, getCouponDiscount());
+        updatedCart = await removeCartItem(userId, true, productId);
       } else if (sessionId) {
-        const updatedCart = await removeCartItem(sessionId, false, productId);
-        setCartItems(updatedCart.items);
-        calculateTotalPrice(updatedCart.items, getCouponDiscount());
+        updatedCart = await removeCartItem(sessionId, false, productId);
       }
+      setCartItems(await enrichCartItems(updatedCart.items));
+      calculateTotalPrice(updatedCart.items, getCouponDiscount());
     } catch (error) {
       console.error('Failed to remove item:', error);
     }
@@ -127,7 +161,9 @@ const Cart = () => {
       <div className="cart-items">
         {cartItems.map((item: any) => (
           <div key={item.productId} className="cart-item">
-            <img src={item.imageUrl} alt={item.name} className="cart-item-image" />
+            <div>
+              {item.imageURL && <img src={item.imageURL} alt={item.name} className="cart-item-image" />}
+            </div>
             <h2 className="cart-item-name">{item.name}</h2>
             <p className="cart-item-description">{item.description}</p>
             <p className="cart-item-details">Color: {item.color}</p>
@@ -139,7 +175,7 @@ const Cart = () => {
               <Button color="primary" onClick={() => handleAddItem(item.productId)}>
                 Add One
               </Button>
-              <Button color="primary" onClick={() => handleRemoveItem(item.productId)}>
+              <Button color="primary" onClick={() => handleRemoveOneItem(item.productId)}>
                 Remove One
               </Button>
               <Button color="primary" onClick={() => handleRemoveItem(item.productId)}>

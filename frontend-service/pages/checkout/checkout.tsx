@@ -5,7 +5,7 @@ import { button as buttonStyles } from "@nextui-org/theme";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
 import { Button, Progress, Card, Spacer, Input } from "@nextui-org/react";
-import { getUserAddresses, registerOrder } from "@/pages/api/checkoutApi";
+import { getUserAddresses, registerOrder, cartRegisterOrder, getPaymentKeyAndRedirect } from "@/pages/api/checkoutApi";
 
 type CartItem = {
     id: string;
@@ -123,10 +123,55 @@ const CheckoutPage: React.FC = () => {
         try {
             const response = await registerOrder(orderData);
             setOrderId(response.orderId.id);
+            
+            if (userId) {
+                await cartRegisterOrder(userId, orderData);
+            }
+            
             setOrderSubmitted(true);
         } catch (error) {
             console.error('Failed to submit order:', error);
             alert('Failed to submit order. Please try again.');
+        }
+    };
+
+    const handleVoidOrder = async () => {
+        if (!orderId || !addressDetails) {
+            alert('Order ID or address details are missing.');
+            return;
+        }
+
+        const paymentData = {
+            amount_cents: (parseFloat(discountedTotal) * 100).toFixed(0),
+            expiration: 3600,
+            billing_data: {
+                apartment: addressDetails.apartment,
+                email: addressDetails.email,
+                floor: addressDetails.floor.toString(),
+                first_name: addressDetails.first_name,
+                street: addressDetails.street,
+                building: addressDetails.building,
+                phone_number: addressDetails.phone_number,
+                shipping_method: "UNK",
+                postal_code: addressDetails.postal_code.toString(),
+                city: addressDetails.city,
+                country: addressDetails.country,
+                last_name: addressDetails.last_name,
+                state: addressDetails.state
+            },
+            currency: "EGP",
+            integration_id: 4570504,
+            lock_order_when_paid: "false"
+        };
+
+        try {
+            const response = await getPaymentKeyAndRedirect(orderId.toString(), paymentData);
+            if (response.url) {
+                window.location.href = response.url;
+            }
+        } catch (error) {
+            console.error('Failed to void order:', error);
+            alert('Failed to void order. Please try again.');
         }
     };
 
@@ -145,6 +190,17 @@ const CheckoutPage: React.FC = () => {
                         <h1 className={title()}>Thank You!</h1>
                         <p>Your order has been submitted successfully.</p>
                         <p>Order ID: {orderId}</p>
+                        <Button
+                            className={buttonStyles({
+                                color: "primary",
+                                radius: "full",
+                                variant: "shadow",
+                            })}
+                            style={{ marginTop: "20px" }}
+                            onClick={handleVoidOrder}
+                        >
+                            Void Order
+                        </Button>
                         <Spacer y={1} />
                         <Link href="/" className={buttonStyles({ color: "primary", radius: "full", variant: "shadow" })}>
                             Return to Home
@@ -207,7 +263,7 @@ const CheckoutPage: React.FC = () => {
                         placeholder="Select Address"
                         value={selectedAddress}
                         onChange={(e) => handleAddressChange(e.target.value)}
-                        className="w-full" // Add this line to make the select element full-width
+                        className="w-full" 
                     >
                         <option value="" disabled>Select Address</option>
                         {addresses.map(address => (

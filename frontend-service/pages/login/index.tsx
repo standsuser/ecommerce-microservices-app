@@ -70,7 +70,7 @@ const LoginPage: React.FC = () => {
 
         setTimeout(() => {
           // Redirect to the dashboard
-          router.push('/docs'); // Use client-side routing
+          router.push('/'); // Use client-side routing
         }, 1000); // Pause for 1 second
       } else {
         setError('Invalid email or password');

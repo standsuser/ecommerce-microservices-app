@@ -1,4 +1,4 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, Logger, NotFoundException, Param, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { LocalAuthGuard } from '../strategies/local-auth.guard';
@@ -65,3 +65,19 @@ export class UserController {
 
 
 }
+  @Get(':id')
+  async getUserById(@Param('id') id: string) {
+    try {
+      const user = await this.userService.getUserbyID(id);
+      return user;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        Logger.error("Error fetching user:", error);
+        throw new InternalServerErrorException("Failed to fetch user");
+      }
+    }
+  }
+}
+
