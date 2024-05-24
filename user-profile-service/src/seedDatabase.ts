@@ -56,7 +56,7 @@ async function run() {
     // Insert payments
     const payments = [
       {
-        userid: addressResult.insertedIds[0], // reference to the userId from addresses
+        userid: '664e0895f80e44d1d008abf2', // reference to the userId from addresses
         billingAddress: addressResult.insertedIds[0], // reference to an address
         debitOrCredit: 'credit',
         cardNumber: '4111111111111111',
@@ -72,11 +72,11 @@ async function run() {
     // Insert wishlists
     const wishlists = [
       {
-        userid: addressResult.insertedIds[0], // reference to the userId from addresses
-        productid: new ObjectId(), // replace with actual product ID
-        selectedSize: 'M',
-        selectedMaterial: 'Cotton',
-        selectedColor: 'Blue',
+      userid: new ObjectId('664e0895f80e44d1d008abf2'), // reference to the userId from addresses
+      productid: new ObjectId('664e3edd232fd5f39b78eec3'), // replace with actual product ID
+      selectedSize: 'medium',
+      selectedMaterial: 'plastic',
+      selectedColor: 'red',
       },
       // add more wishlists as needed
     ];

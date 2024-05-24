@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Button, Input } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState<any[]>([]);
@@ -23,10 +23,34 @@ const Wishlist = () => {
       }
       const data = await response.json();
       setWishlistItems(data);
+      // Fetch product details for each wishlist item
+      fetchProductDetails(data);
     } catch (error) {
       console.error('Error fetching wishlist items:', error);
     }
   };
+
+  const fetchProductDetails = async (wishlistItems: any[]) => {
+    try {
+      const productIds = wishlistItems.map(item => item.productid);
+      console.log('Fetching product details for productIds:', productIds); // Log productIds being fetched
+      const responses = await Promise.all(
+        productIds.map(productId =>
+          fetch(`http://localhost:3000/product/${productId}`)
+        )
+      );
+      const productsData = await Promise.all(responses.map(res => res.json()));
+      console.log('Received product details:', productsData); // Log received product details
+      const updatedWishlistItems = wishlistItems.map((item, index) => ({
+        ...item,
+        productDetails: productsData[index],
+      }));
+      setWishlistItems(updatedWishlistItems);
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+    }
+  };
+  
 
   const handleRemoveItem = async (wishlistId: string) => {
     try {
@@ -62,23 +86,25 @@ const Wishlist = () => {
       <div className="wishlist-items">
         {wishlistItems.map(item => (
           <div key={item._id} className="wishlist-item">
-            <div>
-              {item.imageURL && <img src={item.imageURL} alt={item.name} className="wishlist-item-image" />}
-            </div>
-            <h2 className="wishlist-item-name">{item.name}</h2>
-            <p className="wishlist-item-description">{item.description}</p>
-            <p className="wishlist-item-details">Color: {item.color}</p>
-            <p className="wishlist-item-details">Size: {item.size}</p>
-            <p className="wishlist-item-details">Material: {item.material}</p>
-            <div className="wishlist-item-actions">
-              <Button color="primary" onClick={() => handleAddToCart(item.productId)}>
-                Add to Cart
-              </Button>
-              <Button color="primary" onClick={() => handleRemoveItem(item._id)}>
-                Remove from Wishlist
-              </Button>
-            </div>
+          <div>
+            {item.productDetails?.imageURL && (
+              <img src={item.productDetails.imageURL} alt={item.name} className="wishlist-item-image" />
+            )}
           </div>
+          <h2 className="wishlist-item-name">NAME: {item.productDetails?.name}</h2>
+          <p className="wishlist-item-description">DESCRIPTION: {item.productDetails?.description}</p>
+         
+          <p className="wishlist-item-price">Price: ${(item.productDetails?.totalPrice)}</p>
+        
+          <div className="wishlist-item-actions">
+            <Button color="primary" onClick={() => handleAddToCart(item.productid)}>
+              Add to Cart
+            </Button>
+            <Button color="primary" onClick={() => handleRemoveItem(item._id)}>
+              Remove from Wishlist
+            </Button>
+          </div>
+        </div>
         ))}
       </div>
     </div>
