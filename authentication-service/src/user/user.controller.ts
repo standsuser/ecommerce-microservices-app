@@ -64,7 +64,7 @@ export class UserController {
 
 
 
-}
+
   @Get(':id')
   async getUserById(@Param('id') id: string) {
     try {
@@ -80,4 +80,6 @@ export class UserController {
     }
   }
 }
+
+
 

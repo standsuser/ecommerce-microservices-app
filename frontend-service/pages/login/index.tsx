@@ -59,7 +59,6 @@ const LoginPage: React.FC = () => {
 
       if (data.success) {
         setLoginSuccess(true);
-        setVer(true);
         setUser(data.response.userID);
         console.log(data);
         localStorage.setItem('user', data.response.userID);
@@ -74,7 +73,6 @@ const LoginPage: React.FC = () => {
         }, 1000); // Pause for 1 second
       } else {
         setError('Invalid email or password');
-        setVer(false);
       }
     } catch (error) {
       setError('An error occurred during login');
