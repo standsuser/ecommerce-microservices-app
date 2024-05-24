@@ -3,12 +3,22 @@ import { useRouter } from 'next/router';
 import { Card, CardFooter, Image, Button } from '@nextui-org/react';
 import DefaultLayout from '@/layouts/default';
 import { title } from "@/components/primitives";
+import { getAllProducts, addFavorite } from "@/pages/api/productApi";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CatalogPage: React.FC = () => {
     const [featuredListings, setFeaturedListings] = useState<any[]>([]);
     const [topOffers, setTopOffers] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
-    const router = useRouter(); // Initialize router
+    const [userId, setUserId] = useState<string | null>(null);
+    const [sessionId, setSessionId] = useState<string | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        setUserId(localStorage.getItem('user'));
+        setSessionId(localStorage.getItem('sessionId'));
+    }, []);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -73,11 +83,27 @@ const CatalogPage: React.FC = () => {
             }
         };
 
-
         fetchCategories();
         fetchFeaturedListings();
         fetchTopOffers();
     }, []);
+
+    const handleCardClick = (productId: string) => {
+        router.push(`/productDetails?id=${productId}`);
+    };
+
+    const handleAddToFavorites = async (productId: string) => {
+        try {
+            const selectedColor = "red";
+            const selectedMaterial = "plastic";
+            const selectedSize = "medium";
+            await addFavorite(userId as string, productId, selectedColor, selectedMaterial, selectedSize);
+            toast.success('Item added to favorites successfully');
+        } catch (error: any) {
+            console.error('Failed to add item to favorites:', error);
+            toast.error('Failed to add item to favorites');
+        }
+    };
 
     return (
         <DefaultLayout>
@@ -88,47 +114,78 @@ const CatalogPage: React.FC = () => {
                         <h1 className={title({ color: "violet" })}>Our Website</h1>
                         <h2 className="text-2xl font-bold mb-4">Categories</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {categories.map((category, index) => (
-                            <div key={index} onClick={() => router.push(`/category?categoryId=${category._id}`)}>
-                                        <Card isHoverable>
-            <Image src={category.imageURL} alt={category.name} width="100%" height={140} />
-            <CardFooter>
-                <div className="flex flex-col">
-                    <div><strong>Name:</strong> {category.name}</div>
-                </div>
-            </CardFooter>
-        </Card>
-    </div>
-))}
+                            {categories.map((category) => (
+                                <div key={category._id} onClick={() => router.push(`/category?categoryId=${category._id}`)}>
+                                    <Card isHoverable>
+                                        <Image src={category.imageURL} alt={category.name} width="100%" height={140} />
+                                        <CardFooter>
+                                            <div className="flex flex-col">
+                                                <div><strong>Name:</strong> {category.name}</div>
+                                            </div>
+                                        </CardFooter>
+                                    </Card>
+                                </div>
+                            ))}
+                        </div>
+                        <h2 className="text-2xl font-bold mb-4">Featured Listings</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {featuredListings.map((listing) => (
+                                <div key={listing._id} onClick={() => handleCardClick(listing._id)}>
+                                    <Card isHoverable>
+                                        <Image src={listing.imageURL} alt={listing.name} width="100%" height={140} />
+                                        <CardFooter>
+                                            <div className="flex flex-col">
+                                                <div><strong>Name:</strong> {listing.name}</div>
+                                                <div><strong>Rating:</strong> {listing.rating}</div>
+                                                <div><strong>Price:</strong> ${listing.totalPrice}</div>
+                                            </div>
+                                        </CardFooter>
+                                    </Card>
+                                    <Button
+                                        onClick={() => handleAddToFavorites(listing._id)}
+                                        className="text-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:bg-yellow-600 focus:outline-none px-4 py-2 rounded-full shadow-lg mt-2"
+                                    >
+                                        Add to Favorites
+                                    </Button>
+                                </div>
+                            ))}
                         </div>
                         <h2 className="text-2xl font-bold mb-4 mt-8">Top Offers</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {topOffers.map((offer, index) => (
-                                <Card key={index} isHoverable>
-                                    <Image src={offer.imageURL} alt={offer.name} width="100%" height={140} />
-                                    <CardFooter>
-                                        <div className="flex flex-col">
-                                            <div><strong>Name:</strong> {offer.name}</div>
-                                            <div><strong>Discount Percentage:</strong> {offer.discountpercentage}%</div>
-                                            <div><strong>Valid Until:</strong> {new Date(offer.validityperiod).toLocaleDateString()}</div>
-                                            <div><strong>Rating:</strong> {offer.rating}</div>
-                                            <div><strong>Price:</strong> ${offer.totalPrice}</div>
-                                        </div>
-                                    </CardFooter>
-                                </Card>
+                            {topOffers.map((offer) => (
+                                <div key={offer._id} onClick={() => handleCardClick(offer._id)}>
+                                    <Card isHoverable>
+                                        <Image src={offer.imageURL} alt={offer.name} width="100%" height={140} />
+                                        <CardFooter>
+                                            <div className="flex flex-col">
+                                                <div><strong>Name:</strong> {offer.name}</div>
+                                                <div><strong>Discount Percentage:</strong> {offer.discountpercentage}%</div>
+                                                <div><strong>Valid Until:</strong> {new Date(offer.validityperiod).toLocaleDateString()}</div>
+                                                <div><strong>Rating:</strong> {offer.rating}</div>
+                                                <div><strong>Price:</strong> ${offer.totalPrice}</div>
+                                            </div>
+                                        </CardFooter>
+                                    </Card>
+                                    <Button
+                                        onClick={() => handleAddToFavorites(offer._id)}
+                                        className="text-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:bg-yellow-600 focus:outline-none px-4 py-2 rounded-full shadow-lg mt-2"
+                                    >
+                                        Add to Favorites
+                                    </Button>
+                                </div>
                             ))}
                         </div>
                     </div>
                     <Button
                         color="primary"
                         variant="shadow"
-                        onClick={() => {}} // Add functionality if needed mycomment
+                        onClick={() => {}} // Add functionality if needed
                         className="mt-8"
                     >
                         Explore More
                     </Button>
-                
                 </section>
+                <ToastContainer />
             </div>
         </DefaultLayout>
     );
