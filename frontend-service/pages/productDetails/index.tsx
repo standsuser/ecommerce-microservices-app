@@ -81,6 +81,33 @@ const ProductDetailsPage: React.FC = () => {
     }
   };
 
+  const handleRentToCart = async () => {
+    try {
+      const addItemDto = {
+        rentalDuration: 'N/A',
+        isRented: true,
+        name: product.name,
+        amount_cents: totalPrice * 100, // converting dollars to cents
+        description: product.description,
+        color,
+        size,
+        material,
+        quantity: 1,
+      };
+
+      if (userId) {
+        await addItemToCart(userId, product._id, addItemDto, true);
+      } else if (sessionId) {
+        await addItemToCart(sessionId, product._id, addItemDto, false);
+      }
+
+      toast.success('Item added to cart');
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+      toast.error('Failed to add item to cart');
+    }
+  };
+
   const handleRent = () => {
     router.push(`/cart?productId=${product._id}`);
   };

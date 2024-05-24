@@ -199,7 +199,7 @@ const CheckoutPage: React.FC = () => {
                             style={{ marginTop: "20px" }}
                             onClick={handleVoidOrder}
                         >
-                            Void Order
+                            Checkout
                         </Button>
                         <Spacer y={1} />
                         <Link href="/" className={buttonStyles({ color: "primary", radius: "full", variant: "shadow" })}>
