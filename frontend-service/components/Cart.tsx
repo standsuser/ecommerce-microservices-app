@@ -5,13 +5,13 @@ import { Button, Input } from '@nextui-org/react';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState<string>('');
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [couponError, setCouponError] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     setUserId(localStorage.getItem('user'));

@@ -1,13 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardFooter, Image, Button } from '@nextui-org/react'; // Import Card, CardFooter, Image, and Button components
+import { useRouter } from 'next/router';
+import { Card, CardFooter, Image, Button } from '@nextui-org/react';
 import DefaultLayout from '@/layouts/default';
 import { title } from "@/components/primitives";
 
 const CatalogPage: React.FC = () => {
     const [featuredListings, setFeaturedListings] = useState<any[]>([]);
     const [topOffers, setTopOffers] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
+    const router = useRouter(); // Initialize router
 
     useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/product/category', {
+                    method: 'GET',
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch categories');
+                }
+                const data = await response.json();
+                setCategories(data);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
         const fetchProductDetails = async (productId: string) => {
             try {
                 const response = await fetch(`http://localhost:3000/product/${productId}`, {
@@ -55,6 +73,8 @@ const CatalogPage: React.FC = () => {
             }
         };
 
+
+        fetchCategories();
         fetchFeaturedListings();
         fetchTopOffers();
     }, []);
@@ -62,27 +82,24 @@ const CatalogPage: React.FC = () => {
     return (
         <DefaultLayout>
             <div>
-               
                 <section className="flex flex-col items-center justify-center gap-6 py-8 md:py-10">
                     <div className="max-w-lg text-center">
-                    <div>
                         <h1 className={title()}>Welcome to </h1>
                         <h1 className={title({ color: "violet" })}>Our Website</h1>
-                    </div>                      
-                      <h2 className="text-2xl font-bold mb-4">Featured Listings</h2>
+                        <h2 className="text-2xl font-bold mb-4">Categories</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {featuredListings.map((listing, index) => (
-                                <Card key={index} isHoverable>
-                                    <Image src={listing.imageURL} alt={listing.name} width="100%" height={140} />
-                                    <CardFooter>
-                                        <div className="flex flex-col">
-                                            <div><strong>Name:</strong> {listing.name}</div>
-                                            <div><strong>Rating:</strong> {listing.rating}</div>
-                                            <div><strong>Price:</strong> ${listing.totalPrice}</div>
-                                        </div>
-                                    </CardFooter>
-                                </Card>
-                            ))}
+                        {categories.map((category, index) => (
+                            <div key={index} onClick={() => router.push(`/category?categoryId=${category._id}`)}>
+                                        <Card isHoverable>
+            <Image src={category.imageURL} alt={category.name} width="100%" height={140} />
+            <CardFooter>
+                <div className="flex flex-col">
+                    <div><strong>Name:</strong> {category.name}</div>
+                </div>
+            </CardFooter>
+        </Card>
+    </div>
+))}
                         </div>
                         <h2 className="text-2xl font-bold mb-4 mt-8">Top Offers</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -16,22 +16,30 @@ import { SessionService } from '../session/session.service';
 import { ProducerService } from 'src/kafka/producer.service';
 
 const bcrypt = require("bcrypt");
+import { v4 as uuidv4 } from 'uuid';
+import { text } from 'stream/consumers';
+
+
 
 
 @Injectable()
 export class UserService {
     private mailService: Mailservice;
     private readonly sessionService: SessionService;
-    private otpStore: Map<string, { otp: string, expires: Date, userData: CreateUserDto }> = new Map();
+    private otpStore: Map<string, { otp: string, expires: Date }> = new Map();
 
-    constructor(
-        @Inject('USER_MODEL')
-        private userModel: Model<User>,
-        private jwtService: JwtService,
-        private readonly producerService: ProducerService,
-    ) {
-        this.mailService = new Mailservice('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')
-    }
+
+
+  constructor(
+    @Inject('USER_MODEL')
+    private userModel: Model<User>,
+    private jwtService: JwtService,
+    private readonly producerService: ProducerService,
+  ) {
+    this.mailService = new Mailservice(
+      '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',
+    );
+  }
 
     async validateUser(email: string, password: string) {
         const user = await this.userModel.findOne({ email }).exec();
@@ -167,8 +175,8 @@ export class UserService {
         const hashedPassword = await bcrypt.hash(password, 10);
         await this.userModel.updateOne({ email }, { password: hashedPassword }).exec();
 
-        return "Password updated successfully" ;
-    }
+    return "Password updated successfully" ;
+  }
 
     async forgetPassword(email: string , otp: string , newPassword: string): Promise<void> {
         const existingUser = await this.getUserbyEmail(email);

@@ -81,6 +81,21 @@ export class UserService {
     );
   }
 
+  async addToWishlist(userId: string, productId: string) {
+    try {
+      const wishlist = new this.wishlistModel({
+        userid: userId,
+        productid: productId,
+      });
+
+      await wishlist.save();
+
+      return wishlist;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async getProfile(userId: string) {
     try {
       const profile = await this.addressModel
