@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
-import { getUserProfile, getPrevOrders, getAddress, deleteAddress, addAddress, getCards, deleteCard, getMyReviews } from "@/pages/api/profileApi";
+import { getUserProfile, getPrevOrders, getAddress, deleteAddress, addAddress, getCards, deleteCard, getMyReviews, deleteMyReview, updateMyReview } from "@/pages/api/profileApi";
 
 export default function PersonalInformationPage() {
     const [userId, setUserId] = useState<string | null>(null);
@@ -11,6 +11,7 @@ export default function PersonalInformationPage() {
     const [addresses, setAddresses] = useState<any[]>([]);
     const [cards, setCards] = useState<any[]>([]);
     const [reviews, setReviews] = useState<any[]>([]);
+    const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
     const [newAddress, setNewAddress] = useState<any>({
         addresslabel: '',
         apartment: '',
@@ -26,6 +27,10 @@ export default function PersonalInformationPage() {
         country: '',
         last_name: '',
         state: ''
+    });
+    const [newReview, setNewReview] = useState<any>({
+        rating: 0,
+        review: ''
     });
 
     useEffect(() => {
@@ -108,6 +113,43 @@ export default function PersonalInformationPage() {
         }
     };
 
+    const handleDeleteReview = async (reviewId: string) => {
+        if (!userId) return;
+        try {
+            await deleteMyReview(userId, reviewId);
+            setReviews(reviews.filter(review => review._id !== reviewId));
+        } catch (error) {
+            console.error("Failed to delete review:", error);
+        }
+    };
+
+    const handleUpdateReview = async () => {
+        if (!userId || !editingReviewId) return;
+        try {
+            await updateMyReview(userId, editingReviewId, newReview.rating, newReview.review);
+            setReviews(reviews.map(review => 
+                review._id === editingReviewId ? { ...review, ...newReview } : review
+            ));
+            setEditingReviewId(null);
+            setNewReview({ rating: 0, review: '' });
+        } catch (error) {
+            console.error("Failed to update review:", error);
+        }
+    };
+
+    const handleEditReview = (reviewId: string, currentReview: any) => {
+        setEditingReviewId(reviewId);
+        setNewReview({ rating: currentReview.rating, review: currentReview.review });
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setNewReview(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
     const handleAddAddress = async () => {
         if (!userId) return;
         try {
@@ -132,14 +174,6 @@ export default function PersonalInformationPage() {
         } catch (error) {
             console.error("Failed to add address:", error);
         }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setNewAddress(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
     };
 
     return (
@@ -233,8 +267,50 @@ export default function PersonalInformationPage() {
                                 <p><strong>Product Name:</strong> {review.productName}</p>
                                 <p><strong>Review:</strong> {review.review}</p>
                                 <p><strong>Rating:</strong> {review.rating}</p>
+                                <button
+                                    onClick={() => handleEditReview(review._id, review)}
+                                    className="bg-blue-500 text-white px-4 py-2 mt-2"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteReview(review._id)}
+                                    className="bg-red-500 text-white px-4 py-2 mt-2"
+                                >
+                                    Remove
+                                </button>
                             </div>
                         ))}
+                    </div>
+                )}
+                {editingReviewId && (
+                    <div className="mt-8">
+                        <h2 className={title()}>Edit Review</h2>
+                        <div className="flex flex-col">
+                            <label htmlFor="rating" className="mb-1 capitalize">Rating</label>
+                            <input
+                                type="number"
+                                id="rating"
+                                name="rating"
+                                value={newReview.rating}
+                                onChange={handleChange}
+                                className="border px-4 py-2"
+                            />
+                            <label htmlFor="review" className="mb-1 capitalize">Review</label>
+                            <textarea
+                                id="review"
+                                name="review"
+                                value={newReview.review}
+                                onChange={handleChange}
+                                className="border px-4 py-2"
+                            />
+                            <button
+                                onClick={handleUpdateReview}
+                                className="bg-green-500 text-white px-4 py-2 mt-4"
+                            >
+                                Update Review
+                            </button>
+                        </div>
                     </div>
                 )}
                 {orders.length > 0 && (

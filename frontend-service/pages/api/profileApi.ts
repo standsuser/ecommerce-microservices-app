@@ -183,3 +183,48 @@ export const getMyReviews = async (userId: string) => {
     throw error;
   }
 };
+
+export const deleteMyReview = async (userId: string, reviewId: string) => {
+  const url = `${PRODUCT_API_URL}/product/review/delete/${userId}/${reviewId}`;
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete review');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to delete review', error);
+    throw error;
+  }
+};
+
+export const updateMyReview = async (userId: string, reviewId: string, rating: number, review: string) => {
+  const url = `${PRODUCT_API_URL}/product/review/update/${userId}/${reviewId}`;
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ rating, review }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update review');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to update review', error);
+    throw error;
+  }
+};
