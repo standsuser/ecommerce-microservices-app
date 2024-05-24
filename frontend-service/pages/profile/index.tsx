@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
-import { getUserProfile, getPrevOrders, getAddress, deleteAddress, addAddress } from "@/pages/api/profileApi";
+import { getUserProfile, getPrevOrders, getAddress, deleteAddress, addAddress, getCards, deleteCard, getMyReviews } from "@/pages/api/profileApi";
 
 export default function PersonalInformationPage() {
     const [userId, setUserId] = useState<string | null>(null);
@@ -9,6 +9,8 @@ export default function PersonalInformationPage() {
     const [userData, setUserData] = useState<any>(null);
     const [orders, setOrders] = useState<any[]>([]);
     const [addresses, setAddresses] = useState<any[]>([]);
+    const [cards, setCards] = useState<any[]>([]);
+    const [reviews, setReviews] = useState<any[]>([]);
     const [newAddress, setNewAddress] = useState<any>({
         addresslabel: '',
         apartment: '',
@@ -36,6 +38,8 @@ export default function PersonalInformationPage() {
             fetchUserData(storedUserId);
             fetchUserOrders(storedUserId);
             fetchUserAddresses(storedUserId);
+            fetchUserCards(storedUserId);
+            fetchUserReviews(storedUserId);
         }
     }, []);
 
@@ -66,6 +70,24 @@ export default function PersonalInformationPage() {
         }
     };
 
+    const fetchUserCards = async (userId: string) => {
+        try {
+            const cards = await getCards(userId);
+            setCards(cards);
+        } catch (error) {
+            console.error("Failed to fetch cards:", error);
+        }
+    };
+
+    const fetchUserReviews = async (userId: string) => {
+        try {
+            const reviews = await getMyReviews(userId);
+            setReviews(reviews);
+        } catch (error) {
+            console.error("Failed to fetch reviews:", error);
+        }
+    };
+
     const handleDeleteAddress = async (addressId: string) => {
         if (!userId) return;
         try {
@@ -73,6 +95,16 @@ export default function PersonalInformationPage() {
             setAddresses(addresses.filter(address => address._id !== addressId));
         } catch (error) {
             console.error("Failed to delete address:", error);
+        }
+    };
+
+    const handleDeleteCard = async (cardId: string) => {
+        if (!userId) return;
+        try {
+            await deleteCard(userId, cardId);
+            setCards(cards.filter(card => card._id !== cardId));
+        } catch (error) {
+            console.error("Failed to delete card:", error);
         }
     };
 
@@ -175,6 +207,36 @@ export default function PersonalInformationPage() {
                         Add Address
                     </button>
                 </div>
+                {cards.length > 0 && (
+                    <div className="mt-8">
+                        <h2 className={title()}>Card Information</h2>
+                        {cards.map(card => (
+                            <div key={card._id} className="border p-4 mb-4">
+                                <p><strong>Card Number:</strong> {card.cardNumber}</p>
+                                <p><strong>Card Holder Name:</strong> {card.cardHolderName}</p>
+                                <p><strong>Expiry Date:</strong> {card.expiryDate}</p>
+                                <button
+                                    onClick={() => handleDeleteCard(card._id)}
+                                    className="bg-red-500 text-white px-4 py-2 mt-2"
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {reviews.length > 0 && (
+                    <div className="mt-8">
+                        <h2 className={title()}>My Reviews</h2>
+                        {reviews.map(review => (
+                            <div key={review._id} className="border p-4 mb-4">
+                                <p><strong>Product Name:</strong> {review.productName}</p>
+                                <p><strong>Review:</strong> {review.review}</p>
+                                <p><strong>Rating:</strong> {review.rating}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
                 {orders.length > 0 && (
                     <div className="mt-8">
                         <h2 className={title()}>Previous Orders</h2>

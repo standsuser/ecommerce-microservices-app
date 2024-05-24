@@ -1,6 +1,7 @@
 const PROFILE_API_URL = 'http://localhost:3003';
 const AUTH_API_URL = 'http://localhost:3080';
 const CART_API_URL = 'http://localhost:3015'
+const PRODUCT_API_URL = 'http://localhost:3000';
 
 
 
@@ -114,6 +115,71 @@ export const addAddress = async (userId: string, address: any) => {
     return await response.json();
   } catch (error) {
     console.error('Failed to add address', error);
+    throw error;
+  }
+};
+export const getCards = async (userId: string) => {
+  const url = `${PROFILE_API_URL}/user/card/${userId}`;
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch cards');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to fetch cards', error);
+    throw error;
+  }
+};
+
+export const deleteCard = async (userId: string, cardId: string) => {
+  const url = `${PROFILE_API_URL}/user/deleteCard/${userId}?cardId=${cardId}`;
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete card');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to delete card', error);
+    throw error;
+  }
+};
+
+export const getMyReviews = async (userId: string) => {
+  const url = `${PRODUCT_API_URL}/product/myreviews/${userId}`;
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch reviews');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to fetch reviews', error);
     throw error;
   }
 };
