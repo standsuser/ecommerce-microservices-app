@@ -1,8 +1,8 @@
 const API_URL = 'http://localhost:3015';
 
 export const getCartItems = async (identifier: string, isUser: boolean) => {
-  let url = isUser 
-    ? `${API_URL}/cart/items/${identifier}` 
+  let url = isUser
+    ? `${API_URL}/cart/items/${identifier}`
     : `${API_URL}/cart/guest/${identifier}/items`;
 
   let response = await fetch(url, {
@@ -35,8 +35,12 @@ export const getCartItems = async (identifier: string, isUser: boolean) => {
 };
 
 
-export const addItemToCart = async (sessionId: string, productId: string, addItemDto: any) => {
-  const response = await fetch(`${API_URL}/cart/guest/${sessionId}/add-item/${productId}`, {
+export const addItemToCart = async (identifier: string, productId: string, addItemDto: any, isUser: boolean) => {
+  const url = isUser
+    ? `${API_URL}/cart/${identifier}/add-item/${productId}`
+    : `${API_URL}/cart/guest/${identifier}/add-item/${productId}`;
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -100,7 +104,7 @@ export const createOrder = async (userId: string, shippingData: any) => {
 };
 
 export const removeCartItem = async (identifier: string, isUser: boolean, productId: string) => {
-  const url = isUser 
+  const url = isUser
     ? `${API_URL}/cart/remove-item/${identifier}/${productId}`
     : `${API_URL}/cart/guest/${identifier}/remove-item/${productId}`;
 
@@ -120,8 +124,8 @@ export const removeCartItem = async (identifier: string, isUser: boolean, produc
 };
 
 export const updateItemQuantity = async (identifier: string, isUser: boolean, productId: string, quantityChange: number) => {
-  let url = isUser 
-    ? `${API_URL}/cart/${identifier}/update-quantity/${productId}` 
+  let url = isUser
+    ? `${API_URL}/cart/${identifier}/update-quantity/${productId}`
     : `${API_URL}/cart/guest/${identifier}/update-quantity/${productId}`;
 
   let response = await fetch(url, {

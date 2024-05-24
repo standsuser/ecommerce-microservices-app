@@ -21,8 +21,10 @@ const ProductDetailsPage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    setUserId(localStorage.getItem('user'));
-    setSessionId(localStorage.getItem('sessionId'));
+    const user = localStorage.getItem('user');
+    const sessionId = localStorage.getItem('sessionId');
+    setUserId(user);
+    setSessionId(sessionId);
 
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get("id");
@@ -67,9 +69,9 @@ const ProductDetailsPage: React.FC = () => {
       };
 
       if (userId) {
-        await addItemToCart(userId, product._id, addItemDto);
+        await addItemToCart(userId, product._id, addItemDto, true);
       } else if (sessionId) {
-        await addItemToCart(sessionId, product._id, addItemDto);
+        await addItemToCart(sessionId, product._id, addItemDto, false);
       }
 
       toast.success('Item added to cart');
