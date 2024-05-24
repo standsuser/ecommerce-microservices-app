@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from 'next/router';
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
 import { getUserProfile, getPrevOrders, getAddress, deleteAddress, addAddress, getCards, deleteCard, getMyReviews, deleteMyReview, updateMyReview, addCard } from "@/pages/api/profileApi";
@@ -37,6 +38,8 @@ export default function PersonalInformationPage() {
         cardHolderName: '',
         expiryDate: ''
     });
+    const [loading, setLoading] = useState(true); // Add loading state
+    const router = useRouter();
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('user');
@@ -44,14 +47,18 @@ export default function PersonalInformationPage() {
         setUserId(storedUserId);
         setSessionId(storedSessionId);
 
-        if (storedUserId) {
+        if (!storedUserId) {
+            alert('You need to login first');
+            router.push('/login');
+        } else {
             fetchUserData(storedUserId);
             fetchUserOrders(storedUserId);
             fetchUserAddresses(storedUserId);
             fetchUserCards(storedUserId);
             fetchUserReviews(storedUserId);
+            setLoading(false); // Set loading to false after fetching items
         }
-    }, []);
+    }, [router]);
 
     const fetchUserData = async (userId: string) => {
         try {
@@ -207,6 +214,10 @@ export default function PersonalInformationPage() {
             console.error("Failed to add card:", error);
         }
     };
+
+    if (loading) {
+        return <div>Loading...</div>; // Show a loading message while checking authentication
+    }
 
     return (
         <DefaultLayout>
