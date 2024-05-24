@@ -27,10 +27,18 @@ const CategoryPage: React.FC = () => {
   const { categoryId } = router.query;
   const [products, setProducts] = useState<Product[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true); // Add loading state for authentication
 
   useEffect(() => {
-    setUserId(localStorage.getItem('user'));
-  }, []);
+    const storedUserId = localStorage.getItem('user');
+    if (!storedUserId) {
+      alert('You need to login first');
+      router.push('/login');
+    } else {
+      setUserId(storedUserId);
+      setLoading(false); // Set loading to false after authentication check
+    }
+  }, [router]);
 
   const calculateAverageRating = (product: Product) => {
     return product.totalReviews ? ((product.totalRating / product.totalReviews) * 10).toFixed(1) : "No ratings yet";
@@ -124,6 +132,10 @@ const CategoryPage: React.FC = () => {
       fetchCategory();
     }
   }, [categoryId]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading message while checking authentication
+  }
 
   return (
     <DefaultLayout>

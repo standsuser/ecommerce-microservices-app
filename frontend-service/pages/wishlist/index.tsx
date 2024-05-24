@@ -6,15 +6,21 @@ import DefaultLayout from '@/layouts/default';
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState<any[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true); // Add loading state
   const router = useRouter();
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('user');
     setUserId(storedUserId);
-    if (storedUserId) {
+
+    if (!storedUserId) {
+      alert('You need to login first');
+      router.push('/login');
+    } else {
       fetchWishlistItems(storedUserId);
+      setLoading(false); // Set loading to false after fetching items
     }
-  }, []);
+  }, [router]);
 
   const fetchWishlistItems = async (userId: string) => {
     try {
@@ -70,13 +76,13 @@ const Wishlist = () => {
         quantity: 1,
         rentalDuration: "",
         name: item.productDetails.name,
-        amount_cents: item.productDetails.totalPrice * 100, // multiply totalPrice by 1000
+        amount_cents: item.productDetails.totalPrice * 100, // multiply totalPrice by 100
         description: item.productDetails.description,
         color: "red",
         size: "medium",
         material: "plastic"
       };
-  
+
       const response = await fetch(`http://localhost:3015/cart/${userId}/add-item/${productId}`, {
         method: 'POST',
         headers: {
@@ -84,47 +90,49 @@ const Wishlist = () => {
         },
         body: JSON.stringify(payload)
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to add item to cart');
       }
-  
+
       alert('Item added to cart successfully');
     } catch (error) {
       console.error('Failed to add item to cart:', error);
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading message while checking authentication
+  }
+
   return (
     <DefaultLayout>
-
-    <div style={{ maxWidth: '800px', margin: '10px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: 'purple' }}>
-      <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>Your Wishlist</h1>
-      <div>
-        {wishlistItems.map(item => (
-          <div key={item._id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '16px', marginBottom: '12px', backgroundColor: 'black' }}>
-            <div>
-              {item.productDetails?.imageURL && (
-                <img src={item.productDetails.imageURL} alt={item.productDetails.name} style={{ width: '100px', height: '100px', objectFit: 'contain', marginBottom: '12px' }} />
-              )}
+      <div style={{ maxWidth: '800px', margin: '10px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: 'purple' }}>
+        <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>Your Wishlist</h1>
+        <div>
+          {wishlistItems.map(item => (
+            <div key={item._id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '16px', marginBottom: '12px', backgroundColor: 'black' }}>
+              <div>
+                {item.productDetails?.imageURL && (
+                  <img src={item.productDetails.imageURL} alt={item.productDetails.name} style={{ width: '100px', height: '100px', objectFit: 'contain', marginBottom: '12px' }} />
+                )}
+              </div>
+              <h2 style={{ fontSize: '18px', fontWeight: 'bold' }}>{item.productDetails?.name}</h2>
+              <p style={{ marginBottom: '8px' }}>{item.productDetails?.description}</p>
+              <p style={{ fontSize: '16px', marginBottom: '12px' }}>Price: ${(item.productDetails?.totalPrice)}</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Button color="primary" onClick={() => handleAddToCart(item.productid, item)}>
+                  Add to Cart
+                </Button>
+                <Button color="primary" onClick={() => handleRemoveItem(item._id)}>
+                  Remove from Wishlist
+                </Button>
+              </div>
             </div>
-            <h2 style={{ fontSize: '18px', fontWeight: 'bold' }}>{item.productDetails?.name}</h2>
-            <p style={{ marginBottom: '8px' }}>{item.productDetails?.description}</p>
-            <p style={{ fontSize: '16px', marginBottom: '12px' }}>Price: ${(item.productDetails?.totalPrice)}</p>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Button color="primary" onClick={() => handleAddToCart(item.productid, item)}>
-                Add to Cart
-              </Button>
-              <Button color="primary" onClick={() => handleRemoveItem(item._id)}>
-                Remove from Wishlist
-              </Button>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
     </DefaultLayout>
-
   );
 };
 
