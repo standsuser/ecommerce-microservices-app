@@ -3,12 +3,22 @@ import { useRouter } from 'next/router';
 import { Card, CardFooter, Image, Button } from '@nextui-org/react';
 import DefaultLayout from '@/layouts/default';
 import { title } from "@/components/primitives";
+import { getAllProducts, addFavorite } from "@/pages/api/productApi";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CatalogPage: React.FC = () => {
     const [featuredListings, setFeaturedListings] = useState<any[]>([]);
     const [topOffers, setTopOffers] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
-    const router = useRouter(); // Initialize router
+    const [userId, setUserId] = useState<string | null>(null);
+    const [sessionId, setSessionId] = useState<string | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        setUserId(localStorage.getItem('user'));
+        setSessionId(localStorage.getItem('sessionId'));
+    }, []);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -82,6 +92,19 @@ const CatalogPage: React.FC = () => {
         router.push(`/productDetails?id=${productId}`);
     };
 
+    const handleAddToFavorites = async (productId: string) => {
+        try {
+            const selectedColor = "red";
+            const selectedMaterial = "plastic";
+            const selectedSize = "medium";
+            await addFavorite(userId as string, productId, selectedColor, selectedMaterial, selectedSize);
+            toast.success('Item added to favorites successfully');
+        } catch (error: any) {
+            console.error('Failed to add item to favorites:', error);
+            toast.error('Failed to add item to favorites');
+        }
+    };
+
     return (
         <DefaultLayout>
             <div>
@@ -118,6 +141,12 @@ const CatalogPage: React.FC = () => {
                                             </div>
                                         </CardFooter>
                                     </Card>
+                                    <Button
+                                        onClick={() => handleAddToFavorites(listing._id)}
+                                        className="text-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:bg-yellow-600 focus:outline-none px-4 py-2 rounded-full shadow-lg mt-2"
+                                    >
+                                        Add to Favorites
+                                    </Button>
                                 </div>
                             ))}
                         </div>
@@ -137,6 +166,12 @@ const CatalogPage: React.FC = () => {
                                             </div>
                                         </CardFooter>
                                     </Card>
+                                    <Button
+                                        onClick={() => handleAddToFavorites(offer._id)}
+                                        className="text-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:bg-yellow-600 focus:outline-none px-4 py-2 rounded-full shadow-lg mt-2"
+                                    >
+                                        Add to Favorites
+                                    </Button>
                                 </div>
                             ))}
                         </div>
@@ -150,6 +185,7 @@ const CatalogPage: React.FC = () => {
                         Explore More
                     </Button>
                 </section>
+                <ToastContainer />
             </div>
         </DefaultLayout>
     );
