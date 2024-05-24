@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardFooter, Image, Button } from "@nextui-org/react";
 import DefaultLayout from "@/layouts/default";
-import { getAllProducts, getProductReviews } from "@/pages/api/productApi";
+import { getAllProducts } from "@/pages/api/productApi";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/router';
@@ -22,18 +22,8 @@ interface Product {
   totalReviews: number;
 }
 
-interface Review {
-  _id: string;
-  productId: string;
-  userId: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-}
-
 const ProductPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [reviews, setReviews] = useState<{ [key: string]: Review[] }>({});
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
@@ -44,28 +34,15 @@ const ProductPage = () => {
   }, []);
 
   useEffect(() => {
-    const fetchProductsAndReviews = async () => {
+    const fetchProducts = async () => {
       try {
         const products = await getAllProducts();
         setProducts(products);
-
-        products.forEach(async (product: Product) => {
-          try {
-            const reviews = await getProductReviews(product._id);
-            setReviews((prev) => ({ ...prev, [product._id]: reviews }));
-          } catch (error: any) {
-            if (error.message === 'Failed to fetch product reviews') {
-              setReviews((prev) => ({ ...prev, [product._id]: [] }));
-            } else {
-              console.error("Error fetching reviews:", error);
-            }
-          }
-        });
       } catch (error: any) {
-        console.error("Error fetching products and reviews:", error);
+        console.error("Error fetching products:", error);
       }
     };
-    fetchProductsAndReviews();
+    fetchProducts();
   }, []);
 
   const calculateAverageRating = (product: Product) => {
@@ -78,7 +55,7 @@ const ProductPage = () => {
         quantity: 1,
         rentalDuration: "",
         name: item.name,
-        amount_cents: item.totalPrice * 100, // multiply totalPrice by 1000
+        amount_cents: item.totalPrice * 100, // multiply totalPrice by 100
         description: item.description,
         color: "red",
         size: "medium",
@@ -183,20 +160,6 @@ const ProductPage = () => {
               >
                 View Details
               </Button>
-            </div>
-            <div className="mt-4">
-              <h4 className="text-center text-lg font-semibold">Reviews</h4>
-              {reviews[product._id] && reviews[product._id].length > 0 ? (
-                reviews[product._id].map((review) => (
-                  <div key={review._id} className="bg-gray-800 text-white p-4 rounded-lg mt-2">
-                    <p className="text-sm">Rating: {review.rating} stars</p>
-                    <p className="text-sm">Comment: {review.comment}</p>
-                    <p className="text-xs text-gray-400">Posted on: {new Date(review.createdAt).toLocaleDateString()}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center text-gray-500">No reviews yet</p>
-              )}
             </div>
           </div>
         ))}
