@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Button } from '@nextui-org/react';
+import DefaultLayout from '@/layouts/default';
 
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState<any[]>([]);
@@ -93,11 +94,11 @@ const Wishlist = () => {
       console.error('Failed to add item to cart:', error);
     }
   };
-  
-  
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: 'purple' }}>
+    <DefaultLayout>
+
+    <div style={{ maxWidth: '800px', margin: '10px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: 'purple' }}>
       <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>Your Wishlist</h1>
       <div>
         {wishlistItems.map(item => (
@@ -111,10 +112,9 @@ const Wishlist = () => {
             <p style={{ marginBottom: '8px' }}>{item.productDetails?.description}</p>
             <p style={{ fontSize: '16px', marginBottom: '12px' }}>Price: ${(item.productDetails?.totalPrice)}</p>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button color="primary" onClick={() => handleAddToCart(item.productid, item)}>
-  Add to Cart
-</Button>
-
+              <Button color="primary" onClick={() => handleAddToCart(item.productid, item)}>
+                Add to Cart
+              </Button>
               <Button color="primary" onClick={() => handleRemoveItem(item._id)}>
                 Remove from Wishlist
               </Button>
@@ -123,6 +123,8 @@ const Wishlist = () => {
         ))}
       </div>
     </div>
+    </DefaultLayout>
+
   );
 };
 
