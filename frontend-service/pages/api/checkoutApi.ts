@@ -17,7 +17,7 @@ export const getUserAddresses = async (userId: string) => {
 };
 const PAYMENT_API_URL = 'http://localhost:3010';
 
-export const registerOrder = async (orderData: any) => {
+export const registerOrder = async (userId: string, orderData: any) => {
   const response = await fetch(`${PAYMENT_API_URL}/payment/register-order`, {
     method: 'POST',
     headers: {
@@ -29,6 +29,13 @@ export const registerOrder = async (orderData: any) => {
   if (!response.ok) {
     throw new Error('Failed to register order');
   }
+  const hiddenResponse = await fetch(`http://localhost:3015/${userId}/createOrder`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(orderData),
+  });
 
   return response.json();
 };
@@ -47,6 +54,7 @@ export const getPaymentKeyAndRedirect = async (orderId: string, paymentData: any
   if (!response.ok) {
     throw new Error('Failed to get payment key and redirect');
   }
+
 
   return response.json();
 };

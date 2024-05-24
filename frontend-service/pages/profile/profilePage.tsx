@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
-import { getUserProfile } from "@/pages/api/profileApi";
+import { getUserProfile, getPrevOrders } from "@/pages/api/profileApi";
 
 export default function PersonalInformationPage() {
     const [userId, setUserId] = useState<string | null>(null);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [userData, setUserData] = useState<any>(null);
+    const [orders, setOrders] = useState<any[]>([]);
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('user');
@@ -16,6 +17,7 @@ export default function PersonalInformationPage() {
 
         if (storedUserId) {
             fetchUserData(storedUserId);
+            fetchUserOrders(storedUserId);
         }
     }, []);
 
@@ -25,6 +27,15 @@ export default function PersonalInformationPage() {
             setUserData(data);
         } catch (error) {
             console.error("Failed to fetch user data:", error);
+        }
+    };
+
+    const fetchUserOrders = async (userId: string) => {
+        try {
+            const orders = await getPrevOrders(userId);
+            setOrders(orders);
+        } catch (error) {
+            console.error("Failed to fetch previous orders:", error);
         }
     };
 
@@ -51,6 +62,33 @@ export default function PersonalInformationPage() {
                         <p><strong>Country:</strong> {userData.country}</p>
                         <p><strong>Address Label:</strong> {userData.addresslabel}</p>
                         <p><strong>State:</strong> {userData.state}</p>
+                    </div>
+                )}
+                {orders.length > 0 && (
+                    <div className="mt-8">
+                        <h2 className={title()}>Previous Orders</h2>
+                        <table className="min-w-full table-auto mt-4">
+                            <thead>
+                                <tr>
+                                    <th className="px-4 py-2">Order ID</th>
+                                    <th className="px-4 py-2">Product</th>
+                                    <th className="px-4 py-2">Quantity</th>
+                                    <th className="px-4 py-2">Price</th>
+                                    <th className="px-4 py-2">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orders.map((order) => (
+                                    <tr key={order.id}>
+                                        <td className="border px-4 py-2">{order.id}</td>
+                                        <td className="border px-4 py-2">{order.product}</td>
+                                        <td className="border px-4 py-2">{order.quantity}</td>
+                                        <td className="border px-4 py-2">{order.price}</td>
+                                        <td className="border px-4 py-2">{order.date}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </section>
