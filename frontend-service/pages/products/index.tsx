@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Card, CardFooter, Image, Button } from "@nextui-org/react";
+import { Card, Button } from "@nextui-org/react";
 import DefaultLayout from "@/layouts/default";
 import { getAllProducts, addFavorite } from "@/pages/api/productApi";
 import { toast, ToastContainer } from 'react-toastify';
@@ -122,57 +122,46 @@ const ProductPage = () => {
   return (
     <DefaultLayout>
       <ToastContainer />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-16">
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px' }}>
         {products.map((product, index) => (
-          <div key={index} className="relative">
-            <Link href={`/productDetails?id=${product._id}`} legacyBehavior>
-              <Card radius="lg" className="border-none flex-grow cursor-pointer">
-                <Image
-                  src={product.imageURL[0]}
-                  alt={product.name}
-                  width="100%"
-                  height={200}
-                  className="object-cover"
-                />
-                <CardFooter>
-                  <div className="text-center">
-                    <p className="text-lg text-white font-semibold mb-2">{product.name}</p>
-                    <p className="text-sm text-white/80 mb-2">Price: ${product.totalPrice}</p>
-                    <p className="text-sm text-white/80 mb-2">Availability: {product.availability ? "In Stock" : "Out of Stock"}</p>
-                    <p className="text-sm text-white/80 mb-2">Description: {product.description}</p>
-                    <p className="text-sm text-white/80 mb-2">Sizes: {product.sizes.join(", ")}</p>
-                    <p className="text-sm text-white/80 mb-2">Colors: {product.colors.join(", ")}</p>
-                    <p className="text-sm text-white/80 mb-2">Materials: {product.materials.join(", ")}</p>
-                    <p className="text-sm text-yellow-500 mb-2">Rating: {calculateAverageRating(product)}</p>
-                  </div>
-                </CardFooter>
+          <div key={index} style={{ flex: '1 1 calc(25% - 16px)', boxSizing: 'border-box' }}>
+            <Link href={`/productDetails?id=${product._id}`} passHref>
+              <Card isPressable isHoverable>
+                <div style={{ padding: 0 }}>
+                  <img
+                    src={product.imageURL[0]}
+                    style={{ objectFit: "cover", width: "100%", height: "200px" }}
+                    alt={product.name}
+                  />
+                </div>
+                <div style={{ padding: '16px' }}>
+                  <h3>{product.name}</h3>
+                  <p>Price: ${product.totalPrice}</p>
+                  <p>Availability: {product.availability ? "In Stock" : "Out of Stock"}</p>
+                  <p>{product.description}</p>
+                  <p>Sizes: {product.sizes.join(", ")}</p>
+                  <p>Colors: {product.colors.join(", ")}</p>
+                  <p>Materials: {product.materials.join(", ")}</p>
+                  <p>Rating: {calculateAverageRating(product)}</p>
+                </div>
               </Card>
             </Link>
-            <div className="text-center mt-4 space-x-4">
-              <Button
-                onClick={() => handleAddToWishlist(product._id)}
-                className="text-sm text-white bg-purple-500 hover:bg-purple-600 focus:bg-purple-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
-              >
+            <div style={{ textAlign: 'center', marginTop: '8px' }}>
+              <Button onClick={() => handleAddToWishlist(product._id)} color="secondary" style={{ margin: '4px' }}>
                 Add to Wishlist
               </Button>
-              <Button
-                onClick={() => handleAddToFavorites(product._id)}
-                className="text-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:bg-yellow-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
-              >
+              <Button onClick={() => handleAddToFavorites(product._id)} color="warning" style={{ margin: '4px' }}>
                 Add to Favorites
               </Button>
-              <Button
-                onClick={() => handleViewDetails(product._id)}
-                className="text-sm text-white bg-gray-500 hover:bg-gray-600 focus:bg-gray-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
-              >
+              <Button onClick={() => handleViewDetails(product._id)} color="primary" style={{ margin: '4px' }}>
                 View Details
               </Button>
             </div>
           </div>
         ))}
       </div>
-      <div className="bg-gray-900 text-white py-6 text-center">
-        <p className="text-sm">© 2024 Your Website. All rights reserved.</p>
+      <div style={{ backgroundColor: "#1a1a1a", color: "white", padding: "1rem", textAlign: "center", marginTop: "2rem" }}>
+        <p>&copy; 2024 Your Website. All rights reserved.</p>
       </div>
     </DefaultLayout>
   );
