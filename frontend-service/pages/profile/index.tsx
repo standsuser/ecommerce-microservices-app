@@ -215,20 +215,29 @@ export default function PersonalInformationPage() {
                     <h1 className={title()}>Personal Information</h1>
                 </div>
                 {userData && (
-                    <div className="mt-4">
-                        <p><strong>ID:</strong> {userData.id}</p>
-                        <p><strong>First Name:</strong> {userData.first_name}</p>
-                        <p><strong>Last Name:</strong> {userData.last_name}</p>
-                        <p><strong>Email:</strong> {userData.email}</p>
-                        <p><strong>Company:</strong> {userData.company}</p>
-                        {/* Other personal information fields */}
+                    <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="bg-black shadow-lg rounded-lg p-6">
+                            <p><strong>ID:</strong> {userData.id}</p>
+                        </div>
+                        <div className="bg-black shadow-lg rounded-lg p-6">
+                            <p><strong>First Name:</strong> {userData.first_name}</p>
+                        </div>
+                        <div className="bg-black shadow-lg rounded-lg p-6">
+                            <p><strong>Last Name:</strong> {userData.last_name}</p>
+                        </div>
+                        <div className="bg-black shadow-lg rounded-lg p-6">
+                            <p><strong>Email:</strong> {userData.email}</p>
+                        </div>
+                        <div className="bg-black shadow-lg rounded-lg p-6">
+                            <p><strong>Company:</strong> {userData.company}</p>
+                        </div>
                     </div>
                 )}
                 {addresses.length > 0 && (
                     <div className="mt-4">
                         <h2 className={title()}>Address Information</h2>
                         {addresses.map(address => (
-                            <div key={address._id} className="border p-4 mb-4">
+                            <div key={address._id} className="border p-4 mb-4 rounded-lg shadow-md">
                                 <p><strong>Address Label:</strong> {address.addresslabel}</p>
                                 <p><strong>Apartment:</strong> {address.apartment}</p>
                                 <p><strong>Floor:</strong> {address.floor}</p>
@@ -241,7 +250,7 @@ export default function PersonalInformationPage() {
                                 <p><strong>State:</strong> {address.state}</p>
                                 <button
                                     onClick={() => handleDeleteAddress(address._id)}
-                                    className="bg-red-500 text-white px-4 py-2 mt-2"
+                                    className="bg-red-500 text-white px-4 py-2 mt-2 rounded"
                                 >
                                     Remove
                                 </button>
@@ -261,14 +270,14 @@ export default function PersonalInformationPage() {
                                     name={key}
                                     value={newAddress[key]}
                                     onChange={handleChange}
-                                    className="border px-4 py-2"
+                                    className="border px-4 py-2 rounded"
                                 />
                             </div>
                         ))}
                     </div>
                     <button
                         onClick={handleAddAddress}
-                        className="bg-blue-500 text-white px-4 py-2 mt-4"
+                        className="bg-blue-500 text-white px-4 py-2 mt-4 rounded"
                     >
                         Add Address
                     </button>
@@ -277,13 +286,13 @@ export default function PersonalInformationPage() {
                     <div className="mt-8">
                         <h2 className={title()}>Card Information</h2>
                         {cards.map(card => (
-                            <div key={card._id} className="border p-4 mb-4">
+                            <div key={card._id} className="border p-4 mb-4 rounded-lg shadow-md">
                                 <p><strong>Card Number:</strong> {card.cardNumber}</p>
                                 <p><strong>Card Holder Name:</strong> {card.cardHolderName}</p>
                                 <p><strong>Expiry Date:</strong> {card.expiryDate}</p>
                                 <button
                                     onClick={() => handleDeleteCard(card._id)}
-                                    className="bg-red-500 text-white px-4 py-2 mt-2"
+                                    className="bg-red-500 text-white px-4 py-2 mt-2 rounded"
                                 >
                                     Remove
                                 </button>
@@ -303,14 +312,14 @@ export default function PersonalInformationPage() {
                                     name={key}
                                     value={newCard[key]}
                                     onChange={handleChange}
-                                    className="border px-4 py-2"
+                                    className="border px-4 py-2 rounded"
                                 />
                             </div>
                         ))}
                     </div>
                     <button
                         onClick={handleAddCard}
-                        className="bg-blue-500 text-white px-4 py-2 mt-4"
+                        className="bg-blue-500 text-white px-4 py-2 mt-4 rounded"
                     >
                         Add Card
                     </button>
@@ -319,19 +328,19 @@ export default function PersonalInformationPage() {
                     <div className="mt-8">
                         <h2 className={title()}>My Reviews</h2>
                         {reviews.map(review => (
-                            <div key={review._id} className="border p-4 mb-4">
+                            <div key={review._id} className="border p-4 mb-4 rounded-lg shadow-md">
                                 <p><strong>Product Name:</strong> {review.productName}</p>
                                 <p><strong>Review:</strong> {review.review}</p>
                                 <p><strong>Rating:</strong> {review.rating}</p>
                                 <button
                                     onClick={() => handleEditReview(review._id, review)}
-                                    className="bg-blue-500 text-white px-4 py-2 mt-2"
+                                    className="bg-blue-500 text-white px-4 py-2 mt-2 rounded"
                                 >
                                     Edit
                                 </button>
                                 <button
                                     onClick={() => handleDeleteReview(review._id)}
-                                    className="bg-red-500 text-white px-4 py-2 mt-2"
+                                    className="bg-red-500 text-white px-4 py-2 mt-2 rounded"
                                 >
                                     Remove
                                 </button>
@@ -350,7 +359,7 @@ export default function PersonalInformationPage() {
                                 name="rating"
                                 value={newReview.rating}
                                 onChange={handleChange}
-                                className="border px-4 py-2"
+                                className="border px-4 py-2 rounded"
                             />
                             <label htmlFor="review" className="mb-1 capitalize">Review</label>
                             <textarea
@@ -358,11 +367,11 @@ export default function PersonalInformationPage() {
                                 name="review"
                                 value={newReview.review}
                                 onChange={handleChange}
-                                className="border px-4 py-2"
+                                className="border px-4 py-2 rounded"
                             />
                             <button
                                 onClick={handleUpdateReview}
-                                className="bg-green-500 text-white px-4 py-2 mt-4"
+                                className="bg-green-500 text-white px-4 py-2 mt-4 rounded"
                             >
                                 Update Review
                             </button>
