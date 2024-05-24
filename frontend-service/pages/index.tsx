@@ -89,8 +89,8 @@ const CatalogPage: React.FC = () => {
                         <h2 className="text-2xl font-bold mb-4">Categories</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {categories.map((category, index) => (
-    <div key={index} onClick={() => router.push(`/category/${category._id}`)}>
-        <Card isHoverable>
+                            <div key={index} onClick={() => router.push(`/category?categoryId=${category._id}`)}>
+                                        <Card isHoverable>
             <Image src={category.imageURL} alt={category.name} width="100%" height={140} />
             <CardFooter>
                 <div className="flex flex-col">
