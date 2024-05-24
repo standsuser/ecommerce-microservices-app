@@ -19,27 +19,20 @@ const bcrypt = require("bcrypt");
 import { v4 as uuidv4 } from 'uuid';
 import { text } from 'stream/consumers';
 
-
-
-
 @Injectable()
 export class UserService {
     private mailService: Mailservice;
     private readonly sessionService: SessionService;
-    private otpStore: Map<string, { otp: string, expires: Date }> = new Map();
+    private otpStore: Map<string, { otp: string, expires: Date, userData: CreateUserDto }> = new Map();
 
-
-
-  constructor(
-    @Inject('USER_MODEL')
-    private userModel: Model<User>,
-    private jwtService: JwtService,
-    private readonly producerService: ProducerService,
-  ) {
-    this.mailService = new Mailservice(
-      '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',
-    );
-  }
+    constructor(
+        @Inject('USER_MODEL')
+        private userModel: Model<User>,
+        private jwtService: JwtService,
+        private readonly producerService: ProducerService,
+    ) {
+        this.mailService = new Mailservice('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')
+    }
 
     async validateUser(email: string, password: string) {
         const user = await this.userModel.findOne({ email }).exec();
@@ -175,8 +168,8 @@ export class UserService {
         const hashedPassword = await bcrypt.hash(password, 10);
         await this.userModel.updateOne({ email }, { password: hashedPassword }).exec();
 
-    return "Password updated successfully" ;
-  }
+        return "Password updated successfully" ;
+    }
 
     async forgetPassword(email: string , otp: string , newPassword: string): Promise<void> {
         const existingUser = await this.getUserbyEmail(email);
@@ -194,29 +187,14 @@ export class UserService {
         }).exec();
     }
 
-    async resendOtp(email: string): Promise<void> {
-        const userOtpData = this.otpStore.get(email);
-        
-        if (!userOtpData) {
-            throw new Error('No OTP found for this email');
-        }
-
-        const newOtp = this.generateOtp();
-        const newOtpExpiration = new Date();
-        newOtpExpiration.setMinutes(newOtpExpiration.getMinutes() + 15); // OTP valid for 15 minutes
-
-        this.otpStore.set(email, { ...userOtpData, otp: newOtp, expires: newOtpExpiration });
-        await this.sendOtpEmail(email, newOtp);
-    }
-
     async sendPasswordResetEmail(email: string): Promise<void> {
         const otp = this.generateOtp();
         const otpExpiration = new Date();
         otpExpiration.setMinutes(otpExpiration.getMinutes() + 15); // OTP valid for 15 minutes
 
         this.otpStore.set(email, {
-          otp, expires: otpExpiration,
-          userData: new CreateUserDto
+            otp, expires: otpExpiration,
+            userData: new CreateUserDto
         });
         const resetLink = `http://localhost:5050/forgetPassword`;
         const mailOptions = {
@@ -231,6 +209,21 @@ export class UserService {
             Logger.error('Error sending password reset email:', error);
             throw new Error('Failed to send password reset email');
         }
+    }
+
+    async resendOtp(email: string): Promise<void> {
+        const userOtpData = this.otpStore.get(email);
+        
+        if (!userOtpData) {
+            throw new Error('No OTP found for this email');
+        }
+
+        const newOtp = this.generateOtp();
+        const newOtpExpiration = new Date();
+        newOtpExpiration.setMinutes(newOtpExpiration.getMinutes() + 15); // OTP valid for 15 minutes
+
+        this.otpStore.set(email, { ...userOtpData, otp: newOtp, expires: newOtpExpiration });
+        await this.sendOtpEmail(email, newOtp);
     }
 
     private generateOtp(): string {
