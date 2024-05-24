@@ -20,6 +20,9 @@ const ProductDetailsPage: React.FC = () => {
   const [basePrice, setBasePrice] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [rating, setRating] = useState<number>(0);
+  const [review, setReview] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
@@ -33,6 +36,7 @@ const ProductDetailsPage: React.FC = () => {
 
     if (productId) {
       fetchProductDetails(productId);
+      fetchProductReviews(productId);
     }
   }, []);
 
@@ -47,6 +51,44 @@ const ProductDetailsPage: React.FC = () => {
       setBasePrice(data.totalPrice || 0);
     } catch (error) {
       console.error(`Error fetching details for product ID ${productId}:`, error);
+    }
+  };
+
+  const fetchProductReviews = async (productId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/product/review/${productId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch product reviews");
+      }
+      const data = await response.json();
+      setReviews(data);
+    } catch (error) {
+      console.error(`Error fetching reviews for product ID ${productId}:`, error);
+    }
+  };
+
+  const handleAddReview = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/product/review/add/${product._id}/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ rating, review })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add review');
+      }
+
+      const newReview = await response.json();
+      setReviews([...reviews, newReview]);
+      setRating(0);
+      setReview("");
+      toast.success('Review added successfully');
+    } catch (error) {
+      console.error('Failed to add review:', error);
+      toast.error('Failed to add review');
     }
   };
 
@@ -71,11 +113,12 @@ const ProductDetailsPage: React.FC = () => {
         quantity: 1,
       };
 
-      if (userId) {
-        await addItemToCart(userId, product._id, addItemDto, true);
-      } else if (sessionId) {
-        await addItemToCart(sessionId, product._id, addItemDto, false);
+      const userOrSessionId = userId || sessionId;
+      if (!userOrSessionId) {
+        throw new Error('User or session ID not found');
       }
+
+      await addItemToCart(userOrSessionId, product._id, addItemDto, !!userId);
 
       toast.success('Item added to cart');
     } catch (error) {
@@ -211,6 +254,47 @@ const ProductDetailsPage: React.FC = () => {
             </div>
           </CardFooter>
         </Card>
+      </div>
+      <div className="mt-4">
+        <h4 className="text-center text-lg font-semibold">Reviews</h4>
+        {reviews.length > 0 ? (
+          reviews.map((review) => (
+            <div key={review._id} className="bg-gray-800 text-white p-4 rounded-lg mt-2">
+              <p className="text-sm">Rating: {review.rating} stars</p>
+              <p className="text-sm">Comment: {review.review}</p>
+              <p className="text-xs text-gray-400">Posted on: {new Date(review.reviewdate).toLocaleDateString()}</p>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500">No reviews yet</p>
+        )}
+      </div>
+      <div className="mt-4">
+        <h4 className="text-center text-lg font-semibold">Add a Review</h4>
+        <div className="flex flex-col items-center">
+          <label className="mb-2">
+            Rating:
+            <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="ml-2">
+              <option value={0}>Select rating</option>
+              {[1, 2, 3, 4, 5].map((num) => (
+                <option key={num} value={num}>{num}</option>
+              ))}
+            </select>
+          </label>
+          <textarea
+            value={review}
+            onChange={(e) => setReview(e.target.value)}
+            rows={4}
+            placeholder="Write your review here..."
+            className="mb-2 p-2 w-full border border-gray-300 rounded-md"
+          />
+          <Button
+            className="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
+            onClick={handleAddReview}
+          >
+            Submit Review
+          </Button>
+        </div>
       </div>
     </DefaultLayout>
   );
