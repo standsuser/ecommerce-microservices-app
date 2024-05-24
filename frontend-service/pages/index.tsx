@@ -101,6 +101,21 @@ const CatalogPage: React.FC = () => {
     </div>
 ))}
                         </div>
+                        <h2 className="text-2xl font-bold mb-4">Featured Listings</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {featuredListings.map((listing, index) => (
+                                <Card key={index} isHoverable>
+                                    <Image src={listing.imageURL} alt={listing.name} width="100%" height={140} />
+                                    <CardFooter>
+                                        <div className="flex flex-col">
+                                            <div><strong>Name:</strong> {listing.name}</div>
+                                            <div><strong>Rating:</strong> {listing.rating}</div>
+                                            <div><strong>Price:</strong> ${listing.totalPrice}</div>
+                                        </div>
+                                    </CardFooter>
+                                </Card>
+                            ))}
+                        </div>
                         <h2 className="text-2xl font-bold mb-4 mt-8">Top Offers</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {topOffers.map((offer, index) => (
