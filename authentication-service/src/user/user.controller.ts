@@ -25,6 +25,8 @@ export class UserController {
     return this.userService.sendPasswordResetEmail(command.email);
   }
 
+  
+
   @UseGuards(LocalAuthGuard)
   @MessagePattern('login')
   async login(command) {
@@ -57,6 +59,16 @@ export class UserController {
   @MessagePattern('updatePassword')
   async updatePassword(command) {
     return this.userService.updatePassword(command.email, command.password);
+  }
+
+  @MessagePattern('confirmOtp')
+  async confirmOtp(command) {
+    return this.userService.confirmOtp(command.email, command.otp);
+  }
+
+  @MessagePattern('resendOtp')
+  async resendOtp(command) {
+    return this.userService.resendOtp(command.email);
   }
 
 

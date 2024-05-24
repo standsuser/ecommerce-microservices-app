@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Logger, Param, Post, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Logger, Param, Patch, Post, Put } from '@nestjs/common';
 
 import { AppService } from './app.service';
 import { Roles } from './decorators/role.decorator';
@@ -183,6 +183,8 @@ export class AppController {
       }
     }
 
+  
+
     @Post('sendPasswordResetEmail')
     async sendPasswordResetEmail(@Body() { email }: { email: string }): Promise<any> {
       try {
@@ -191,6 +193,30 @@ export class AppController {
         return { success: true, response };
       } catch (error) {
         // Handle any errors thrown during password reset
+        return { success: false, message: error }; // Return error response
+      }
+    }
+
+    @Post('confirmOtp')
+    async confirmOtp(@Body() { email, otp }: { email: string, otp: string }): Promise<any> {
+      try {
+        // Attempt to confirm OTP
+        const response = await this.userService.confirmOtp(email, otp);
+        return { success: true, response };
+      } catch (error) {
+        // Handle any errors thrown during OTP confirmation
+        return { success: false, message: error }; // Return error response
+      }
+    }
+
+    @Post('resendOtp')
+    async resendOtp(@Body() { email }: { email: string }): Promise<any> {
+      try {
+        // Attempt to resend OTP
+        const response = await this.userService.resendOtp(email);
+        return { success: true, response };
+      } catch (error) {
+        // Handle any errors thrown during OTP resend
         return { success: false, message: error }; // Return error response
       }
     }
