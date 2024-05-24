@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, CardFooter, Image } from "@nextui-org/react";
 import DefaultLayout from "@/layouts/default";
+import { addItemToCart } from "@/pages/api/cartApi"; // Import the API function
 
 const sizePrices: { [key: string]: number } = { small: 5, medium: 10, large: 15 };
 const colorPrices: { [key: string]: number } = { red: 2, blue: 3, green: 4, black: 5, white: 6 };
@@ -12,6 +13,7 @@ const ProductDetailsPage: React.FC = () => {
   const [color, setColor] = useState<string>("black");
   const [material, setMaterial] = useState<string>("wood");
   const [basePrice, setBasePrice] = useState<number>(0);
+  const [userId, setUserId] = useState<string>("user123"); // Assume a user ID for now
 
   useEffect(() => {
     const fetchProductDetails = async (productId: string) => {
@@ -35,6 +37,25 @@ const ProductDetailsPage: React.FC = () => {
       fetchProductDetails(productId);
     }
   }, []);
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+
+    const addItemDto = {
+      size,
+      color,
+      material,
+      totalPrice,
+    };
+
+    try {
+      await addItemToCart(userId, product._id, addItemDto);
+      alert('Item added to cart successfully');
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+      alert('Failed to add item to cart');
+    }
+  };
 
   const totalPrice =
     basePrice +
@@ -90,6 +111,9 @@ const ProductDetailsPage: React.FC = () => {
               <p className="text-lg font-semibold mt-2">${totalPrice.toFixed(2)}</p>
             </div>
             <div className="flex flex-col space-y-2">
+              <Button onClick={handleAddToCart} className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm">
+                Add to Cart
+              </Button>
               <Button className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm">
                 Add to Wishlist
               </Button>
