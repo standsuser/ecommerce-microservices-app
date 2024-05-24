@@ -31,15 +31,13 @@ interface Review {
 const ProductPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<{ [key: string]: Review[] }>({});
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   const storedUserId = localStorage.getItem('user');
-  //   setUserId(storedUserId);
-  //   if (storedUserId) {
-  //     fetchFavoritesItems(storedUserId);
-  //   }
-  // }, []);
+  useEffect(() => {
+    setUserId(localStorage.getItem('user'));
+    setSessionId(localStorage.getItem('sessionId'));
+  }, []);
 
   useEffect(() => {
     const fetchProductsAndReviews = async () => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, CardFooter, Image } from "@nextui-org/react";
 import DefaultLayout from "@/layouts/default";
-import { addItemToCart } from "@/pages/api/cartApi"; // Import the API function
+import { addItemToCart } from "@/pages/api/cartApi"; // Make sure this function is correctly imported
 
 const sizePrices: { [key: string]: number } = { small: 5, medium: 10, large: 15 };
 const colorPrices: { [key: string]: number } = { red: 2, blue: 3, green: 4, black: 5, white: 6 };
@@ -13,22 +13,12 @@ const ProductDetailsPage: React.FC = () => {
   const [color, setColor] = useState<string>("black");
   const [material, setMaterial] = useState<string>("wood");
   const [basePrice, setBasePrice] = useState<number>(0);
-  const [userId, setUserId] = useState<string>("user123"); // Assume a user ID for now
+  const [userId, setUserId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProductDetails = async (productId: string) => {
-      try {
-        const response = await fetch(`http://localhost:3000/product/${productId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch product details");
-        }
-        const data = await response.json();
-        setProduct(data);
-        setBasePrice(data.totalPrice || 0);
-      } catch (error) {
-        console.error(`Error fetching details for product ID ${productId}:`, error);
-      }
-    };
+    setUserId(localStorage.getItem('user'));
+    setSessionId(localStorage.getItem('sessionId'));
 
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get("id");
@@ -38,22 +28,17 @@ const ProductDetailsPage: React.FC = () => {
     }
   }, []);
 
-  const handleAddToCart = async () => {
-    if (!product) return;
-
-    const addItemDto = {
-      size,
-      color,
-      material,
-      totalPrice,
-    };
-
+  const fetchProductDetails = async (productId: string) => {
     try {
-      await addItemToCart(userId, product._id, addItemDto);
-      alert('Item added to cart successfully');
+      const response = await fetch(`http://localhost:3000/product/${productId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch product details");
+      }
+      const data = await response.json();
+      setProduct(data);
+      setBasePrice(data.totalPrice || 0);
     } catch (error) {
-      console.error('Error adding item to cart:', error);
-      alert('Failed to add item to cart');
+      console.error(`Error fetching details for product ID ${productId}:`, error);
     }
   };
 
@@ -62,6 +47,33 @@ const ProductDetailsPage: React.FC = () => {
     sizePrices[size] +
     colorPrices[color] +
     materialPrices[material];
+
+  const handleAddToCart = async () => {
+    try {
+      const addItemDto = {
+        rentalDuration: 'N/A', // or some value if you have this information
+        isRented: false, // or true if you are renting
+        name: product.name,
+        amount_cents: totalPrice * 100, // converting dollars to cents
+        description: product.description,
+        color,
+        size,
+        material,
+        quantity: 1, // or the quantity you want to add
+      };
+
+      if (userId) {
+        await addItemToCart(userId, product._id, addItemDto);
+      } else if (sessionId) {
+        await addItemToCart(sessionId, product._id, addItemDto);
+      }
+
+      alert('Item added to cart');
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+      alert('Failed to add item to cart');
+    }
+  };
 
   if (!product) {
     return <p>Loading...</p>;
@@ -111,14 +123,17 @@ const ProductDetailsPage: React.FC = () => {
               <p className="text-lg font-semibold mt-2">${totalPrice.toFixed(2)}</p>
             </div>
             <div className="flex flex-col space-y-2">
-              <Button onClick={handleAddToCart} className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm">
-                Add to Cart
-              </Button>
               <Button className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm">
                 Add to Wishlist
               </Button>
               <Button className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm">
                 Add to Favorites
+              </Button>
+              <Button
+                className="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
+                onClick={handleAddToCart}
+              >
+                Add to Cart
               </Button>
             </div>
           </CardFooter>
