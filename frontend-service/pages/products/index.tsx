@@ -17,6 +17,15 @@ interface Product {
 
 const ProductPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // useEffect(() => {
+  //   const storedUserId = localStorage.getItem('user');
+  //   setUserId(storedUserId);
+  //   if (storedUserId) {
+  //     fetchFavoritesItems(storedUserId);
+  //   }
+  // }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,8 +43,35 @@ const ProductPage = () => {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = (productId: string) => {
-    console.log("Adding product to cart:", productId);
+  const handleAddToCart = async (productId: string, item: any) => {
+    try {
+      const payload = {
+        quantity: 1,
+        rentalDuration: "",
+        name: item.productDetails.name,
+        amount_cents: item.productDetails.totalPrice * 100, // multiply totalPrice by 1000
+        description: item.productDetails.description,
+        color: "red",
+        size: "medium",
+        material: "plastic"
+      };
+  
+      const response = await fetch(`http://localhost:3015/cart/${userId}/add-item/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to add item to cart');
+      }
+  
+      alert('Item added to cart successfully');
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+    }
   };
 
   const handleRent = (productId: string) => {
@@ -70,7 +106,7 @@ const ProductPage = () => {
               </Card>
               <div className="text-center mt-4 space-x-4">
                 <Button
-                  onClick={() => handleAddToCart(product._id)}
+                  onClick={() => handleAddToCart(product._id, product)}
                   className="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
                 >
                   Add to cart
