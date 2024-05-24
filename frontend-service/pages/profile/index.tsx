@@ -15,6 +15,7 @@ import {
   updateMyReview,
   addCard,
 } from "@/pages/api/profileApi";
+import { user } from "@nextui-org/theme";
 
 export default function PersonalInformationPage() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -196,24 +197,29 @@ const handleInputChange = (e) => {
     });
   };
   
- 
-  // Function to handle updating user info
+  const editedUserData = userData ? {
+    first_name: userData.first_name,
+    last_name: userData.last_name,
+    phone_number: userData.phone_number,
+    email: userData.email
+  } : {};
+  
   const handleUpdateUserInfo = async () => {
     const url = `http://localhost:3080/editProfile/${userId}`;
-
+  
     try {
       const response = await fetch(url, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
+            "Content-Type": "application/json",
+          },
+        body: JSON.stringify(editedUserData),
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to update user profile");
       }
-
+  
       const updatedUserData = await response.json(); // Assuming your backend returns updated user data
       // Handle the updatedUserData as needed
     } catch (error) {

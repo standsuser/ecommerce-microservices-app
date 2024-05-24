@@ -44,7 +44,7 @@ export class UserController {
     return this.userService.sendPasswordResetEmail(command.email);
   }
 
-  @Patch('/editProfile/:userId')
+  @Put('/editProfile/:userId')
   async editProfile(@Param('userId') userId: string, @Body() body: any) {
     return await this.userService.editProfile(userId, body);
   }

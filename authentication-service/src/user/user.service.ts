@@ -7,6 +7,8 @@ import { UserAlreadyExistsException } from '../exceptions/userAlreadyExists.exce
 import { Mailservice } from './Mail.service';
 import { SessionService } from '../session/session.service';
 import { ProducerService } from 'src/kafka/producer.service';
+import { Types } from 'mongoose';
+
 const bcrypt = require("bcrypt");
 
 
@@ -252,40 +254,37 @@ export class UserService {
         return true;
     }
 
-
     async editProfile(userId: string, body: any) {
         try {
           const allowedUpdates = ['first_name', 'last_name', 'phone_number', 'email'];
           const updates = Object.keys(body);
           const isValidOperation = updates.every(update => allowedUpdates.includes(update));
-    
+      
           if (!isValidOperation) {
             throw new BadRequestException('Invalid updates!');
           }
-    
+      
           const updateData = {};
           for (const key of allowedUpdates) {
             if (body[key] !== undefined) {
               updateData[key] = body[key];
             }
           }
-    
-          const updateResult = await this.userModel.updateOne({ _id: userId }, { $set: updateData }).exec();
-    
+      
+          const updateResult = await this.userModel.updateOne({ _id: new Types.ObjectId(userId) }, { $set: updateData }).exec();
+      
           if (updateResult.modifiedCount === 0) {
             throw new NotFoundException('Profile not found');
           }
-    
-          const updatedProfile = await this.userModel.findById(userId).exec();
+      
+          const updatedProfile = await this.userModel.findById(new Types.ObjectId(userId)).exec();
           if (!updatedProfile) {
             throw new NotFoundException('Profile not found');
           }
-    
+      
           return updatedProfile;
         } catch (error) {
           throw new NotFoundException('Profile not found');
         }
       }
-    
-    }
-
+}
