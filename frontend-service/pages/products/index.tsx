@@ -106,7 +106,7 @@ const ProductPage = () => {
 
   const handleAddToWishlist = async (productId: string) => {
     try {
-      const response = await fetch(`http://localhost:3003/user/addToWishlist/${userId}/${productId}`, {
+      const response = await fetch(`http://localhost:3003/user/addWishlist/${userId}/${productId}`, {
         method: 'POST'
       });
 
