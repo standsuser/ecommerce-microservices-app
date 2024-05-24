@@ -33,6 +33,7 @@
 		"react-bootstrap": "^2.10.2",
 		"react-dom": "^18.2.0",
 		"react-share": "^5.1.0",
+		"react-toastify": "^10.0.5",
 		"tailwind-variants": "^0.1.20",
 		"tailwindcss": "3.4.3",
 		"typescript": "5.0.4"

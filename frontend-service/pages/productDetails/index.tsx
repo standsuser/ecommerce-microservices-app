@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, CardFooter, Image } from "@nextui-org/react";
 import DefaultLayout from "@/layouts/default";
+import { addItemToCart } from "@/pages/api/cartApi";
+import { useRouter } from 'next/router';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const sizePrices: { [key: string]: number } = { small: 5, medium: 10, large: 15 };
 const colorPrices: { [key: string]: number } = { red: 2, blue: 3, green: 4, black: 5, white: 6 };
@@ -12,21 +16,15 @@ const ProductDetailsPage: React.FC = () => {
   const [color, setColor] = useState<string>("black");
   const [material, setMaterial] = useState<string>("wood");
   const [basePrice, setBasePrice] = useState<number>(0);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchProductDetails = async (productId: string) => {
-      try {
-        const response = await fetch(`http://localhost:3000/product/${productId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch product details");
-        }
-        const data = await response.json();
-        setProduct(data);
-        setBasePrice(data.totalPrice || 0);
-      } catch (error) {
-        console.error(`Error fetching details for product ID ${productId}:`, error);
-      }
-    };
+    const user = localStorage.getItem('user');
+    const sessionId = localStorage.getItem('sessionId');
+    setUserId(user);
+    setSessionId(sessionId);
 
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get("id");
@@ -36,11 +34,100 @@ const ProductDetailsPage: React.FC = () => {
     }
   }, []);
 
+  const fetchProductDetails = async (productId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/product/${productId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch product details");
+      }
+      const data = await response.json();
+      setProduct(data);
+      setBasePrice(data.totalPrice || 0);
+    } catch (error) {
+      console.error(`Error fetching details for product ID ${productId}:`, error);
+    }
+  };
+
   const totalPrice =
     basePrice +
     sizePrices[size] +
     colorPrices[color] +
     materialPrices[material];
+
+  const handleAddToCart = async () => {
+    try {
+      const addItemDto = {
+        rentalDuration: 'N/A',
+        isRented: false,
+        name: product.name,
+        amount_cents: totalPrice * 100, // converting dollars to cents
+        description: product.description,
+        color,
+        size,
+        material,
+        quantity: 1,
+      };
+
+      if (userId) {
+        await addItemToCart(userId, product._id, addItemDto, true);
+      } else if (sessionId) {
+        await addItemToCart(sessionId, product._id, addItemDto, false);
+      }
+
+      toast.success('Item added to cart');
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+      toast.error('Failed to add item to cart');
+    }
+  };
+
+  const handleRentToCart = async () => {
+    try {
+      const addItemDto = {
+        rentalDuration: 'N/A',
+        isRented: true,
+        name: product.name,
+        amount_cents: totalPrice * 100, // converting dollars to cents
+        description: product.description,
+        color,
+        size,
+        material,
+        quantity: 1,
+      };
+
+      if (userId) {
+        await addItemToCart(userId, product._id, addItemDto, true);
+      } else if (sessionId) {
+        await addItemToCart(sessionId, product._id, addItemDto, false);
+      }
+
+      toast.success('Item added to cart');
+    } catch (error) {
+      console.error('Failed to add item to cart:', error);
+      toast.error('Failed to add item to cart');
+    }
+  };
+
+  const handleRent = () => {
+    router.push(`/cart?productId=${product._id}`);
+  };
+
+  const handleAddToWishlist = async () => {
+    try {
+      const response = await fetch(`http://localhost:3003/user/addToWishlist/${userId}/${product._id}`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add item to wishlist');
+      }
+
+      toast.success('Item added to wishlist successfully');
+    } catch (error) {
+      console.error('Failed to add item to wishlist:', error);
+      toast.error('Failed to add item to wishlist');
+    }
+  };
 
   if (!product) {
     return <p>Loading...</p>;
@@ -48,6 +135,7 @@ const ProductDetailsPage: React.FC = () => {
 
   return (
     <DefaultLayout>
+      <ToastContainer />
       <div className="flex justify-center items-center mt-8">
         <Card shadow="sm">
           <Image
@@ -95,6 +183,18 @@ const ProductDetailsPage: React.FC = () => {
               </Button>
               <Button className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm">
                 Add to Favorites
+              </Button>
+              <Button
+                className="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
+                onClick={handleAddToCart}
+              >
+                Add to Cart
+              </Button>
+              <Button
+                className="text-sm text-white bg-green-500 hover:bg-green-600 focus:bg-green-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
+                onClick={handleRent}
+              >
+                Rent
               </Button>
             </div>
           </CardFooter>
