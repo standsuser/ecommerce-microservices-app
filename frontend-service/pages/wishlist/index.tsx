@@ -70,7 +70,7 @@ const Wishlist = () => {
         quantity: 1,
         rentalDuration: "",
         name: item.productDetails.name,
-        amount_cents: item.productDetails.totalPrice, // assuming totalPrice is in dollars
+        amount_cents: item.productDetails.totalPrice * 100, // multiply totalPrice by 1000
         description: item.productDetails.description,
         color: "red",
         size: "medium",

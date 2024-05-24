@@ -92,6 +92,13 @@ export default function Nbar() {
             </Button>
           </NavbarItem>
         )}
+                {isAuthenticated && (
+          <NavbarItem>
+            <Button as={Link} color="primary" href="favorites" variant="flat">
+              Favorites
+            </Button>
+          </NavbarItem>
+        )}
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
