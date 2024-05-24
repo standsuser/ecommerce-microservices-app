@@ -6,7 +6,7 @@ const sizePrices: { [key: string]: number } = { small: 5, medium: 10, large: 15 
 const colorPrices: { [key: string]: number } = { red: 2, blue: 3, green: 4, black: 5, white: 6 };
 const materialPrices: { [key: string]: number } = { plastic: 20, wood: 30, HDPEplastic: 40 };
 
-const ProductDetailsPage:React.FC = () => {
+const ProductDetailsPage: React.FC = () => {
   const [product, setProduct] = useState<any>(null);
   const [size, setSize] = useState<string>("medium");
   const [color, setColor] = useState<string>("black");
@@ -14,16 +14,10 @@ const ProductDetailsPage:React.FC = () => {
   const [basePrice, setBasePrice] = useState<number>(0);
 
   useEffect(() => {
-
     const fetchProductDetails = async (productId: string) => {
-          console.log("test1")
-
       try {
         const response = await fetch(`http://localhost:3000/product/${productId}`);
-        console.log("test2")
         if (!response.ok) {
-          console.log("test3")
-
           throw new Error("Failed to fetch product details");
         }
         const data = await response.json();
