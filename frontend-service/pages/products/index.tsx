@@ -11,7 +11,7 @@ interface Product {
   availability: boolean;
   description: string;
   sizes: string[];
-  colors: string[];
+  colors: string[]; 
   materials: string[];
 }
 
