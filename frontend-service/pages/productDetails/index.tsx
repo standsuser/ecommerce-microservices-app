@@ -9,12 +9,14 @@ import 'react-toastify/dist/ReactToastify.css';
 const sizePrices: { [key: string]: number } = { small: 5, medium: 10, large: 15 };
 const colorPrices: { [key: string]: number } = { red: 2, blue: 3, green: 4, black: 5, white: 6 };
 const materialPrices: { [key: string]: number } = { plastic: 20, wood: 30, HDPEplastic: 40 };
+const rentalPrices: { [key: string]: number } = { none: 0, '1 week': 20, '1 month': 50, '6 months': 100 };
 
 const ProductDetailsPage: React.FC = () => {
   const [product, setProduct] = useState<any>(null);
   const [size, setSize] = useState<string>("medium");
   const [color, setColor] = useState<string>("black");
   const [material, setMaterial] = useState<string>("wood");
+  const [rentalDuration, setRentalDuration] = useState<string>("none");
   const [basePrice, setBasePrice] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -52,7 +54,8 @@ const ProductDetailsPage: React.FC = () => {
     basePrice +
     sizePrices[size] +
     colorPrices[color] +
-    materialPrices[material];
+    materialPrices[material] +
+    rentalPrices[rentalDuration];
 
   const handleAddToCart = async () => {
     try {
@@ -84,7 +87,7 @@ const ProductDetailsPage: React.FC = () => {
   const handleRentToCart = async () => {
     try {
       const addItemDto = {
-        rentalDuration: 'N/A',
+        rentalDuration,
         isRented: true,
         name: product.name,
         amount_cents: totalPrice * 100, // converting dollars to cents
@@ -174,11 +177,20 @@ const ProductDetailsPage: React.FC = () => {
                     ))}
                   </select>
                 </label>
+                <label>
+                  Select Rental Duration:
+                  <select value={rentalDuration} onChange={(e) => setRentalDuration(e.target.value)}>
+                    <option value="none">None</option>
+                    <option value="1 week">1 week</option>
+                    <option value="1 month">1 month</option>
+                    <option value="6 months">6 months</option>
+                  </select>
+                </label>
               </div>
               <p className="text-lg font-semibold mt-2">${totalPrice.toFixed(2)}</p>
             </div>
             <div className="flex flex-col space-y-2">
-              <Button className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm">
+              <Button className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm" onClick={handleAddToWishlist}>
                 Add to Wishlist
               </Button>
               <Button className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm">
@@ -192,7 +204,7 @@ const ProductDetailsPage: React.FC = () => {
               </Button>
               <Button
                 className="text-sm text-white bg-green-500 hover:bg-green-600 focus:bg-green-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
-                onClick={handleRent}
+                onClick={handleRentToCart}
               >
                 Rent
               </Button>
