@@ -15,6 +15,21 @@ export const getAllProducts = async () => {
     return response.json();
 };
 
+export const addFavorite = async (userId: string, productId: string, selectedColor: string, selectedMaterial: string, selectedSize: string) => {
+    const response = await fetch(`${API_URL}/product/favorites`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, productId, selectedColor, selectedMaterial, selectedSize }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to add item to favorites');
+    }
+    return response.json();
+};
+
 export const getProductReviews = async (productId: string) => {
     const response = await fetch(`${API_URL}/product/review/${productId}`, {
         method: 'GET',

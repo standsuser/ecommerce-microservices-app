@@ -4,6 +4,16 @@ import DefaultLayout from "@/layouts/default";
 import { addItemToCart } from "@/pages/api/cartApi";
 import { useRouter } from 'next/router';
 import { toast, ToastContainer } from 'react-toastify';
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  TwitterShareButton,
+  TwitterIcon,
+  WhatsappShareButton,
+  WhatsappIcon,
+  LinkedinShareButton,
+  LinkedinIcon,
+} from 'react-share';
 import 'react-toastify/dist/ReactToastify.css';
 
 const sizePrices: { [key: string]: number } = { small: 5, medium: 10, large: 15 };
@@ -179,6 +189,9 @@ const ProductDetailsPage: React.FC = () => {
     return <p>Loading...</p>;
   }
 
+  const shareUrl = window.location.href;
+  const shareTitle = `Check out this product: ${product.name}`;
+
   return (
     <DefaultLayout>
       <ToastContainer />
@@ -231,6 +244,14 @@ const ProductDetailsPage: React.FC = () => {
                 </label>
               </div>
               <p className="text-lg font-semibold mt-2">${totalPrice.toFixed(2)}</p>
+              <div className="flex space-x-2 mt-4">
+                <TwitterShareButton url={shareUrl} title={shareTitle}>
+                  <TwitterIcon size={32} round />
+                </TwitterShareButton>
+                <WhatsappShareButton url={shareUrl} title={shareTitle} separator=":: ">
+                  <WhatsappIcon size={32} round />
+                </WhatsappShareButton>
+              </div>
             </div>
             <div className="flex flex-col space-y-2">
               <Button className="text-sm text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm" onClick={handleAddToWishlist}>
