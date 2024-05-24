@@ -4,6 +4,7 @@ import { Card, CardFooter, Image, Button } from "@nextui-org/react";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DefaultLayout from "@/layouts/default";
+import { getAllProducts, addFavorite } from "@/pages/api/productApi";
 import Link from "next/link";
 
 interface Product {
@@ -33,6 +34,19 @@ const CategoryPage: React.FC = () => {
 
   const calculateAverageRating = (product: Product) => {
     return product.totalReviews ? ((product.totalRating / product.totalReviews) * 10).toFixed(1) : "No ratings yet";
+  };
+
+  const handleAddToFavorites = async (productId: string) => {
+    try {
+      const selectedColor = "red";
+      const selectedMaterial = "plastic";
+      const selectedSize = "medium";
+      await addFavorite(userId as string, productId, selectedColor, selectedMaterial, selectedSize);
+      toast.success('Item added to favorites successfully');
+    } catch (error: any) {
+      console.error('Failed to add item to favorites:', error);
+      toast.error('Failed to add item to favorites');
+    }
   };
 
   const handleAddToCart = async (productId: string, item: Product) => {
@@ -142,16 +156,10 @@ const CategoryPage: React.FC = () => {
             </Link>
             <div className="text-center mt-4 space-x-4">
               <Button
-                onClick={() => handleAddToCart(product._id, product)}
-                className="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
+                onClick={() => handleAddToFavorites(product._id)}
+                className="text-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:bg-yellow-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
               >
-                Add to cart
-              </Button>
-              <Button
-                onClick={() => handleRent(product._id)}
-                className="text-sm text-white bg-green-500 hover:bg-green-600 focus:bg-green-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
-              >
-                Rent
+                Add to Favorites
               </Button>
               <Button
                 onClick={() => handleAddToWishlist(product._id)}

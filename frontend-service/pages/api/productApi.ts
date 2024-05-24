@@ -27,7 +27,7 @@ export const addFavorite = async (userId: string, productId: string, selectedCol
     if (!response.ok) {
         throw new Error('Failed to add item to favorites');
     }
-    return response.json();
+    return response.status;
 };
 
 export const getProductReviews = async (productId: string) => {
