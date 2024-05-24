@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button, Dropdown, DropdownTrigger, DropdownItem, DropdownMenu } from "@nextui-org/react";
 import { AcmeLogo } from "./AcmeLogo.jsx";
 import { getVer, getUser, setUser } from "@/auth";
@@ -7,8 +7,12 @@ import { title } from "./primitives.js";
 import { useRouter } from 'next/router';
 
 export default function Nbar() {
-  const isAuthenticated = getVer();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsAuthenticated(getVer());
+  }, [router.pathname]);
 
   const linkStyle = (isActive: boolean) => ({
     color: isActive ? 'purple' : 'inherit',
@@ -37,15 +41,15 @@ export default function Nbar() {
         <NavbarItem isActive={router.pathname === '/'}>
           <Link href="/" style={linkStyle(router.pathname === '/')} aria-current={router.pathname === '/' ? "page" : undefined}>Homepage</Link>
         </NavbarItem>
-        <NavbarItem isActive={router.pathname === '/products'}>
-          <Link href="/products" style={linkStyle(router.pathname === '/products')} aria-current={router.pathname === '/products' ? "page" : undefined}>Products</Link>
-        </NavbarItem>
-        {isAuthenticated && (
-          <NavbarItem isActive={router.pathname === '/profile'}>
-            <Link href="/profile" style={linkStyle(router.pathname === '/profile')} aria-current={router.pathname === '/profile' ? "page" : undefined}>Profile</Link>
+          <NavbarItem isActive={router.pathname === '/products'}>
+            <Link href="/products" style={linkStyle(router.pathname === '/products')} aria-current={router.pathname === '/products' ? "page" : undefined}>Products</Link>
           </NavbarItem>
-        )}
-      </NavbarContent>
+          {isAuthenticated && (
+            <NavbarItem isActive={router.pathname === '/profile'}>
+              <Link href="/profile" style={linkStyle(router.pathname === '/profile')} aria-current={router.pathname === '/profile' ? "page" : undefined}>Profile</Link>
+            </NavbarItem>
+          )}
+        </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
           <Button as={Link} color="primary" href="cart/cartPage" variant="flat">
