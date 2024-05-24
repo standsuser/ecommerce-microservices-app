@@ -163,6 +163,14 @@ export class UserService {
         return "Password updated successfully" ;
     }
 
+  async updateUserProfile(userId: string, updateData: Partial<User>): Promise<User> {
+    const updatedUser = await this.userModel.findByIdAndUpdate(userId, updateData, { new: true }).exec();
+    if (!updatedUser) {
+      throw new NotFoundException('User not found');
+    }
+    return updatedUser;
+  }
+
     async forgetPassword(email: string , otp: string , newPassword: string): Promise<void> {
         const existingUser = await this.getUserbyEmail(email);
         if (!existingUser) {

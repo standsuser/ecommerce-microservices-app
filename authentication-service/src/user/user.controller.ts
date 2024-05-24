@@ -1,9 +1,28 @@
-import { Controller, Get, InternalServerErrorException, Logger, NotFoundException, Param, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, InternalServerErrorException, Logger, NotFoundException, Param, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { LocalAuthGuard } from '../strategies/local-auth.guard';
 import { JwtAuthGuard } from '../strategies/jwt-auth.guard';
 import { ExistsAuthGuard } from '../strategies/exists-auth.guard';
+
+export interface User extends Document {
+  first_name?: string;
+  last_name?: string;
+  email: string;
+  phone_number?: string;
+  company?: string;
+  apartment?: string;
+  floor?: string;
+  street?: string;
+  building?: string;
+  postal_code?: string;
+  extra_description?: string;
+  city?: string;
+  country?: string;
+  addresslabel?: string;
+  state?: string;
+  password: string;
+}
 
 @Controller()
 export class UserController {
@@ -74,8 +93,20 @@ export class UserController {
 
 
 
-
-
+  @Put('update/:id')
+  async updateUserProfile(@Param('id') userId: string, @Body() updateData: Partial<User>) {
+    try {
+      const updatedUser = await this.userService.updateUserProfile(userId, updateData);
+      return updatedUser;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        Logger.error("Error updating user profile:", error);
+        throw new InternalServerErrorException("Failed to update user profile");
+      }
+    }
+  }
 
   @Get(':id')
   async getUserById(@Param('id') id: string) {

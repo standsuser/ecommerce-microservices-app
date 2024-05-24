@@ -251,3 +251,26 @@ export const updateMyReview = async (userId: string, reviewId: string, rating: n
     throw error;
   }
 };
+
+export const updateUserProfile = async (userId: string, updateData: any) => {
+  const url = `${AUTH_API_URL}/update/${userId}`;
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update user profile');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to update user profile', error);
+    throw error;
+  }
+};
