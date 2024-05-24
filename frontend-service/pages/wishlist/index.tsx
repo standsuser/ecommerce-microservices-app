@@ -33,14 +33,12 @@ const Wishlist = () => {
   const fetchProductDetails = async (wishlistItems: any[]) => {
     try {
       const productIds = wishlistItems.map(item => item.productid);
-      console.log('Fetching product details for productIds:', productIds); // Log productIds being fetched
       const responses = await Promise.all(
         productIds.map(productId =>
           fetch(`http://localhost:3000/product/${productId}`)
         )
       );
       const productsData = await Promise.all(responses.map(res => res.json()));
-      console.log('Received product details:', productsData); // Log received product details
       const updatedWishlistItems = wishlistItems.map((item, index) => ({
         ...item,
         productDetails: productsData[index],
@@ -50,7 +48,6 @@ const Wishlist = () => {
       console.error('Error fetching product details:', error);
     }
   };
-  
 
   const handleRemoveItem = async (wishlistId: string) => {
     try {
@@ -81,30 +78,28 @@ const Wishlist = () => {
   };
 
   return (
-    <div className="wishlist-container">
-      <h1 className="wishlist-title">Your Wishlist</h1>
-      <div className="wishlist-items">
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: 'purple' }}>
+      <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>Your Wishlist</h1>
+      <div>
         {wishlistItems.map(item => (
-          <div key={item._id} className="wishlist-item">
-          <div>
-            {item.productDetails?.imageURL && (
-              <img src={item.productDetails.imageURL} alt={item.name} className="wishlist-item-image" />
-            )}
+          <div key={item._id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '16px', marginBottom: '12px', backgroundColor: 'black' }}>
+            <div>
+              {item.productDetails?.imageURL && (
+                <img src={item.productDetails.imageURL} alt={item.productDetails.name} style={{ width: '100px', height: '100px', objectFit: 'contain', marginBottom: '12px' }} />
+              )}
+            </div>
+            <h2 style={{ fontSize: '18px', fontWeight: 'bold' }}>{item.productDetails?.name}</h2>
+            <p style={{ marginBottom: '8px' }}>{item.productDetails?.description}</p>
+            <p style={{ fontSize: '16px', marginBottom: '12px' }}>Price: ${(item.productDetails?.totalPrice)}</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Button color="primary" onClick={() => handleAddToCart(item.productid)}>
+                Add to Cart
+              </Button>
+              <Button color="primary" onClick={() => handleRemoveItem(item._id)}>
+                Remove from Wishlist
+              </Button>
+            </div>
           </div>
-          <h2 className="wishlist-item-name">NAME: {item.productDetails?.name}</h2>
-          <p className="wishlist-item-description">DESCRIPTION: {item.productDetails?.description}</p>
-         
-          <p className="wishlist-item-price">Price: ${(item.productDetails?.totalPrice)}</p>
-        
-          <div className="wishlist-item-actions">
-            <Button color="primary" onClick={() => handleAddToCart(item.productid)}>
-              Add to Cart
-            </Button>
-            <Button color="primary" onClick={() => handleRemoveItem(item._id)}>
-              Remove from Wishlist
-            </Button>
-          </div>
-        </div>
         ))}
       </div>
     </div>

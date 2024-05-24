@@ -78,6 +78,20 @@ async function run() {
       selectedMaterial: 'plastic',
       selectedColor: 'red',
       },
+      {
+        userid: new ObjectId('664e0895f80e44d1d008abf2'), // reference to the userId from addresses
+        productid: new ObjectId('664e3edd232fd5f39b78eec8'), // replace with actual product ID
+        selectedSize: 'medium',
+        selectedMaterial: 'plastic',
+        selectedColor: 'red',
+        },
+        {
+          userid: new ObjectId('664e0895f80e44d1d008abf2'), // reference to the userId from addresses
+          productid: new ObjectId('664e3edd232fd5f39b78eecc'), // replace with actual product ID
+          selectedSize: 'medium',
+          selectedMaterial: 'plastic',
+          selectedColor: 'red',
+          },
       // add more wishlists as needed
     ];
     const wishlistResult = await db.collection('wishlists').insertMany(wishlists);
