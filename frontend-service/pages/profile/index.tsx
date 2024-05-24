@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
-import { getUserProfile, getPrevOrders, getAddress, deleteAddress, addAddress, getCards, deleteCard, getMyReviews, deleteMyReview, updateMyReview } from "@/pages/api/profileApi";
+import { getUserProfile, getPrevOrders, getAddress, deleteAddress, addAddress, getCards, deleteCard, getMyReviews, deleteMyReview, updateMyReview, addCard } from "@/pages/api/profileApi";
 
 export default function PersonalInformationPage() {
     const [userId, setUserId] = useState<string | null>(null);
@@ -31,6 +31,11 @@ export default function PersonalInformationPage() {
     const [newReview, setNewReview] = useState<any>({
         rating: 0,
         review: ''
+    });
+    const [newCard, setNewCard] = useState<any>({
+        cardNumber: '',
+        cardHolderName: '',
+        expiryDate: ''
     });
 
     useEffect(() => {
@@ -144,10 +149,22 @@ export default function PersonalInformationPage() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setNewReview(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        if (name in newAddress) {
+            setNewAddress(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        } else if (name in newReview) {
+            setNewReview(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        } else if (name in newCard) {
+            setNewCard(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        }
     };
 
     const handleAddAddress = async () => {
@@ -173,6 +190,21 @@ export default function PersonalInformationPage() {
             });
         } catch (error) {
             console.error("Failed to add address:", error);
+        }
+    };
+
+    const handleAddCard = async () => {
+        if (!userId) return;
+        try {
+            const addedCard = await addCard(userId, newCard);
+            setCards([...cards, addedCard]);
+            setNewCard({
+                cardNumber: '',
+                cardHolderName: '',
+                expiryDate: ''
+            });
+        } catch (error) {
+            console.error("Failed to add card:", error);
         }
     };
 
@@ -259,6 +291,30 @@ export default function PersonalInformationPage() {
                         ))}
                     </div>
                 )}
+                <div className="mt-8">
+                    <h2 className={title()}>Add New Card</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        {Object.keys(newCard).map((key) => (
+                            <div key={key} className="flex flex-col">
+                                <label htmlFor={key} className="mb-1 capitalize">{key.replace('_', ' ')}</label>
+                                <input
+                                    type="text"
+                                    id={key}
+                                    name={key}
+                                    value={newCard[key]}
+                                    onChange={handleChange}
+                                    className="border px-4 py-2"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <button
+                        onClick={handleAddCard}
+                        className="bg-blue-500 text-white px-4 py-2 mt-4"
+                    >
+                        Add Card
+                    </button>
+                </div>
                 {reviews.length > 0 && (
                     <div className="mt-8">
                         <h2 className={title()}>My Reviews</h2>

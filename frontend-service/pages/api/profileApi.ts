@@ -140,6 +140,29 @@ export const getCards = async (userId: string) => {
   }
 };
 
+export const addCard = async (userId: string, card: any) => {
+  const url = `${PROFILE_API_URL}/user/addCard/${userId}`;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(card),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to add card');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to add card', error);
+    throw error;
+  }
+};
+
 export const deleteCard = async (userId: string, cardId: string) => {
   const url = `${PROFILE_API_URL}/user/deleteCard/${userId}?cardId=${cardId}`;
   try {
