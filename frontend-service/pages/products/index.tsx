@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardFooter, Image, Button } from "@nextui-org/react";
 import DefaultLayout from "@/layouts/default";
-import { getAllProducts } from "@/pages/api/productApi";
+import { getAllProducts, addFavorite } from "@/pages/api/productApi";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/router';
@@ -98,6 +98,19 @@ const ProductPage = () => {
     }
   };
 
+  const handleAddToFavorites = async (productId: string) => {
+    try {
+      const selectedColor = "red";
+      const selectedMaterial = "plastic";
+      const selectedSize = "medium";
+      await addFavorite(userId as string, productId, selectedColor, selectedMaterial, selectedSize);
+      toast.success('Item added to favorites successfully');
+    } catch (error: any) {
+      console.error('Failed to add item to favorites:', error);
+      toast.error('Failed to add item to favorites');
+    }
+  };
+
   const handleRent = (productId: string) => {
     router.push(`/cart?productId=${productId}`);
   };
@@ -137,22 +150,16 @@ const ProductPage = () => {
             </Link>
             <div className="text-center mt-4 space-x-4">
               <Button
-                onClick={() => handleAddToCart(product._id, product)}
-                className="text-sm text-white bg-blue-500 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
-              >
-                Add to cart
-              </Button>
-              <Button
-                onClick={() => handleRent(product._id)}
-                className="text-sm text-white bg-green-500 hover:bg-green-600 focus:bg-green-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
-              >
-                Rent
-              </Button>
-              <Button
                 onClick={() => handleAddToWishlist(product._id)}
                 className="text-sm text-white bg-purple-500 hover:bg-purple-600 focus:bg-purple-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
               >
                 Add to Wishlist
+              </Button>
+              <Button
+                onClick={() => handleAddToFavorites(product._id)}
+                className="text-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:bg-yellow-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
+              >
+                Add to Favorites
               </Button>
               <Button
                 onClick={() => handleViewDetails(product._id)}
