@@ -102,7 +102,7 @@ export default function Nbar() {
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
-          <Button as={Link} color="primary" href="cart/cartPage" variant="flat">
+          <Button as={Link} color="primary" href="cart" variant="flat">
             Cart
           </Button>
         </NavbarItem>
