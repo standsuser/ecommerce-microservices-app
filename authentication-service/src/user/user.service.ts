@@ -1,14 +1,7 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable no-var */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prefer-const */
-/* eslint-disable prettier/prettier */
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from '../interfaces/user';
 import { CreateUserDto } from '../dto/create.user.dto';
-import { LoginDto } from '../dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserAlreadyExistsException } from '../exceptions/userAlreadyExists.exception';
 import { Mailservice } from './Mail.service';
@@ -16,8 +9,7 @@ import { SessionService } from '../session/session.service';
 import { ProducerService } from 'src/kafka/producer.service';
 
 const bcrypt = require("bcrypt");
-import { v4 as uuidv4 } from 'uuid';
-import { text } from 'stream/consumers';
+
 
 @Injectable()
 export class UserService {
