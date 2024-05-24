@@ -5,7 +5,7 @@ import { button as buttonStyles } from "@nextui-org/theme";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
 import { Button, Progress, Card, Spacer, Input } from "@nextui-org/react";
-import { getUserAddresses, registerOrder, getPaymentKeyAndRedirect } from "@/pages/api/checkoutApi";
+import { getUserAddresses, registerOrder, cartRegisterOrder, getPaymentKeyAndRedirect } from "@/pages/api/checkoutApi";
 
 type CartItem = {
     id: string;
@@ -123,6 +123,11 @@ const CheckoutPage: React.FC = () => {
         try {
             const response = await registerOrder(orderData);
             setOrderId(response.orderId.id);
+            
+            if (userId) {
+                await cartRegisterOrder(userId, orderData);
+            }
+            
             setOrderSubmitted(true);
         } catch (error) {
             console.error('Failed to submit order:', error);

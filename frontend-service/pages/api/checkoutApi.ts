@@ -17,7 +17,7 @@ export const getUserAddresses = async (userId: string) => {
 };
 const PAYMENT_API_URL = 'http://localhost:3010';
 
-export const registerOrder = async (userId: string, orderData: any) => {
+export const registerOrder = async (orderData: any) => {
   const response = await fetch(`${PAYMENT_API_URL}/payment/register-order`, {
     method: 'POST',
     headers: {
@@ -29,7 +29,10 @@ export const registerOrder = async (userId: string, orderData: any) => {
   if (!response.ok) {
     throw new Error('Failed to register order');
   }
-  const hiddenResponse = await fetch(`http://localhost:3015/${userId}/createOrder`, {
+  return response.json();
+};
+export const cartRegisterOrder = async (userId: string, orderData: any) => {
+  const response = await fetch(`http://localhost:3015/cart/${userId}/createOrder`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -37,8 +40,11 @@ export const registerOrder = async (userId: string, orderData: any) => {
     body: JSON.stringify(orderData),
   });
 
+  if (!response.ok) {
+    throw new Error('Failed to register order in cart');
+  }
   return response.json();
-};
+}
 
 export const getPaymentKeyAndRedirect = async (orderId: string, paymentData: any) => {
   const API_URL = 'http://localhost:3010';
