@@ -32,6 +32,7 @@ export default function PersonalInformationPage() {
     email: '',
     phone_number: ''
   });
+  const [editing, setEditing] = useState(false);
 
   const [newAddress, setNewAddress] = useState<any>({
     addresslabel: "",
@@ -88,6 +89,17 @@ export default function PersonalInformationPage() {
       console.error("Failed to fetch user data:", error);
     }
   };
+
+// Function to handle input changes
+const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setUserData((prevUserData) => ({
+      ...prevUserData,
+      [id]: value,
+    }));
+  };
+
+
 
   const fetchUserOrders = async (userId: string) => {
     try {
@@ -183,12 +195,15 @@ export default function PersonalInformationPage() {
       review: currentReview.review,
     });
   };
-  const editUserProfile = async (userId: string, userData: any) => {
+  
+ 
+  // Function to handle updating user info
+  const handleUpdateUserInfo = async () => {
     const url = `http://localhost:3080/editProfile/${userId}`;
 
     try {
       const response = await fetch(url, {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -199,9 +214,11 @@ export default function PersonalInformationPage() {
         throw new Error("Failed to update user profile");
       }
 
-      return await response.json(); // Assuming your backend returns updated user data
+      const updatedUserData = await response.json(); // Assuming your backend returns updated user data
+      // Handle the updatedUserData as needed
     } catch (error) {
-      throw new Error("Failed to update user profile: " + error.message);
+      console.error("Failed to update user profile:", error.message);
+      // Handle error state or display an error message
     }
   };
 
@@ -276,37 +293,68 @@ export default function PersonalInformationPage() {
     <DefaultLayout>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="inline-block max-w-lg text-center justify-center mt-20">
-          <h1 className={title()}>Personal Information</h1>
+                  <h1 className={title()}>Personal Information</h1>
         </div>
         {userData && (
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="bg-black shadow-lg rounded-lg p-6">
-              <p>
-                <strong>First Name:</strong> {userData.first_name}
-              </p>
+              <label htmlFor="firstNameInput">
+                <strong>First Name:</strong>
+              </label>
+              <input
+                type="text"
+                id="first_name" // Change the id to match your backend model attribute
+                className="block w-full bg-gray-200 text-black border border-gray-300 rounded-lg p-2 mt-1"
+                value={userData.first_name}
+                onChange={handleInputChange} // Update state on change
+              />
             </div>
             <div className="bg-black shadow-lg rounded-lg p-6">
-              <p>
-                <strong>Last Name:</strong> {userData.last_name}
-              </p>
+              <label htmlFor="lastNameInput">
+                <strong>Last Name:</strong>
+              </label>
+              <input
+                type="text"
+                id="last_name" // Change the id to match your backend model attribute
+                className="block w-full bg-gray-200 text-black border border-gray-300 rounded-lg p-2 mt-1"
+                value={userData.last_name}
+                onChange={handleInputChange} // Update state on change
+              />
             </div>
             <div className="bg-black shadow-lg rounded-lg p-6">
-              <p>
-                <strong>Email:</strong> {userData.email}
-              </p>
+              <label htmlFor="emailInput">
+                <strong>Email:</strong>
+              </label>
+              <input
+                type="email"
+                id="email" // Change the id to match your backend model attribute
+                className="block w-full bg-gray-200 text-black border border-gray-300 rounded-lg p-2 mt-1"
+                value={userData.email}
+                onChange={handleInputChange} // Update state on change
+              />
             </div>
             <div className="bg-black shadow-lg rounded-lg p-6">
-              <p>
-                <strong>Phone Number:</strong> {userData.phone_number}
-              </p>
-            </div>
-            <div className="bg-black shadow-lg rounded-lg p-6">
-              <p>
-                <strong>Company:</strong> {userData.company}
-              </p>
+              <label htmlFor="phoneInput">
+                <strong>Phone Number:</strong>
+              </label>
+              <input
+                type="tel"
+                id="phone_number" // Change the id to match your backend model attribute
+                className="block w-full bg-gray-200 text-black border border-gray-300 rounded-lg p-2 mt-1"
+                value={userData.phone_number}
+                onChange={handleInputChange} // Update state on change
+              />
             </div>
           </div>
         )}
+        <div className="flex justify-center mt-4 md:mt-0 col-span-2">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+            onClick={handleUpdateUserInfo} // Call the function to handle update
+          >
+            Save Changes
+          </button>
+          </div>
         {addresses.length > 0 && (
           <div className="mt-4">
             <h2 className={title()}>Address Information</h2>
