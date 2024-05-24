@@ -4,15 +4,12 @@ import DefaultLayout from "@/layouts/default";
 import { addItemToCart } from "@/pages/api/cartApi";
 import { useRouter } from 'next/router';
 import { toast, ToastContainer } from 'react-toastify';
+import { getAllProducts } from "@/pages/api/productApi";
 import {
-  FacebookShareButton,
-  FacebookIcon,
   TwitterShareButton,
   TwitterIcon,
   WhatsappShareButton,
   WhatsappIcon,
-  LinkedinShareButton,
-  LinkedinIcon,
 } from 'react-share';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -26,6 +23,7 @@ const ProductDetailsPage: React.FC = () => {
   const [size, setSize] = useState<string>("medium");
   const [color, setColor] = useState<string>("black");
   const [material, setMaterial] = useState<string>("wood");
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [rentalDuration, setRentalDuration] = useState<string>("none");
   const [basePrice, setBasePrice] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
@@ -47,8 +45,22 @@ const ProductDetailsPage: React.FC = () => {
     if (productId) {
       fetchProductDetails(productId);
       fetchProductReviews(productId);
+      fetchAllProducts();  // Add this line
     }
   }, []);
+  const fetchAllProducts = async () => {
+    try {
+      const products = await getAllProducts();
+      setRelatedProducts(products);
+    } catch (error) {
+      console.error("Failed to fetch all products:", error);
+    }
+  };
+
+  const relatedProductsFiltered = relatedProducts.filter(
+    (relatedProduct) =>
+      relatedProduct.categoryId === product.categoryId && relatedProduct._id !== product._id
+  ).slice(0, 4);
 
   const fetchProductDetails = async (productId: string) => {
     try {
@@ -317,6 +329,29 @@ const ProductDetailsPage: React.FC = () => {
           </Button>
         </div>
       </div>
+      <div className="mt-8">
+        <h4 className="text-center text-lg font-semibold">Related Products</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {relatedProductsFiltered.map((relatedProduct) => (
+            <Card key={relatedProduct._id} shadow="sm">
+              <Image
+                alt="Related Product Image"
+                className="object-cover"
+                height={200}
+                src={relatedProduct.imageURL && relatedProduct.imageURL.length > 0 ? relatedProduct.imageURL[0] : "https://nextui.org/images/hero-card.jpeg"}
+                width="100%"
+              />
+              <CardFooter>
+                <div className="text-center">
+                  <p className="text-lg font-semibold">{relatedProduct.name}</p>
+                  <p className="text-sm text-gray-600">${relatedProduct.totalPrice}</p>
+                </div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+
     </DefaultLayout>
   );
 };
