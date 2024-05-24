@@ -15,33 +15,26 @@ import { Mailservice } from './Mail.service';
 import { SessionService } from '../session/session.service';
 import { ProducerService } from 'src/kafka/producer.service';
 
-const bcrypt = require("bcrypt");
-import { v4 as uuidv4 } from 'uuid';
+const bcrypt = require('bcrypt');
+// import { v4 as uuidv4 } from 'uuid';
 import { text } from 'stream/consumers';
-
-
-
 
 @Injectable()
 export class UserService {
-    private mailService: Mailservice;
-    private readonly sessionService: SessionService;
-    private otpStore: Map<string, { otp: string, expires: Date }> = new Map();
+  private mailService: Mailservice;
+  private readonly sessionService: SessionService;
+  private otpStore: Map<string, { otp: string; expires: Date }> = new Map();
 
-
-
-    constructor(
-        @Inject('USER_MODEL')
-        private userModel: Model<User>,
-        private jwtService: JwtService,
-        private readonly producerService: ProducerService,
-
-
-    ) {
-        this.mailService = new Mailservice('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')
-
-
-    }
+  constructor(
+    @Inject('USER_MODEL')
+    private userModel: Model<User>,
+    private jwtService: JwtService,
+    private readonly producerService: ProducerService,
+  ) {
+    this.mailService = new Mailservice(
+      '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',
+    );
+  }
 
   async validateUser(email: string, password: string) {
     const user = await this.userModel.findOne({ email }).exec();
@@ -69,13 +62,13 @@ export class UserService {
     try {
       const user = await this.userModel.findById(id).exec();
       if (!user) {
-        throw new NotFoundException("User not found");
+        throw new NotFoundException('User not found');
       }
       const { __v, ...userData } = user.toObject();
       return { id, ...userData };
     } catch (error) {
-      Logger.error("Error fetching user:", error);
-      throw new Error("Failed to fetch user");
+      Logger.error('Error fetching user:', error);
+      throw new Error('Failed to fetch user');
     }
   }
 
@@ -100,7 +93,7 @@ export class UserService {
       ...createUserDto,
       password: hashedPassword,
     });
-    const savedUser = await newUser.save() as User;
+    const savedUser = (await newUser.save()) as User;
     await this.sendVerificationEmail(savedUser.email);
     await this.sendUserRegisteredEvent(savedUser);
     return savedUser;
@@ -122,18 +115,38 @@ export class UserService {
     }
   }
 
-  
   private async sendUserRegisteredEvent(user: User): Promise<void> {
     const record = {
       topic: 'userRegistered',
       messages: [
         {
           value: JSON.stringify({
-            userId: user._id,
+            userid: user._id,
             email: user.email,
             first_name: user.first_name,
             last_name: user.last_name,
-            // Add other fields as needed
+            addresslabel: user.addresslabel,
+
+            apartment: user.apartment,
+
+            floor: user.floor,
+
+            street: user.street,
+
+            building: user.building,
+
+            phone_number: user.phonenumber,
+
+            postal_code: user.postal_code,
+
+            extra_description: user.extra_description,
+
+            city: user.city,
+
+            country: user.country,
+
+            state: user.state,
+
             eventType: 'UserRegistered',
           }),
         },
@@ -149,30 +162,39 @@ export class UserService {
 
   async updatePassword(email: string, password: string) {
     const hashedPassword = await bcrypt.hash(password, 10);
-    await this.userModel.updateOne({ email }, { password: hashedPassword }).exec();
+    await this.userModel
+      .updateOne({ email }, { password: hashedPassword })
+      .exec();
 
-    return "Password updated successfully" ;
+    return 'Password updated successfully';
   }
 
-  async forgetPassword(email: string , otp: string , newPassword: string): Promise<void> {
+  async forgetPassword(
+    email: string,
+    otp: string,
+    newPassword: string,
+  ): Promise<void> {
     const existingUser = await this.getUserbyEmail(email);
     if (!existingUser) {
       throw new NotFoundException('User not found');
     }
-    if (!await this.verifyOtp(email, otp)) {
+    if (!(await this.verifyOtp(email, otp))) {
       throw new Error('Invalid OTP');
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.userModel.updateOne({
-      email,
-    }, {
-      password: hashedPassword,
-    }).exec();
-
+    await this.userModel
+      .updateOne(
+        {
+          email,
+        },
+        {
+          password: hashedPassword,
+        },
+      )
+      .exec();
   }
 
-
-   async sendPasswordResetEmail(email: string): Promise<void> {
+  async sendPasswordResetEmail(email: string): Promise<void> {
     const otp = this.generateOtp();
     const otpExpiration = new Date();
     otpExpiration.setMinutes(otpExpiration.getMinutes() + 15); // OTP valid for 15 minutes
@@ -193,13 +215,9 @@ export class UserService {
     }
   }
 
-
-
   private generateOtp(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
-
-
 
   private async verifyOtp(email: string, otp: string): Promise<boolean> {
     const storedOtpData = this.otpStore.get(email);
@@ -223,9 +241,4 @@ export class UserService {
     this.otpStore.delete(email);
     return true;
   }
-
-  
 }
-
-
-

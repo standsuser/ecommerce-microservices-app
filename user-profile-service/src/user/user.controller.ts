@@ -72,5 +72,15 @@ export class UserController {
     return await this.userService.getWishlist(userId);
   }
 
+  @Post('/addwishlist/:userId/:productId')
+  async addToWishlist(
+    @Param('userId') userId: string,
+    @Param('productId') productId: string,
+  ) {
+    return await this.userService.addToWishlist(
+      userId,
+      productId,
+    );
+  }
 
 }
