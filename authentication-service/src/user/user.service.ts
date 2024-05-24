@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from '../interfaces/user';
 import { CreateUserDto } from '../dto/create.user.dto';
@@ -7,7 +7,6 @@ import { UserAlreadyExistsException } from '../exceptions/userAlreadyExists.exce
 import { Mailservice } from './Mail.service';
 import { SessionService } from '../session/session.service';
 import { ProducerService } from 'src/kafka/producer.service';
-
 const bcrypt = require("bcrypt");
 
 
@@ -133,7 +132,7 @@ export class UserService {
         return savedUser;
     }
 
-    private async sendUserRegisteredEvent(user: User): Promise<void> {
+    private async sendUserRegisteredEvent(user: User): Promise<void> { //not used anymore
         const record = {
             topic: 'userRegistered',
             messages: [
@@ -252,4 +251,41 @@ export class UserService {
         this.otpStore.delete(email);
         return true;
     }
-}
+
+
+    async editProfile(userId: string, body: any) {
+        try {
+          const allowedUpdates = ['first_name', 'last_name', 'phone_number', 'email'];
+          const updates = Object.keys(body);
+          const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+    
+          if (!isValidOperation) {
+            throw new BadRequestException('Invalid updates!');
+          }
+    
+          const updateData = {};
+          for (const key of allowedUpdates) {
+            if (body[key] !== undefined) {
+              updateData[key] = body[key];
+            }
+          }
+    
+          const updateResult = await this.userModel.updateOne({ _id: userId }, { $set: updateData }).exec();
+    
+          if (updateResult.modifiedCount === 0) {
+            throw new NotFoundException('Profile not found');
+          }
+    
+          const updatedProfile = await this.userModel.findById(userId).exec();
+          if (!updatedProfile) {
+            throw new NotFoundException('Profile not found');
+          }
+    
+          return updatedProfile;
+        } catch (error) {
+          throw new NotFoundException('Profile not found');
+        }
+      }
+    
+    }
+

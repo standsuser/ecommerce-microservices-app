@@ -26,7 +26,7 @@ export class UserService {
   async onModuleInit() {
     // Consume 'wishlist' topic for additions
     await this.consumerService.consume(
-      { topics: ['addtowishlist', 'userRegistered'] },
+      { topics: ['addtowishlist', 'userRegistered'] }, //not using userRegistered anymore --mariam 
       {
         eachMessage: async ({ topic, partition, message }) => {
           try {

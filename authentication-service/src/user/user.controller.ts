@@ -1,4 +1,4 @@
-import { Body, Controller, Get, InternalServerErrorException, Logger, NotFoundException, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, InternalServerErrorException, Logger, NotFoundException, Param, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { LocalAuthGuard } from '../strategies/local-auth.guard';
@@ -44,6 +44,10 @@ export class UserController {
     return this.userService.sendPasswordResetEmail(command.email);
   }
 
+  @Patch('/editProfile/:userId')
+  async editProfile(@Param('userId') userId: string, @Body() body: any) {
+    return await this.userService.editProfile(userId, body);
+  }
   
 
   @UseGuards(LocalAuthGuard)
