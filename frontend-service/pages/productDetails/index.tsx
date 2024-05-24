@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, CardFooter, Image } from "@nextui-org/react";
 import DefaultLayout from "@/layouts/default";
-import { addItemToCart } from "@/pages/api/cartApi"; // Make sure this function is correctly imported
+import { addItemToCart } from "@/pages/api/cartApi";
+import { useRouter } from 'next/router';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const sizePrices: { [key: string]: number } = { small: 5, medium: 10, large: 15 };
 const colorPrices: { [key: string]: number } = { red: 2, blue: 3, green: 4, black: 5, white: 6 };
@@ -15,6 +18,7 @@ const ProductDetailsPage: React.FC = () => {
   const [basePrice, setBasePrice] = useState<number>(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     setUserId(localStorage.getItem('user'));
@@ -51,15 +55,15 @@ const ProductDetailsPage: React.FC = () => {
   const handleAddToCart = async () => {
     try {
       const addItemDto = {
-        rentalDuration: 'N/A', // or some value if you have this information
-        isRented: false, // or true if you are renting
+        rentalDuration: 'N/A',
+        isRented: false,
         name: product.name,
         amount_cents: totalPrice * 100, // converting dollars to cents
         description: product.description,
         color,
         size,
         material,
-        quantity: 1, // or the quantity you want to add
+        quantity: 1,
       };
 
       if (userId) {
@@ -68,10 +72,31 @@ const ProductDetailsPage: React.FC = () => {
         await addItemToCart(sessionId, product._id, addItemDto);
       }
 
-      alert('Item added to cart');
+      toast.success('Item added to cart');
     } catch (error) {
       console.error('Failed to add item to cart:', error);
-      alert('Failed to add item to cart');
+      toast.error('Failed to add item to cart');
+    }
+  };
+
+  const handleRent = () => {
+    router.push(`/cart?productId=${product._id}`);
+  };
+
+  const handleAddToWishlist = async () => {
+    try {
+      const response = await fetch(`http://localhost:3003/user/addToWishlist/${userId}/${product._id}`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add item to wishlist');
+      }
+
+      toast.success('Item added to wishlist successfully');
+    } catch (error) {
+      console.error('Failed to add item to wishlist:', error);
+      toast.error('Failed to add item to wishlist');
     }
   };
 
@@ -81,6 +106,7 @@ const ProductDetailsPage: React.FC = () => {
 
   return (
     <DefaultLayout>
+      <ToastContainer />
       <div className="flex justify-center items-center mt-8">
         <Card shadow="sm">
           <Image
@@ -134,6 +160,12 @@ const ProductDetailsPage: React.FC = () => {
                 onClick={handleAddToCart}
               >
                 Add to Cart
+              </Button>
+              <Button
+                className="text-sm text-white bg-green-500 hover:bg-green-600 focus:bg-green-600 focus:outline-none px-4 py-2 rounded-full shadow-lg"
+                onClick={handleRent}
+              >
+                Rent
               </Button>
             </div>
           </CardFooter>
