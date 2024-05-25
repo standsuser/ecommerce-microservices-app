@@ -133,3 +133,4 @@ This project is an e-commerce platform built with modern technologies for a robu
 
 - **Paymob:**
   - Integrated for handling payments securely.
+!(homepage.png)
